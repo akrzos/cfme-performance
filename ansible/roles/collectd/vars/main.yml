@@ -1,0 +1,17 @@
+---
+#
+# Vars for collectd
+#
+
+collectd_packages:
+  cfme-vmdb:
+    - collectd
+    - collectd-postgresql
+    - collectd-apache
+  cfme:
+    - collectd
+    - collectd-apache
+  cfme-all-in-one:
+    - collectd
+    - collectd-postgresql
+    - collectd-apache

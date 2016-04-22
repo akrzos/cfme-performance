@@ -1,4 +1,7 @@
 *.py[cod]
 
+# Ansible files:
+*.retry
+
 # Swap files
 *.sw[po]

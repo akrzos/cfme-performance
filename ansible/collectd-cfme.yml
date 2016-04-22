@@ -2,3 +2,30 @@
 #
 # Playbook to install and configure collectd on cfme appliance
 #
+
+# Cloud Forms Database appliances
+- hosts: cfme-vmdb
+  remote_user: root
+  vars:
+    config_type: cfme-vmdb
+  roles:
+    - collectd
+  tags: cfme-vmdb
+
+# Cloud Forms Worker appliances
+- hosts: cfme
+  remote_user: root
+  vars:
+    config_type: cfme
+  roles:
+    - collectd
+  tags: cfme
+
+# Cloud Forms Database appliances with Graphite/Grafana
+- hosts: cfme-all-in-one
+  remote_user: root
+  vars:
+    config_type: cfme-all-in-one
+  roles:
+    - collectd
+  tags: cfme-all-in-one

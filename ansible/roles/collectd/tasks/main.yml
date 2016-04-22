@@ -1,0 +1,82 @@
+---
+#
+# Install/setup collectd
+#
+
+- name: Check for epel
+  shell: rpm -qa | grep -q epel-release
+  ignore_errors: true
+  register: epel_installed
+
+- name: Install epel repo
+  command: rpm -ivh {{ epel7_rpm }}
+  become: true
+  when: epel_installed.rc != 0
+
+- name: Install collectd rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items: "{{collectd_packages[config_type]}}"
+
+- name: Copy cfme-http.conf for apache monitoring
+  copy:
+    src=cfme-http.conf
+    dest=/etc/httpd/conf.d/cfme-http.conf
+    owner=root
+    group=root
+    mode=0644
+  when: apache_monitoring
+  notify:
+    - restart httpd
+
+- name: Configure collectd.conf
+  template:
+    src={{config_type}}.collectd.conf.j2
+    dest=/etc/collectd.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Check for collectd permissive
+  shell: semodule -l | grep -q permissive_collectd_t
+  become: true
+  register: collectd_permissive
+  ignore_errors: true
+  changed_when: false
+
+- name: Set permissive for collectd
+  shell: semanage permissive -a collectd_t
+  become: true
+  when: collectd_permissive.rc != 0
+  ignore_errors: true
+
+- name: Collectd policy customization
+  copy:
+    src=custom-collectd.pp
+    dest=/root/custom-collectd.pp
+    owner=root
+    group=root
+    mode=644
+  become: true
+
+- name: Check for collectd custom
+  shell: semodule -l | grep -q custom-collectd
+  become: true
+  register: collectd_custom
+  ignore_errors: true
+  changed_when: false
+
+- name: Set custom policy for collectd
+  shell: semodule -i /root/custom-collectd.pp
+  become: true
+  when: collectd_custom.rc != 0
+
+- name: Setup collectd service
+  service: name=collectd state=restarted enabled=true
+  become: true
+
+- name: Disable EPEL
+  shell: rpm -e epel-release
+  ignore_errors: true
+  become: true

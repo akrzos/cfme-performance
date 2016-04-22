@@ -1,5 +1,16 @@
 ---
+###############################
+# Collectd Configuration Items
+###############################
+apache_monitoring: false
+collectd_interval: 10
+graphite_host: 1.1.1.1
+graphite_prefix: manageiq
 
+
+###############################
+# Repos
+###############################
 repos:
   rhel7:
     baseurl: http://download.example.com/rel-eng/repos/rhel-7.2-z-candidate/x86_64/
@@ -8,5 +19,7 @@ repos:
   rhel7_optional:
     baseurl: http://download.example.com/released/RHEL-7/7.2/Server-optional/$basearch/os/
 
+###############################
 # RPMs:
+###############################
 epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm

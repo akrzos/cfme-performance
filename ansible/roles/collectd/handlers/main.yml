@@ -1,0 +1,7 @@
+---
+#
+# Handlers for collectd
+#
+
+- name: restart httpd
+  service: name=httpd state=restarted
