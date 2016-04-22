@@ -1,0 +1,15 @@
+---
+#
+# Setup second interface with static ip address
+#
+
+- name: Deploy ifcfg-eth1
+  template:
+    src=ifcfg-eth1.j2
+    dest=/etc/sysconfig/network-scripts/ifcfg-eth1
+    owner=root
+    group=root
+    mode=0644
+
+- name: Bounce interface
+  shell: "ifdown eth1; ifup eth1"

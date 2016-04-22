@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to Reset Cloud Forms VMDB
+# Tasks to Reset Cloud Forms VMDB
 #
 
 - name: Stop services

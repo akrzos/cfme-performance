@@ -1,0 +1,9 @@
+---
+#
+# Playbook to configure 2nd network interface to cfme appliance
+#
+
+- hosts: cfme-vmdb,cfme,cfme-all-in-one
+  remote_user: root
+  roles:
+    - setup-interface

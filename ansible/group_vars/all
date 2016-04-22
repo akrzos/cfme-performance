@@ -7,12 +7,26 @@ collectd_interval: 10
 graphite_host: 1.1.1.1
 graphite_prefix: manageiq
 
+
 ###############################
 # CFME items
 ###############################
 dev_v2_key: http://download.example.com/v2_key/v2_key.dev
 setup_vmdb_region: 0
 vmdb_password: smartvm
+
+
+###############################
+# CFME 2nd interface ip address
+###############################
+# Map inventory to ip addresses
+ip_addresses:
+  inventory_hostname1:
+    ipaddr: 172.16.10.10
+    netmask: 255.255.255.0
+  inventory_hostname2:
+    ipaddr: 172.16.10.11
+    netmask: 255.255.255.0
 
 ###############################
 # Repos
@@ -24,6 +38,7 @@ repos:
     baseurl: http://download.example.com/rel-eng/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/x86_64/os/
   rhel7_optional:
     baseurl: http://download.example.com/released/RHEL-7/7.2/Server-optional/$basearch/os/
+
 
 ###############################
 # RPMs:
