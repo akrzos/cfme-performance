@@ -1,0 +1,12 @@
+---
+#
+# Setup cfme/miq repos
+#
+
+- name: Install Repo File
+  template:
+    src=cfme-performance.repo.j2
+    dest=/etc/yum.repos.d/cfme-performance.repo
+    owner=root
+    group=root
+    mode=0644

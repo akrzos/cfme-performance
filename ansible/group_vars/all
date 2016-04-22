@@ -1,0 +1,12 @@
+---
+
+repos:
+  rhel7:
+    baseurl: http://download.example.com/rel-eng/repos/rhel-7.2-z-candidate/x86_64/
+  rhscl7:
+    baseurl: http://download.example.com/rel-eng/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/x86_64/os/
+  rhel7_optional:
+    baseurl: http://download.example.com/released/RHEL-7/7.2/Server-optional/$basearch/os/
+
+# RPMs:
+epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm

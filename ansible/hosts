@@ -1,0 +1,5 @@
+# CFME VMDB appliances
+[cfme-vmdb]
+
+# CFME worker appliances
+[cfme]
