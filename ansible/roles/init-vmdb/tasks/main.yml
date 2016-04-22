@@ -1,0 +1,14 @@
+---
+#
+# Setup vmdb on cfme-vmdb appliance
+#
+
+- name: Install dev v2_key
+  get_url:
+    url={{dev_v2_key}}
+    dest=/var/www/miq/vmdb/certs/v2_key
+    mode=0400
+
+# Can be run against same machine multiple times without harm (5.6)
+- name: Setup vmdb
+  command: appliance_console_cli --region {{setup_vmdb_region}} --internal -p {{vmdb_password}}

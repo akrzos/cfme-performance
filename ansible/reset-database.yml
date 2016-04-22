@@ -2,3 +2,8 @@
 #
 # Playbook to reset cfme appliance database
 #
+
+- hosts: cfme-vmdb,cfme-all-in-one
+  remote_user: root
+  roles:
+    - reset-database

@@ -2,3 +2,8 @@
 #
 # Playbook to setup database on vmdb appliances
 #
+
+- hosts: cfme-vmdb
+  remote_user: root
+  roles:
+    - init-vmdb

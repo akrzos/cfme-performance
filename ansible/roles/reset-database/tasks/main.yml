@@ -1,0 +1,31 @@
+---
+#
+# Playbook to Reset Cloud Forms VMDB
+#
+
+- name: Stop services
+  service: name={{item}} state=stopped
+  with_items:
+    - evmserverd
+    - collectd
+
+- name: Drop FS caches
+  shell: sync; sync; echo 3 > /proc/sys/vm/drop_caches
+
+- name: Restart Postgres
+  service: name=rh-postgresql94-postgresql state=restarted
+
+- name: Remove replication
+  shell: "cd /var/www/miq/vmdb; bin/rake evm:dbsync:local_uninstall"
+
+- name: Reset database
+  shell: "cd /var/www/miq/vmdb; DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rake evm:db:reset"
+
+- name: Seed database
+  shell: "cd /var/www/miq/vmdb; bin/rake db:seed"
+
+- name: Start services
+  service: name={{item}} state=started
+  with_items:
+    - evmserverd
+    - collectd
