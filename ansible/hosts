@@ -3,3 +3,6 @@
 
 # CFME worker appliances
 [cfme]
+
+# CFME All-In-One Performance Monitored appliances
+[cfme-all-in-one]
