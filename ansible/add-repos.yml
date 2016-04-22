@@ -3,7 +3,7 @@
 # Playbook to add necessary repos to cfme appliance
 #
 
-- hosts: cfme-vmdb
+- hosts: cfme-vmdb,cfme,cfme-all-in-one
   remote_user: root
   roles:
     - repos
