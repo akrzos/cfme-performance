@@ -11,9 +11,12 @@ graphite_prefix: manageiq
 ###############################
 # CFME items
 ###############################
-dev_v2_key: http://download.example.com/v2_key/v2_key.dev
 setup_vmdb_region: 0
+use_separate_vmdb_disk: true
+vmdb_disk: /dev/vdb
 vmdb_password: smartvm
+# Use false if patching before init-vmdb playbook/role
+proctitle_restart: false
 
 
 ###############################

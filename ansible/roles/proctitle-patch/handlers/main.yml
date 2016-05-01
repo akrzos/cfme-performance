@@ -7,3 +7,4 @@
   service:
     name: evmserverd
     state: restarted
+  when: proctitle_restart

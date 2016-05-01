@@ -1,0 +1,7 @@
+---
+#
+# Change hostname on appliance
+#
+
+- name: Set hostname
+  hostname: name="{{inventory_hostname}}"

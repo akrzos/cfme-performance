@@ -3,5 +3,8 @@
 # Ansible files:
 *.retry
 
+# Ignore local copy of ansible hosts file
+ansible/hosts.local
+
 # Swap files
 *.sw[po]
