@@ -4,6 +4,5 @@
 #
 
 - hosts: sshkey
-  tasks:
-    - name: Setup | authorized key upload
-      authorized_key: user=root key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  roles:
+    - sshkey

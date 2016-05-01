@@ -1,0 +1,21 @@
+---
+#
+# Post deployment of appliance automation
+#
+
+
+- hosts: sshkey
+  roles:
+    - sshkey
+
+- hosts: cfme-vmdb
+  remote_user: root
+  vars:
+    config_type: cfme-vmdb
+  roles:
+    - hostname
+    - repos
+    - config-interface
+    - proctitle-patch
+    - init-vmdb
+    - collectd

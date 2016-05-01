@@ -1,6 +1,6 @@
 ---
 #
-# Setup second interface with static ip address
+# Configure second interface with static ip address
 #
 
 - name: Deploy ifcfg-eth1

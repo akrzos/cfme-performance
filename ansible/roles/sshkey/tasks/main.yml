@@ -1,0 +1,7 @@
+---
+#
+# Task to deploy current user's ssh key into an appliances authorized_key file
+#
+
+- name: Setup | authorized key upload
+  authorized_key: user=root key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
