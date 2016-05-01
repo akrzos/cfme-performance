@@ -1,0 +1,9 @@
+---
+#
+# Handlers for proctitle-patch
+#
+
+- name: restart evmserverd
+  service:
+    name: evmserverd
+    state: restarted

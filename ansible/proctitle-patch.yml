@@ -1,0 +1,9 @@
+---
+#
+# Playbook to apply patch for process titles on 5.5.x cfme appliances
+#
+
+- hosts: cfme-vmdb,cfme,cfme-all-in-one
+  remote_user: root
+  roles:
+    - proctitle-patch

@@ -1,0 +1,44 @@
+---
+#
+# Patches 5.5 appliances to display process titles as the actual worker names
+#
+# Example:
+# ps afx | grep -E "[Ww]orkers|[pP]ID"
+#  PID TTY      STAT   TIME COMMAND
+# 3057 ?        Sl     0:24 /var/www/miq/vmdb/lib/workers/bin/evm_server.rb
+# 3221 ?        SNl    0:09  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3224 ?        SNl    0:09  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3227 ?        SNl    0:08  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3230 ?        SNl    0:10  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3233 ?        SNl    0:11  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3236 ?        SNl    0:09  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3239 ?        SNl    0:09  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+# 3242 ?        SNl    0:09  \_ /var/www/miq/vmdb/lib/workers/bin/worker.rb
+#
+# Becomes:
+#  PID TTY      STAT   TIME COMMAND
+# 4844 ?        Sl     0:17 /var/www/miq/vmdb/lib/workers/bin/evm_server.rb
+# 5014 ?        SNl    0:10  \_ MiqGenericWorker id: 22, queue: generic
+# 5017 ?        SNl    0:10  \_ MiqGenericWorker id: 23, queue: generic
+# 5020 ?        SNl    0:10  \_ MiqPriorityWorker id: 24, queue: generic
+# 5023 ?        SNl    0:10  \_ MiqPriorityWorker id: 25, queue: generic
+# 5026 ?        SNl    0:08  \_ MiqReportingWorker id: 26, queue: reporting
+# 5029 ?        SNl    0:08  \_ MiqReportingWorker id: 27, queue: reporting
+# 5032 ?        SNl    0:09  \_ MiqScheduleWorker id: 28
+# 5035 ?        SNl    0:08  \_ MiqUiWorker id: 29, uri: http://127.0.0.1:3000
+# 5044 ?        SNl    0:08  \_ MiqWebServiceWorker id: 30, uri: http://127.0.0.1:4000
+
+- name: Determine CFME version
+  shell: cat /var/www/miq/vmdb/VERSION | grep -q "^5.5"
+  register: is55
+  changed_when: false
+  ignore_errors: true
+
+- name: Deploy patched runner.rb
+  copy:
+    src: runner.rb
+    dest: /var/www/miq/vmdb/app/models/miq_worker/runner.rb
+    backup: true
+  when: "{{is55.rc}} == 0"
+  notify:
+    - restart evmserverd

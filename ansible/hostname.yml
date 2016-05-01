@@ -1,0 +1,10 @@
+---
+#
+# Playbook to set hostname on cfme appliance
+#
+
+- hosts: cfme-vmdb,cfme,cfme-all-in-one
+  remote_user: root
+  tasks:
+    - name: Set hostname
+      hostname: name="{{inventory_hostname}}"
