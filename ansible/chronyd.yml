@@ -1,0 +1,9 @@
+---
+#
+# Playbook to set chronyd time servers for CFME appliances
+#
+
+- hosts: cfme-vmdb,cfme,cfme-all-in-one
+  remote_user: root
+  roles:
+    - chronyd

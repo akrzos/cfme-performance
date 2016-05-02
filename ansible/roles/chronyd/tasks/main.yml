@@ -1,0 +1,11 @@
+---
+#
+# Setup chronyd time servers
+#
+
+- name: Set up chronyd config file
+  template:
+    src: chronyd.conf.j2
+    dest: /etc/chrony.conf
+  notify:
+    - restart chronyd

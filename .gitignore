@@ -6,5 +6,8 @@
 # Ignore local copy of ansible hosts file
 ansible/hosts.local
 
+# Ignore local copy of ansible vars file
+ansible/group_vars/all.local.yml
+
 # Swap files
 *.sw[po]

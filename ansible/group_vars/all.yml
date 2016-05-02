@@ -18,6 +18,10 @@ vmdb_password: smartvm
 # Use false if patching before init-vmdb playbook/role
 proctitle_restart: false
 
+chrony_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
 
 ###############################
 # CFME 2nd interface ip address

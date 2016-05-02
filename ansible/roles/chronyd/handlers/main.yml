@@ -1,0 +1,7 @@
+---
+#
+# Handlers for chronyd
+#
+
+- name: restart chronyd
+  service: name=chronyd enabled=true state=restarted
