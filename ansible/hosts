@@ -2,12 +2,8 @@
 # CFME-Performance hosts file
 #
 
+# Appliances to transfer ssh key to for password-less ssh
 [sshkey]
-
-[sshkey:vars]
-ansible_connection=ssh
-ansible_ssh_user=root
-ansible_ssh_pass=smartvm
 
 # CFME VMDB appliances
 [cfme-vmdb]
