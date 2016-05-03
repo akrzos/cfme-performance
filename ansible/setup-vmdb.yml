@@ -5,5 +5,7 @@
 
 - hosts: cfme-vmdb
   remote_user: root
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - init-vmdb

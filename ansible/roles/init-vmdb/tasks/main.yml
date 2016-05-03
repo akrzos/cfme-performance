@@ -12,7 +12,7 @@
 #
 # Sets up vmdb on vda.  Usually this is a bad idea as /var only has ~2GiB space
 #
-- name: Setup vmdb interal to appliance image disk
+- name: Setup vmdb internal to appliance image disk
   when: not use_separate_vmdb_disk
   command: appliance_console_cli >
     --internal

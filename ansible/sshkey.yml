@@ -4,5 +4,7 @@
 #
 
 - hosts: sshkey
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - sshkey

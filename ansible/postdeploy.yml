@@ -3,8 +3,9 @@
 # Post deployment of appliance automation
 #
 
-
 - hosts: sshkey
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - sshkey
 
@@ -12,6 +13,8 @@
   remote_user: root
   vars:
     config_type: cfme-vmdb
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - hostname
     - chronyd

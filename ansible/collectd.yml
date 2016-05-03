@@ -8,6 +8,8 @@
   remote_user: root
   vars:
     config_type: cfme-vmdb
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - collectd
   tags: cfme-vmdb
@@ -17,6 +19,8 @@
   remote_user: root
   vars:
     config_type: cfme
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - collectd
   tags: cfme
@@ -26,6 +30,8 @@
   remote_user: root
   vars:
     config_type: cfme-all-in-one
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - collectd
   tags: cfme-all-in-one

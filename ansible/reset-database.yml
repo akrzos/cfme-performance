@@ -5,5 +5,7 @@
 
 - hosts: cfme-vmdb,cfme-all-in-one
   remote_user: root
+  vars_files:
+    - group_vars/all.local.yml
   roles:
     - reset-database
