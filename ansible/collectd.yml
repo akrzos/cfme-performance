@@ -5,6 +5,7 @@
 
 # Cloud Forms Database appliances
 - hosts: cfme-vmdb
+  gather_facts: false
   remote_user: root
   vars:
     config_type: cfme-vmdb
@@ -16,6 +17,7 @@
 
 # Cloud Forms Worker appliances
 - hosts: cfme
+  gather_facts: false
   remote_user: root
   vars:
     config_type: cfme
@@ -27,6 +29,7 @@
 
 # Cloud Forms Database appliances with Graphite/Grafana
 - hosts: cfme-all-in-one
+  gather_facts: false
   remote_user: root
   vars:
     config_type: cfme-all-in-one

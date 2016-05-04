@@ -5,4 +5,4 @@
 
 ansible_connection: ssh
 ansible_user: root
-ansible_pass: smartvm
+ansible_ssh_pass: smartvm

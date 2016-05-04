@@ -13,3 +13,6 @@
 
 # CFME All-In-One Performance Monitored appliances
 [cfme-all-in-one]
+
+# RHEVM cluster to host appliances
+[rhevm]

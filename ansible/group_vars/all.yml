@@ -1,5 +1,17 @@
 ---
 ###############################
+# Upload/Deploy Template
+###############################
+rhevm_username: admin@internal
+rhevm_password: smartvm
+export_datastore: export
+
+# Template:
+appliance_template: http://manageiq.org/download/manageiq-ovirt-capablanca-2.ova
+template_dest: /root/manageiq-ovirt-capablanca-2.ova
+
+
+###############################
 # Collectd Configuration Items
 ###############################
 apache_monitoring: false

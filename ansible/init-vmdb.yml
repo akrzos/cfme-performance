@@ -4,6 +4,7 @@
 #
 
 - hosts: cfme-vmdb
+  gather_facts: false
   remote_user: root
   vars_files:
     - group_vars/all.local.yml

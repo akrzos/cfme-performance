@@ -4,6 +4,7 @@
 #
 
 - hosts: sshkey
+  gather_facts: false
   vars_files:
     - group_vars/all.local.yml
   roles:

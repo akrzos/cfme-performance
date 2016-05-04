@@ -1,0 +1,24 @@
+---
+#
+# Upload CFME/Miq appliance into RHEVM datastore
+#
+
+- name: Ensure /etc/rhevm/imageuploader.conf is configured with the password
+  ini_file:
+    dest: /etc/rhevm/imageuploader.conf
+    section: ImageUploader
+    option: passwd
+    value: "{{rhevm_password}}"
+
+- name: Pull appliance image
+  get_url: url={{appliance_template}} dest={{template_dest}}
+
+- name: Upload into export datastore
+  command: "rhevm-image-uploader -e {{export_datastore}} upload {{template_name}}"
+
+- name: Deploy rhevmshellrc
+  template: src=rhevmshellrc.j2 dest=/root/.rhevmshellrc
+
+# Move image to correct datastore
+
+# Maybe clean up image afterwards from file system

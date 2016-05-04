@@ -4,12 +4,14 @@
 #
 
 - hosts: sshkey
+  gather_facts: false
   vars_files:
     - group_vars/all.local.yml
   roles:
     - sshkey
 
 - hosts: cfme-vmdb
+  gather_facts: false
   remote_user: root
   vars:
     config_type: cfme-vmdb
