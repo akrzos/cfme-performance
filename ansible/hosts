@@ -2,9 +2,6 @@
 # CFME-Performance hosts file
 #
 
-# Appliances to transfer ssh key to for password-less ssh
-[sshkey]
-
 # CFME VMDB appliances
 [cfme-vmdb]
 

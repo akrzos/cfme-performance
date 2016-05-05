@@ -1,8 +1,0 @@
----
-#
-# Vars to connect to an appliance with default password and transfer ssh key
-#
-
-ansible_connection: ssh
-ansible_user: root
-ansible_ssh_pass: smartvm

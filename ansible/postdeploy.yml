@@ -3,8 +3,12 @@
 # Post deployment of appliance automation
 #
 
-- hosts: sshkey
+- hosts: cfme-vmdb
   gather_facts: false
+  vars:
+    ansible_connection: ssh
+    ansible_user: root
+    ansible_ssh_pass: smartvm
   vars_files:
     - group_vars/all.local.yml
   roles:
