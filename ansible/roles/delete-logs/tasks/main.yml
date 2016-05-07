@@ -1,0 +1,28 @@
+---
+#
+# Tasks to delete all log files
+#
+# Involves restarting CFME services
+#
+
+- name: Stop services
+  service: name={{item}} state=stopped
+  with_items:
+    - evmserverd
+    - miqtop
+    - miqvmstat
+    - httpd
+
+- name: Delete log files
+  shell: rm -f {{item}}
+  with_items:
+    - /var/www/miq/vmdb/log/*.log*
+    - /var/www/miq/vmdb/log/apache/*.log*
+
+- name: Start services
+  service: name={{item}} state=started
+  with_items:
+    - miqtop
+    - miqvmstat
+    - evmserverd
+    - httpd

@@ -1,0 +1,16 @@
+---
+#
+# Tasks to delete rotated log files and truncate live log files
+#
+
+- name: Delete log files
+  shell: rm -f {{item}}
+  with_items:
+    - /var/www/miq/vmdb/log/*.log-*
+    - /var/www/miq/vmdb/log/apache/*.log-*
+
+- name: Truncate live log files
+  shell: truncate -s 0 {{item}}
+  with_items:
+    - /var/www/miq/vmdb/log/*.log
+    - /var/www/miq/vmdb/log/apache/*.log
