@@ -3,9 +3,13 @@
 # Setup chronyd time servers
 #
 
+- name: Ensure chrony is installed
+  yum: name=chrony state=present
+
 - name: Set up chronyd config file
   template:
     src: chronyd.conf.j2
     dest: /etc/chrony.conf
-  notify:
-    - restart chronyd
+
+- name: Restart chronyd
+  service: name=chronyd enabled=true state=restarted
