@@ -12,7 +12,7 @@ LoadPlugin syslog
 
 # Loaded Plugins:
 LoadPlugin write_graphite
-{% if apache_monitoring %}
+{% if cfme_apache_monitoring %}
 LoadPlugin apache
 {% endif %}
 LoadPlugin cpu
@@ -39,9 +39,9 @@ LoadPlugin uptime
 # Graphite Host Configuration
 <Plugin write_graphite>
   <Carbon>
-    Host "{{graphite_host}}"
+    Host "{{carbon_host}}"
     Port "2003"
-    Prefix "{{graphite_prefix}}."
+    Prefix "{{cfme_carbon_prefix}}."
     Protocol "tcp"
     LogSendErrors true
     StoreRates true
@@ -51,7 +51,7 @@ LoadPlugin uptime
 </Plugin>
 
 
-{% if apache_monitoring %}
+{% if cfme_apache_monitoring %}
 <Plugin apache>
   <Instance "status">
     URL "http://127.0.0.1/mod_status?auto"

@@ -1,6 +1,6 @@
 ---
 #
-# Install/setup collectd
+# Install/Configure collectd
 #
 
 - name: Check for epel
@@ -23,7 +23,7 @@
     owner=root
     group=root
     mode=0644
-  when: apache_monitoring
+  when: cfme_apache_monitoring
   notify:
     - restart httpd
 

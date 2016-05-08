@@ -1,6 +1,8 @@
-#
-# CFME-Performance hosts file
-#
+# cfme-performance example ansible inventory file
+# Example file, copy and edit for your environment
+
+# Carbon/Graphite/Grafana Host
+[monitorhost]
 
 # CFME VMDB appliances
 [cfme-vmdb]

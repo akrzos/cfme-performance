@@ -1,9 +1,9 @@
 ---
 #
-# Playbook to add current user's ssh key to CFME/Miq appliances
+# Playbook to add current user's ssh key to all inventory hosts
 #
 
-- hosts: cfme-vmdb, cfme, cfme-all-in-one
+- hosts: all
   gather_facts: false
   vars:
     ansible_connection: ssh

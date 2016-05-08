@@ -10,23 +10,25 @@ export_datastore: export
 appliance_template: http://manageiq.org/download/manageiq-ovirt-capablanca-2.ova
 
 
-###############################
-# Grafana Configuration Items
-###############################
+########################################
+# Monitor Host Configuration
+########################################
+# Carbon/Graphite:
+carbon_host: 1.1.1.1
+graphite_port: 9000
+graphite_username: root
+graphite_password: calvin
+# Grafana:
 grafana_host: 1.1.1.1
-grafana_port: 3000
+grafana_port: 9001
 grafana_username: admin
 grafana_password: admin
-
-
-###############################
-# Collectd Configuration Items
-###############################
+# Collectd:
 # Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
-apache_monitoring: false
+cfme_apache_monitoring: false
+cfme_carbon_prefix: manageiq
+carbon_host_prefix: carbon
 collectd_interval: 10
-graphite_host: 1.1.1.1
-graphite_prefix: manageiq
 
 
 ###############################

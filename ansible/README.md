@@ -19,81 +19,15 @@ The playbooks are broken up into several directories to organize them.  They all
 
 ## SSH Config File
 
-Your ssh-config.local file informs ssh how to connect to a specifcied "hostname". Your inventory file should map to your ssh config file.  The ansible.cfg file informs ansible to use your ssh-config.local file to correctly map a host in the inventory to what ssh is configured to connect to.
+Your ssh-config.local file informs ssh how to connect to a specified host. Your inventory file should map to your ssh config file.  The ansible.cfg file informs ansible to use your ssh-config.local file to correctly map a host in the inventory to what ssh is configured to connect to.
 
-Example of ansible/ssh-config.local
-```
-# 5.5.4.0
-Host CF-R0000-DB-Benchmark-5540
-    Hostname 11.22.33.44
-    IdentityFile ~/.ssh/id_rsa
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null
-
-# Patched appliance
-Host CF-R0000-DB-Workload-5540-Patched
-    Hostname 11.22.33.44
-    IdentityFile ~/.ssh/id_rsa
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null
-
-Host CF-R0000-DB-Workload-5540
-    Hostname 11.22.33.44
-    IdentityFile ~/.ssh/id_rsa
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null
-
-# 5.6.0.5
-Host CF-R0000-DB-Benchmark-5605
-    Hostname 11.22.33.44
-    IdentityFile ~/.ssh/id_rsa
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null
-
-Host CF-R0000-DB-Workload-5605
-    Hostname 11.22.33.44
-    IdentityFile ~/.ssh/id_rsa
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null
-
-# Replication Masters:
-Host CF-R0099-DB-Workload-ReplicationMaster-55013-2
-    Hostname 11.22.33.44
-    IdentityFile ~/.ssh/id_rsa
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null
-```
+[Example ssh-config File](ssh-config.local.template)
 
 ## Inventory File
 
-Example inventory file (hosts.local) with respect to above ssh-config file
-```
-#
-# CFME-Performance hosts file
-#
+Again, make sure each entry in the ssh-config file maps to a host listed in your ansible inventory file.  See templates for mapping.
 
-# CFME VMDB appliances
-[cfme-vmdb]
-CF-R0000-DB-Benchmark-5540
-CF-R0000-DB-Workload-5540-Patched
-CF-R0000-DB-Workload-5540
-
-CF-R0099-DB-Workload-ReplicationMaster-55013-2
-
-CF-R0000-DB-Benchmark-5605
-CF-R0000-DB-Workload-5605
-
-
-# CFME worker appliances
-[cfme]
-
-# CFME All-In-One Performance Monitored appliances
-[cfme-all-in-one]
-
-# RHEVM cluster to host appliances
-[rhevm]
-
-```
+[Example Inventory File](hosts.local.template)
 
 ## Group_vars all.yml
 
@@ -102,10 +36,11 @@ The ansible vars file is located in group_vars/all.yml.  It can be copied and th
 Example group_vars/all.local.yml
 ```
 ---
-###############################
-# Collectd Configuration Items
-###############################
-graphite_host: 11.22.33.44
+########################################
+# Monitor Host Configuration
+########################################
+# Carbon/Graphite:
+carbon_host: 11.22.33.44
 
 
 ###############################

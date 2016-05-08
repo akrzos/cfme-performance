@@ -29,3 +29,7 @@
     --region {{setup_vmdb_region}}
     --password {{vmdb_password}}
     --dbdisk={{vmdb_disk}}
+
+# Occassionally I have seen evmserverd not running after above initialization of vmdb
+- name: Ensure evmserverd is enabled and started
+  service: name=evmserverd state=started enabled=true
