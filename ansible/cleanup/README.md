@@ -1,11 +1,15 @@
-- [Cleanup](#cleanup)
-  - [clean-logs.yml](#clean-logs.yml)
-  - [delete-logs.yml](#delete-logs.yml)
-  - [reset-database.yml](#reset-database.yml)
-
 # Cleanup
 
-A place for playbooks that help cleanup CFME/Miq appliances after Performance testing.
+Playbooks that help cleanup CFME/Miq appliances for Performance Analysis and Testing.
+
+**Table of Contents**
+========
+- [Playbooks](#playbooks)
+  - [clean-logs.yml](#clean-logsyml)
+  - [clean-logs-restart.yml](#clean-logs-restartyml)
+  - [reset-database.yml](#reset-databaseyml)
+
+# Playbooks
 
 ## clean-logs.yml
 ```
@@ -13,9 +17,9 @@ A place for playbooks that help cleanup CFME/Miq appliances after Performance te
 ```
 Deletes all rotated log files in /var/www/miq/vmdb/log/ and /var/www/miq/vmdb/log/apache/. Truncates any log files in those directories.  **Does not restart evmserverd**
 
-## delete-logs.yml
+## clean-logs-restart.yml
 ```
-[root@perf ansible]# ansible-playbook -i hosts.local cleanup/delete-logs.yml
+[root@perf ansible]# ansible-playbook -i hosts.local cleanup/clean-logs-restart.yml
 ```
 Stops all CFME/Miq Services, then deletes all log files in /var/www/miq/vmdb/log/ and /var/www/miq/vmdb/log/apache/.  Restarts services at conclusion of cleaning up log files.
 

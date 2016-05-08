@@ -1,0 +1,42 @@
+# cfme-performance example ssh config file
+# Example file, copy and edit for your environment
+
+# 5.5.4.0
+Host CF-R0000-DB-Benchmark-5540
+    Hostname 11.22.33.44
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+
+# Patched appliance
+Host CF-R0000-DB-Workload-5540-Patched
+    Hostname 11.22.33.44
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+
+Host CF-R0000-DB-Workload-5540
+    Hostname 11.22.33.44
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+
+# 5.6.0.5
+Host CF-R0000-DB-Benchmark-5605
+    Hostname 11.22.33.44
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+
+Host CF-R0000-DB-Workload-5605
+    Hostname 11.22.33.44
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+
+# Replication Master:
+Host CF-R0099-DB-Workload-ReplicationMaster-55013-2
+    Hostname 11.22.33.44
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null

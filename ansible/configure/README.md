@@ -1,16 +1,27 @@
-- [Configure](#configure)
-  - [sshkey.yml](#sshkey.yml)
-  - [hostname.yml](#hostname.yml)
-  - [repos.yml](#repos.yml)
-  - [chronyd.yml](#chronyd.yml)
-  - [config-interface.yml](#config-interface.yml)
-  - [proctitle-patch.yml](#proctitle-patch.yml)
-  - [init-vmdb.yml](#init-vmdb.yml)
-  - [collectd.yml](#collectd.yml)
-
 # Configure
 
-Playbooks that configure an appliance for Performance Analysis and Testing.
+Playbooks that configure an appliance for Performance Analysis and Testing. Playbooks are ordered in which they should be run.
+
+**Table of Contents**
+========
+- [Playbooks](#playbooks)
+  - [postdeploy.yml](#postdeployyml)
+    - [sshkey.yml](#sshkeyyml)
+    - [hostname.yml](#hostnameyml)
+    - [repos.yml](#reposyml)
+    - [chronyd.yml](#chronydyml)
+    - [config-interface.yml](#config-interfaceyml)
+    - [proctitle-patch.yml](#proctitle-patchyml)
+    - [init-vmdb.yml](#init-vmdbyml)
+    - [collectd.yml](#collectdyml)
+
+# Playbooks
+
+## postdeploy.yml
+```
+[root@perf ansible]# ansible-playbook -i hosts.local configure/postdeploy.yml
+```
+Runs all of the roles from the below playbooks on cfme-vmdb appliances.
 
 ## sshkey.yml
 ```

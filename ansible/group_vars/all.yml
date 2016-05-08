@@ -11,6 +11,15 @@ appliance_template: http://manageiq.org/download/manageiq-ovirt-capablanca-2.ova
 
 
 ###############################
+# Grafana Configuration Items
+###############################
+grafana_host: 1.1.1.1
+grafana_port: 3000
+grafana_username: admin
+grafana_password: admin
+
+
+###############################
 # Collectd Configuration Items
 ###############################
 # Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access

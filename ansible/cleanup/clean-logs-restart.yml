@@ -1,13 +1,13 @@
 ---
 #
-# Playbook to upload CFME/Miq appliance to RHEVM
+# Clean logs and restart CFME/Miq Services
 #
 
-- hosts: rhevm
+- hosts: cfme-vmdb,cfme,cfme-all-in-one
   gather_facts: false
   remote_user: root
   vars_files:
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
-    - upload-template
+    - clean-logs-restart

@@ -3,37 +3,37 @@
 # Upload CFME/Miq appliance into RHEVM datastore
 #
 
-# - name: Ensure /etc/rhevm/imageuploader.conf is configured with the password
-#   ini_file:
-#     dest: /etc/rhevm/imageuploader.conf
-#     section: ImageUploader
-#     option: passwd
-#     value: "{{rhevm_password}}"
-#
-# - name: Pull appliance image
-#   get_url: url={{appliance_template}} dest={{template_dest}}
-#
-# - name: Upload into export datastore
-#   command: "rhevm-image-uploader -e {{export_datastore}} upload {{template_name}}"
+- name: Ensure /etc/rhevm/imageuploader.conf is configured with the password
+  ini_file:
+    dest: /etc/rhevm/imageuploader.conf
+    section: ImageUploader
+    option: passwd
+    value: "{{rhevm_password}}"
+
+- name: Pull appliance image
+  get_url: url={{appliance_template}} dest={{template_dest}}
+
+- name: Upload into export datastore
+  command: "rhevm-image-uploader -e {{export_datastore}} upload {{template_name}}"
 
 # - name: Deploy rhevmshellrc
 #   template: src=rhevmshellrc.j2 dest=/root/.rhevmshellrc
 
-- name: Get template import api command
-  vars:
-    ansible_connection: local
-  shell: "var=`curl -X GET --insecure -u {{rhevm_username}}:{{rhevm_password}} {{export_templates_api_url}} | grep 'import'`; echo ${var:24:110}"
-  register: templates
-
-- debug: msg="{{templates}}"
-
-- name: Import template into datastorage
-  vars:
-    ansible_connection: local
-  shell: "curl -X POST --insecure -u {{rhevm_username}}:{{rhevm_password}} {{rhevm_hostname}}{{templates.stdout}}"
-  register: import_output
-
-- debug: msg="{{import_output}}"
+# - name: Get template import api command
+#   vars:
+#     ansible_connection: local
+#   shell: "var=`curl -X GET --insecure -u {{rhevm_username}}:{{rhevm_password}} {{export_templates_api_url}} | grep 'import'`; echo ${var:24:110}"
+#   register: templates
+#
+# - debug: msg="{{templates}}"
+#
+# - name: Import template into datastorage
+#   vars:
+#     ansible_connection: local
+#   shell: "curl -X POST --insecure -u {{rhevm_username}}:{{rhevm_password}} {{rhevm_hostname}}{{templates.stdout}}"
+#   register: import_output
+#
+# - debug: msg="{{import_output}}"
 
 # Move image to correct datastore
 

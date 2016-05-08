@@ -1,13 +1,13 @@
 ---
 #
-# Playbook to upload CFME/Miq appliance to RHEVM
+# Playbook to install Carbon/Graphite on the monitorhost
 #
 
-- hosts: rhevm
+- hosts: monitorhost
   gather_facts: false
   remote_user: root
   vars_files:
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
-    - upload-template
+    - graphite

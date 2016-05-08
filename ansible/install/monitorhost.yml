@@ -1,7 +1,17 @@
 ---
 #
-# Playbook to upload CFME/Miq Grafana Performance Dashboards to Grafana host
+# Playbook to install an entire monitorhost (carbon/graphite/grafana/dashboards/collectd)
 #
+
+- hosts: monitorhost
+  gather_facts: false
+  remote_user: root
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
+  roles:
+    - graphite
+    - grafana
 
 - hosts: localhost
   gather_facts: false
