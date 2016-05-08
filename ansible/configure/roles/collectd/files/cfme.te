@@ -1,0 +1,20 @@
+
+module cfme 1.0;
+
+require {
+	type postgresql_port_t;
+	type collectd_t;
+	type lmtp_port_t;
+	type httpd_log_t;
+	class tcp_socket name_connect;
+	class file read;
+}
+
+#============= collectd_t ==============
+allow collectd_t httpd_log_t:file read;
+
+#!!!! This avc is allowed in the current policy
+allow collectd_t lmtp_port_t:tcp_socket name_connect;
+
+#!!!! This avc is allowed in the current policy
+allow collectd_t postgresql_port_t:tcp_socket name_connect;

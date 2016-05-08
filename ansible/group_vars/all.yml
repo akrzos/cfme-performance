@@ -8,12 +8,12 @@ export_datastore: export
 
 # Template:
 appliance_template: http://manageiq.org/download/manageiq-ovirt-capablanca-2.ova
-template_dest: /root/manageiq-ovirt-capablanca-2.ova
 
 
 ###############################
 # Collectd Configuration Items
 ###############################
+# Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
 apache_monitoring: false
 collectd_interval: 10
 graphite_host: 1.1.1.1
@@ -34,6 +34,7 @@ chrony_servers:
   - 0.pool.ntp.org
   - 1.pool.ntp.org
   - 2.pool.ntp.org
+
 
 ###############################
 # CFME 2nd interface ip address

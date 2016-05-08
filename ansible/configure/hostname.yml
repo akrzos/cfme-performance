@@ -1,12 +1,13 @@
 ---
 #
-# Playbook to set hostname on cfme appliance
+# Playbook to set hostname on CFME/Miq appliances
 #
 
 - hosts: cfme-vmdb,cfme,cfme-all-in-one
   gather_facts: false
   remote_user: root
   vars_files:
-    - group_vars/all.local.yml
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
   roles:
     - hostname

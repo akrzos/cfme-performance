@@ -11,5 +11,5 @@
     group=root
     mode=0644
 
-- name: Bounce interface
+- name: Bounce eth1 interface
   shell: "ifdown eth1; ifup eth1"

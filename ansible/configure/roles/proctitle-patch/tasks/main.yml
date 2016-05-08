@@ -1,6 +1,6 @@
 ---
 #
-# Patches 5.5 appliances to display process titles as the actual worker names
+# Patches 5.5 CFME appliances to display process titles as the actual worker names
 #
 # Example:
 # ps afx | grep -E "[Ww]orkers|[pP]ID"

@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to add current user's ssh key to appliances
+# Playbook to add current user's ssh key to CFME/Miq appliances
 #
 
 - hosts: cfme-vmdb, cfme, cfme-all-in-one
@@ -10,6 +10,7 @@
     ansible_user: root
     ansible_ssh_pass: smartvm
   vars_files:
-    - group_vars/all.local.yml
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
   roles:
     - sshkey

@@ -23,8 +23,8 @@
     - group_vars/all.local.yml
   roles:
     - hostname
-    - chronyd
     - repos
+    - chronyd
     - config-interface
     - proctitle-patch
     - init-vmdb

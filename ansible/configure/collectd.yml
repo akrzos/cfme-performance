@@ -10,7 +10,8 @@
   vars:
     config_type: cfme-vmdb
   vars_files:
-    - group_vars/all.local.yml
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
   roles:
     - collectd
   tags: cfme-vmdb
@@ -22,7 +23,8 @@
   vars:
     config_type: cfme
   vars_files:
-    - group_vars/all.local.yml
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
   roles:
     - collectd
   tags: cfme
@@ -34,7 +36,8 @@
   vars:
     config_type: cfme-all-in-one
   vars_files:
-    - group_vars/all.local.yml
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
   roles:
     - collectd
   tags: cfme-all-in-one
