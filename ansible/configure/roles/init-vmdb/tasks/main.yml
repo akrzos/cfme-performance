@@ -16,8 +16,8 @@
   when: not use_separate_vmdb_disk
   command: appliance_console_cli >
     --internal
-    --region {{setup_vmdb_region}}
-    --password {{vmdb_password}}
+    --region {{appliances[inventory_hostname].setup_vmdb_region}}
+    --password {{appliances[inventory_hostname].vmdb_password}}
 
 #
 # Sets up vmdb on separate vmdb disk
@@ -26,9 +26,9 @@
   when: use_separate_vmdb_disk
   command: appliance_console_cli >
     --internal
-    --region {{setup_vmdb_region}}
-    --password {{vmdb_password}}
-    --dbdisk={{vmdb_disk}}
+    --region {{appliances[inventory_hostname].setup_vmdb_region}}
+    --password {{appliances[inventory_hostname].vmdb_password}}
+    --dbdisk={{appliances[inventory_hostname].vmdb_disk}}
 
 # Occassionally I have seen evmserverd not running after above initialization of vmdb
 - name: Ensure evmserverd is enabled and started

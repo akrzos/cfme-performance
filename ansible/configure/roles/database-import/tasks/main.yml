@@ -1,0 +1,55 @@
+---
+#
+# Import a database role
+#
+
+- name: Get database dump (5.4.x appliances)
+  get_url:
+    url: "{{db_dumps[appliances[inventory_hostname].dbdump]}}"
+    dest: "/opt/rh/postgresql92/root/var/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
+  when: is54
+
+# Due to Ansible pulling the file into a /tmp directory, wget appears to be the best option to
+# prevent out of space issues by using the destination directory for holding the database dump
+- name: Get database dump (5.5.x appliances)
+  shell: "wget {{db_dumps[appliances[inventory_hostname].dbdump]}} -O /var/opt/rh/rh-postgresql94/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
+  when: is55
+
+# Ignore_errors since appliances might not have collectd
+- name: Stop CFME/Miq Services
+  service: name={{item}} state=stopped
+  with_items:
+    - evmserverd
+    - collectd
+  ignore_errors: true
+
+- name: Drop existing database
+  command: dropdb vmdb_production
+
+- name: Create new database
+  command: createdb vmdb_production
+
+- name: Import database (5.4.x appliances)
+  command: "pg_restore --dbname=vmdb_production /opt/rh/postgresql92/root/var/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
+  when: is54
+
+- name: Import database (5.5.x appliances)
+  command: "pg_restore --dbname=vmdb_production /var/opt/rh/rh-postgresql94/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
+  when: is55
+
+- name: Invalidate all passwords since the v2_key is now different
+  shell: "cd /var/www/miq/vmdb/; bundle exec tools/fix_auth.rb --v2 --invalid bogus"
+
+- name: Run rake evm:automate:reset
+  shell: "cd /var/www/miq/vmdb/; bin/rake evm:automate:reset"
+
+- name: Run rake db:migrate
+  shell: "cd /var/www/miq/vmdb/; bin/rake db:migrate"
+
+# Ignore_errors since appliances might not have collectd
+- name: Start CFME/Miq Services
+  service: name={{item}} state=started
+  with_items:
+    - evmserverd
+    - collectd
+  ignore_errors: true

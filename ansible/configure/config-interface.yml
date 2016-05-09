@@ -10,4 +10,4 @@
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
-    - config-interface
+    - { role: config-interface, when: "{{appliances[inventory_hostname].eth1}} is defined" }

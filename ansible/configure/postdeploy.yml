@@ -24,10 +24,11 @@
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
+    - version
     - hostname
     - repos
     - chronyd
-    - config-interface
+    - { role: config-interface, when: "{{appliances[inventory_hostname].eth1}} is defined" }
     - proctitle-patch
     - init-vmdb
-    - collectd
+    - { role: collectd, when: (is55 or is56) }

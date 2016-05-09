@@ -28,17 +28,11 @@
 # 5035 ?        SNl    0:08  \_ MiqUiWorker id: 29, uri: http://127.0.0.1:3000
 # 5044 ?        SNl    0:08  \_ MiqWebServiceWorker id: 30, uri: http://127.0.0.1:4000
 
-- name: Determine if CFME version 5.5.x
-  shell: cat /var/www/miq/vmdb/VERSION | grep -q "^5.5"
-  register: is55
-  changed_when: false
-  ignore_errors: true
-
-- name: Deploy patched runner.rb
+- name: Deploy patched runner.rb on 5.5.x appliances
   copy:
     src: runner.rb
     dest: /var/www/miq/vmdb/app/models/miq_worker/runner.rb
     backup: true
-  when: "{{is55.rc}} == 0"
+  when: is55
   notify:
     - restart evmserverd

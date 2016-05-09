@@ -19,13 +19,13 @@ The playbooks are broken up into several directories to organize them.  They all
 
 ## SSH Config File
 
-Your ssh-config.local file informs ssh how to connect to a specified host. Your inventory file should map to your ssh config file.  The ansible.cfg file informs ansible to use your ssh-config.local file to correctly map a host in the inventory to what ssh is configured to connect to.
+Your ssh-config.local file informs ssh how to connect to a specified host. Your inventory file (hosts.local) should map to your ssh config file.  The ansible.cfg file informs ansible to use your ssh-config.local file to correctly map a host in the inventory to what ssh is configured to connect to.
 
 [Example ssh-config File](ssh-config.local.template)
 
 ## Inventory File
 
-Again, make sure each entry in the ssh-config file maps to a host listed in your ansible inventory file.  See templates for mapping.
+Again, make sure each entry in the ssh-config.local file maps to a host listed in your ansible inventory file (hosts.local).  See templates for mapping.
 
 [Example Inventory File](hosts.local.template)
 
@@ -44,41 +44,63 @@ carbon_host: 11.22.33.44
 
 
 ###############################
-# CFME 2nd interface ip address
+# CFME Configuration items
 ###############################
-# Map inventory to ip addresses
-ip_addresses:
-  CF-R0000-DB-Benchmark-5540:
-    ipaddr: 172.16.10.10
-    netmask: 255.255.255.0
-  CF-R0000-DB-Workload-5540-Patched:
-    ipaddr: 172.16.10.11
-    netmask: 255.255.255.0
-  CF-R0000-DB-Workload-5540:
-    ipaddr: 172.16.10.12
-    netmask: 255.255.255.0
-  CF-R0000-DB-Benchmark-5605:
-    ipaddr: 172.16.10.13
-    netmask: 255.255.255.0
-  CF-R0000-DB-Workload-5605:
-    ipaddr: 172.16.10.14
-    netmask: 255.255.255.0
+# Per appliance settings:
+appliances:
+  # Appliance that will take a database dump
+  inventory_hostname1:
+    dbdump: dump1
+    eth1:
+      ipaddr: 172.16.10.10
+      netmask: 255.255.255.0
+    use_separate_vmdb_disk: true
+    vmdb_region: 0
+    vmdb_disk: /dev/vdb
+    vmdb_password: smartvm
+  # appliance with different region, no database dump
+  inventory_hostname2:
+    eth1:
+      ipaddr: 172.16.10.11
+      netmask: 255.255.255.0
+    use_separate_vmdb_disk: true
+    vmdb_region: 99
+    vmdb_disk: /dev/vdb
+    vmdb_password: smartvm
+
+
+###############################
+# Database Dumps
+###############################
+# Maps the name of the database dump to its http accessible location
+db_dumps:
+  dump1: http://download.example.com/dbdumps/dump.r0000.cpgd
+  dump2: http://download.example.com/dbdumps/dump.r0001.dmp
 
 
 ###############################
 # Repos
 ###############################
 repos:
+  rhel6:
+    baseurl: http://download.example.com/repos/RHEL-6/6.7/Server/$basearch/os/
+  rhel6z:
+    baseurl: http://download.example.com/repos/RHEL-6.8-20160414.0/6.8/Server/$basearch/os
+  rhscl6:
+    baseurl: http://download.example.com/repos/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/$basearch/os/
+  rhel6_optional:
+    baseurl: http://download.example.com/repos/RHEL-6/6.7/Server/optional/$basearch/os/
   rhel7:
-    baseurl: http://download.cfme-performance.com/repos/RHEL-7/7.2/Server/$basearch/os/
+    baseurl: http://download.example.com/repos/RHEL-7/7.2/Server/$basearch/os/
   rhel7z:
-    baseurl: http://download.cfme-performance.com/repos/rhel-7.2-z-candidate/x86_64/
+    baseurl: http://download.example.com/repos/rhel-7.2-z-candidate/$basearch/
   rhscl7:
-    baseurl: http://download.cfme-performance.com/repos/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/x86_64/os/
+    baseurl: http://download.example.com/repos/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/$basearch/os/
   rhel7_optional:
-    baseurl: http://download.cfme-performance.com/repos/RHEL-7/7.2/Server-optional/$basearch/os/
+    baseurl: http://download.example.com/repos/RHEL-7/7.2/Server-optional/$basearch/os/
 
 ```
+Each entry under appliances must match an entry in your ansible inventory file (hosts.local) as the ansible variable `inventory_hostname` is used to determine if the configuration is setup for that specific appliance.  Since using ip addresses would be less than ideal, I use an ssh config file (ssh-config.local) to address each machine as a name.  That inventory name is also used for the hostname to make it easy to identify what appliance I have ssh-ed to.
 
 # Playbook Directories
 

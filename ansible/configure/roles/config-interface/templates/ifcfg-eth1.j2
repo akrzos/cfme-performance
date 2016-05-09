@@ -15,5 +15,5 @@ PEERROUTES=yes
 IPV6_PEERDNS=yes
 IPV6_PEERROUTES=yes
 DEVICE=eth1
-IPADDR="{{ip_addresses[inventory_hostname].ipaddr}}"
-NETMASK="{{ip_addresses[inventory_hostname].netmask}}"
+IPADDR="{{appliances[inventory_hostname].eth1.ipaddr}}"
+NETMASK="{{appliances[inventory_hostname].eth1.netmask}}"

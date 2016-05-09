@@ -1,9 +1,9 @@
 ---
 #
-# Playbook to add necessary repos to CFME/Miq appliances
+# Import a database playbook
 #
 
-- hosts: cfme-vmdb,cfme,cfme-all-in-one
+- hosts: cfme-vmdb
   gather_facts: false
   remote_user: root
   vars_files:
@@ -11,4 +11,4 @@
     - ../group_vars/all.local.yml
   roles:
     - version
-    - repos
+    - {role: database-import, when: "{{appliances[inventory_hostname].dbdump}} is defined" }

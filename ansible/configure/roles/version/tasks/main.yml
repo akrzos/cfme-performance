@@ -1,0 +1,32 @@
+---
+#
+# Role to determine version and set a fact with the CFME version
+#
+
+- name: Get version
+  shell: cat /var/www/miq/vmdb/VERSION
+  register: version_output
+  changed_when: false
+
+- name: Set fact for CFME version 5.4.x
+  set_fact:
+    is54: true
+    is55: false
+    is56: false
+  when: version_output.stdout|match("^5.4.")
+
+- name: Set fact for CFME version 5.5.x
+  set_fact:
+    is54: false
+    is55: true
+    is56: false
+  when: version_output.stdout|match("^5.5.")
+
+- name: Set fact for CFME version 5.6.x
+  set_fact:
+    is54: false
+    is55: false
+    is56: true
+  when: version_output.stdout|match("^5.6.")
+
+# - debug: msg="is54={{is54}},is55={{is55}},is56={{is56}}"

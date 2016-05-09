@@ -32,44 +32,60 @@ collectd_interval: 10
 
 
 ###############################
-# CFME items
+# CFME Configuration items
 ###############################
-setup_vmdb_region: 0
-use_separate_vmdb_disk: true
-vmdb_disk: /dev/vdb
-vmdb_password: smartvm
 # Use false if patching before init-vmdb playbook/role
 proctitle_restart: false
-
-chrony_servers:
-  - 0.pool.ntp.org
-  - 1.pool.ntp.org
-  - 2.pool.ntp.org
-
-
-###############################
-# CFME 2nd interface ip address
-###############################
-# Map inventory to ip addresses
-ip_addresses:
+# Per appliance settings:
+appliances:
+  # Appliance that will take a database dump
   inventory_hostname1:
-    ipaddr: 172.16.10.10
-    netmask: 255.255.255.0
+    dbdump: dump1
+    eth1:
+      ipaddr: 172.16.10.10
+      netmask: 255.255.255.0
+    use_separate_vmdb_disk: true
+    vmdb_region: 0
+    vmdb_disk: /dev/vdb
+    vmdb_password: smartvm
+  # appliance with different region, no database dump
   inventory_hostname2:
-    ipaddr: 172.16.10.11
-    netmask: 255.255.255.0
+    eth1:
+      ipaddr: 172.16.10.11
+      netmask: 255.255.255.0
+    use_separate_vmdb_disk: true
+    vmdb_region: 99
+    vmdb_disk: /dev/vdb
+    vmdb_password: smartvm
+
+
+###############################
+# Database Dumps
+###############################
+# Maps the name of the database dump to its http accessible location
+db_dumps:
+  dump1: http://download.example.com/dbdumps/dump.r0000.cpgd
+  dump2: http://download.example.com/dbdumps/dump.r0001.dmp
 
 
 ###############################
 # Repos
 ###############################
 repos:
+  rhel6:
+    baseurl: http://download.example.com/repos/RHEL-6/6.7/Server/$basearch/os/
+  rhel6z:
+    baseurl: http://download.example.com/repos/RHEL-6.8-20160414.0/6.8/Server/$basearch/os
+  rhscl6:
+    baseurl: http://download.example.com/repos/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/$basearch/os/
+  rhel6_optional:
+    baseurl: http://download.example.com/repos/RHEL-6/6.7/Server/optional/$basearch/os/
   rhel7:
     baseurl: http://download.example.com/repos/RHEL-7/7.2/Server/$basearch/os/
   rhel7z:
-    baseurl: http://download.example.com/repos/rhel-7.2-z-candidate/x86_64/
+    baseurl: http://download.example.com/repos/rhel-7.2-z-candidate/$basearch/
   rhscl7:
-    baseurl: http://download.example.com/repos/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/x86_64/os/
+    baseurl: http://download.example.com/repos/RHSCL-2.0-RHEL-6-Alpha-1.8/compose/Server/$basearch/os/
   rhel7_optional:
     baseurl: http://download.example.com/repos/RHEL-7/7.2/Server-optional/$basearch/os/
 
@@ -79,3 +95,12 @@ repos:
 ###############################
 epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 grafana_rpm: https://grafanarel.s3.amazonaws.com/builds/grafana-2.6.0-1.x86_64.rpm
+
+
+###############################
+# Time Servers
+###############################
+chrony_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
