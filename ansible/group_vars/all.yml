@@ -78,3 +78,4 @@ repos:
 # RPMs:
 ###############################
 epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+grafana_rpm: https://grafanarel.s3.amazonaws.com/builds/grafana-2.6.0-1.x86_64.rpm

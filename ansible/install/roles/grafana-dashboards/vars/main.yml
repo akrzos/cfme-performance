@@ -1063,7 +1063,7 @@ per_process_panels:
       processes:
         - "Vmware::InfraManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerVmware"
-  Graphite:
+  MonitorHost:
     - name: "Summerized"
       processes:
         - carbon-cache

@@ -1,6 +1,6 @@
 # Install
 
-Playbooks for installing/configuring associated infrastructure with Performance Analysis and Testing of CFME/Miq. Also playbooks for automating importing new CFME/Miq appliances into RHEVM.  **This is mostly a WIP.**
+Playbooks for installing/configuring associated infrastructure with Performance Analysis and Testing of CFME/Miq. Also playbooks for automating importing new CFME/Miq appliances into RHEVM.
 
 **Table of Contents**
 ========
@@ -20,24 +20,25 @@ Three major infrastructure hosts:
 1. Workload Driver - Hosts cfme-performance and cfme_tests (perf fork)
 2. Monitoring Host - Hosts Carbon/Graphite/Grafana for system performance monitoring
 3. Results/Logs Host - Hosts an ELK stack to review testing results and log files from appliances
+All should be built on RHEL7/Centos7
 
 ### monitorhost.yml
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local install/monitorhost.yml
 ```
-Creates a monitoring host machine by installing graphite/grafana and collectd on a single machine.  This basically combines graphite.yml, grafana.yml, grafana-dashboards.yml in a single playbook.
+Creates a monitoring host machine by installing carbon/graphite/grafana and collectd on a single machine.  This basically combines graphite.yml, grafana.yml, grafana-dashboards.yml in a single playbook.
 
 #### graphite.yml
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local install/graphite.yml
 ```
-Installs graphite onto a machine designated as a graphite host.
+Installs carbon/graphite onto a machine designated as a monitor host.
 
 #### grafana.yml
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local install/grafana.yml
 ```
-Installs grafana onto a machine designated as a grafana host.  Usually this is co-located with the Graphite host.
+Installs grafana onto a machine designated as a monitor host.  Usually this is co-located with the carbon/graphite host.
 
 #### grafana-dashboards.yml
 ```

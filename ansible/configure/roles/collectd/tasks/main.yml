@@ -60,9 +60,7 @@
 
 - name: Setup collectd service
   service: name=collectd state=restarted enabled=true
-  become: true
 
 - name: Disable EPEL
   shell: rpm -e epel-release
   ignore_errors: true
-  become: true

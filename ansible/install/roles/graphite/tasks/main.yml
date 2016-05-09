@@ -1,2 +1,90 @@
 ---
-# TODO
+#
+# Install/Configure Carbon and Graphite
+#
+
+- name: Check for epel
+  shell: rpm -qa | grep -q epel-release
+  ignore_errors: true
+  register: epel_installed
+
+- name: Install epel repo
+  command: rpm -ivh {{ epel7_rpm }}
+  when: epel_installed.rc != 0
+
+- name: Install carbon/graphite rpms
+  yum: name={{ item }} state=present
+  with_items:
+    - graphite-web
+    - python-carbon
+    - expect
+
+- name: Check for graphite.db sqlite
+  shell: ls /var/lib/graphite-web/graphite.db
+  ignore_errors: true
+  register: graphite_db_installed
+
+- name: Copy setup-graphite-db.exp
+  copy:
+    src=setup-graphite-db.exp
+    dest=/root/setup-graphite-db.exp
+    owner=root
+    group=root
+    mode=0755
+
+- name: Create initial graphite db
+  shell: "/root/setup-graphite-db.exp {{ graphite_username }} {{ graphite_password }} && chown apache:apache /var/lib/graphite-web/graphite.db"
+  when: graphite_db_installed.rc != 0
+
+- name: Setup apache graphite-web config
+  template:
+    src=graphite-web.conf.j2
+    dest=/etc/httpd/conf.d/graphite-web.conf
+    owner=root
+    group=root
+    mode=0644
+
+- name: Ensure apache is started and enabled
+  service: name=httpd state=started enabled=true
+
+- name: Add firewall rules for carbon-cache and graphite
+  command: "{{ item }}"
+  with_items:
+    - "firewall-cmd --zone=public --add-port=2003/tcp --permanent"
+    - "firewall-cmd --zone=public --add-port={{graphite_port}}/tcp --permanent"
+    - firewall-cmd --reload
+
+- name: Restart apache
+  service: name=httpd state=restarted enabled=true
+
+- name: Ensure carbon-cache service is started and enabled
+  service: name=carbon-cache state=started enabled=true
+
+- name: Copy carbon storage-schemas.conf config
+  copy:
+    src=storage-schemas.conf
+    dest=/etc/carbon/storage-schemas.conf
+    owner=root
+    group=root
+    mode=0644
+
+- name: Setup carbon config
+  copy:
+    src=carbon.conf
+    dest=/etc/carbon/carbon.conf
+    owner=root
+    group=root
+    mode=0644
+
+- name: Stop carbon-cache
+  service: name=carbon-cache state=stopped
+
+- name: Remove initial set carbon storage due to sizing off initial config
+  command: "rm -rf /var/lib/carbon/whispher/carbon"
+
+- name: Restart carbon-cache
+  service: name=carbon-cache state=restarted enabled=true
+
+- name: Disable EPEL
+  shell: rpm -e epel-release
+  ignore_errors: true

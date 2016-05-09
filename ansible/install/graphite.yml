@@ -10,4 +10,7 @@
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
+    - hostname
+    - repos
     - graphite
+    - collectd-monitorhost

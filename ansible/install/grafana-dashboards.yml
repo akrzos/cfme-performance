@@ -31,8 +31,8 @@
         process_list_name: CFME-RedHat
       - template_name: cfme
         process_list_name: CFME-VMware
-      - template_name: graphite
-        process_list_name: Graphite
+      - template_name: monitorhost
+        process_list_name: MonitorHost
   vars_files:
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml

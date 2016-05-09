@@ -10,41 +10,10 @@
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
+    - hostname
+    - repos
     - graphite
+    - collectd-monitorhost
     - grafana
 
-- hosts: localhost
-  gather_facts: false
-  vars:
-    ansible_connection: local
-    overwrite_existing: true
-    dashboards:
-      - template_name: baremetal
-        process_list_name: Baremetal
-      - template_name: guest
-        process_list_name: Guest
-      - template_name: cfme
-        process_list_name: CFME
-      - template_name: cfmeallinone
-        process_list_name: CFME-All-In-One
-      - template_name: cfme
-        process_list_name: CFME-Amazon
-      - template_name: cfme
-        process_list_name: CFME-Azure
-      - template_name: cfme
-        process_list_name: CFME-Containers
-      - template_name: cfme
-        process_list_name: CFME-Microsoft
-      - template_name: cfme
-        process_list_name: CFME-Openstack
-      - template_name: cfme
-        process_list_name: CFME-RedHat
-      - template_name: cfme
-        process_list_name: CFME-VMware
-      - template_name: graphite
-        process_list_name: Graphite
-  vars_files:
-    - ../group_vars/all.yml
-    - ../group_vars/all.local.yml
-  roles:
-    - grafana-dashboards
+- include: grafana-dashboards.yml
