@@ -3,13 +3,15 @@
 # Configure second interface with static ip address
 #
 
-- name: Deploy ifcfg-eth1
+- name: Deploy static ifcfg
   template:
-    src=ifcfg-eth1.j2
-    dest=/etc/sysconfig/network-scripts/ifcfg-eth1
+    src=ifcfg.j2
+    dest=/etc/sysconfig/network-scripts/ifcfg-{{item.name}}
     owner=root
     group=root
     mode=0644
+  with_items: "{{appliances[inventory_hostname].interfaces}}"
 
-- name: Bounce eth1 interface
-  shell: "ifdown eth1; ifup eth1"
+- name: Bounce interface
+  shell: "ifdown {{item.name}}; ifup {{item.name}}"
+  with_items: "{{appliances[inventory_hostname].interfaces}}"

@@ -1,0 +1,10 @@
+---
+#
+# Setup ntpd service
+#
+
+- name: Start ntp services
+  service: name={{item}} state=started enabled=true
+  with_items:
+    - ntpdate
+    - ntpd

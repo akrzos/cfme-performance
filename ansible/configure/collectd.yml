@@ -14,7 +14,7 @@
     - ../group_vars/all.local.yml
   roles:
     - version
-    - { role: collectd, when: (is55 or is56) }
+    - collectd
   tags: cfme-vmdb
 
 # Cloud Forms Worker appliances
@@ -28,7 +28,7 @@
     - ../group_vars/all.local.yml
   roles:
     - version
-    - { role: collectd, when: (is55 or is56) }
+    - collectd
   tags: cfme
 
 # Cloud Forms Database appliances with Graphite/Grafana
@@ -42,5 +42,5 @@
     - ../group_vars/all.local.yml
   roles:
     - version
-    - { role: collectd, when: (is55 or is56) }
+    - collectd
   tags: cfme-all-in-one

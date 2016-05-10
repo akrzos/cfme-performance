@@ -40,6 +40,6 @@ logchange 0.5
 
 logdir /var/log/chrony
 #log measurements statistics tracking
-{% for server in chrony_servers %}
+{% for server in time_servers %}
 server {{ server }} iburst
 {% endfor %}

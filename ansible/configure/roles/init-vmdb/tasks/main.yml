@@ -13,20 +13,20 @@
 # Sets up vmdb on vda.  Usually this is a bad idea as /var only has ~2GiB space
 #
 - name: Setup vmdb internal to appliance image disk
-  when: not use_separate_vmdb_disk
+  when: not appliances[inventory_hostname].use_separate_vmdb_disk
   command: appliance_console_cli >
     --internal
-    --region {{appliances[inventory_hostname].setup_vmdb_region}}
+    --region {{appliances[inventory_hostname].vmdb_region}}
     --password {{appliances[inventory_hostname].vmdb_password}}
 
 #
 # Sets up vmdb on separate vmdb disk
 #
 - name: Setup vmdb internal to appliance vmdb disk
-  when: use_separate_vmdb_disk
+  when: appliances[inventory_hostname].use_separate_vmdb_disk
   command: appliance_console_cli >
     --internal
-    --region {{appliances[inventory_hostname].setup_vmdb_region}}
+    --region {{appliances[inventory_hostname].vmdb_region}}
     --password {{appliances[inventory_hostname].vmdb_password}}
     --dbdisk={{appliances[inventory_hostname].vmdb_disk}}
 

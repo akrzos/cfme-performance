@@ -8,9 +8,13 @@
   ignore_errors: true
   register: epel_installed
 
-- name: Install epel repo
+- name: Install epel repo (rhel7)
   command: rpm -ivh {{ epel7_rpm }}
-  when: epel_installed.rc != 0
+  when: (epel_installed.rc != 0) and (is55 or is56)
+
+- name: Install epel repo (rhel6)
+  command: rpm -ivh {{ epel7_rpm }}
+  when: (epel_installed.rc != 0) and is54
 
 - name: Install collectd rpms
   yum: name={{ item }} state=present
@@ -27,13 +31,23 @@
   notify:
     - restart httpd
 
-- name: Configure collectd.conf
+- name: Configure collectd.conf for 5.5/5.6
   template:
     src={{config_type}}.collectd.conf.j2
     dest=/etc/collectd.conf
     owner=root
     group=root
     mode=0644
+  when: is55 or is56
+
+- name: Configure collectd.conf
+  template:
+    src={{config_type}}.54.collectd.conf.j2
+    dest=/etc/collectd.conf
+    owner=root
+    group=root
+    mode=0644
+  when: is54
 
 - name: Set SELinux Boolean collectd_tcp_network_connect
   seboolean: name=collectd_tcp_network_connect state=yes persistent=yes

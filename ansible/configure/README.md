@@ -9,7 +9,7 @@ Playbooks that configure an appliance for Performance Analysis and Testing. Play
     - [sshkey.yml](#sshkeyyml)
     - [hostname.yml](#hostnameyml)
     - [repos.yml](#reposyml)
-    - [chronyd.yml](#chronydyml)
+    - [time.yml](#timeyml)
     - [config-interface.yml](#config-interfaceyml)
     - [proctitle-patch.yml](#proctitle-patchyml)
     - [init-vmdb.yml](#init-vmdbyml)
@@ -42,17 +42,17 @@ Sets the appliances hostname to the ansible inventory name.  To produce the inte
 ```
 Installs a cfme-performance.repo file into /etc/yum.repos.d directory with necessary repos to install cfme-performance tooling.
 
-### chronyd.yml
+### time.yml
 ```
-[root@perf ansible]# ansible-playbook -i hosts.local configure/chronyd.yml
+[root@perf ansible]# ansible-playbook -i hosts.local configure/time.yml
 ```
-Installs and configures chronyd service to ensure time is synchronized.
+Installs and configures ntp/chronyd service to ensure time is synchronized.
 
 ### config-interface.yml
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/config-interface.yml
 ```
-(Optional) Configures second interface on CFME/Miq appliances with a static address.
+(Optional) Configures static interfaces on CFME/Miq appliances with an address.
 
 ### proctitle-patch.yml
 ```

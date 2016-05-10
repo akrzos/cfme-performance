@@ -1,5 +1,5 @@
 # Deployed by cfme-performance
-NAME="eth1"
+NAME="{{item.name}}"
 ONBOOT=yes
 NETBOOT=yes
 IPV6INIT=yes
@@ -14,6 +14,6 @@ PEERDNS=yes
 PEERROUTES=yes
 IPV6_PEERDNS=yes
 IPV6_PEERROUTES=yes
-DEVICE=eth1
-IPADDR="{{appliances[inventory_hostname].eth1.ipaddr}}"
-NETMASK="{{appliances[inventory_hostname].eth1.netmask}}"
+DEVICE="{{item.name}}"
+IPADDR="{{item.ipaddr}}"
+NETMASK="{{item.netmask}}"

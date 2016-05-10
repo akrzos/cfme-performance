@@ -10,4 +10,6 @@
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
-    - chronyd
+    - version
+    - { role: ntpd, when: (is54)}
+    - { role: chronyd, when: (is55 or is56)}

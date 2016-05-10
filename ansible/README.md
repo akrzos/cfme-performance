@@ -51,18 +51,16 @@ appliances:
   # Appliance that will take a database dump
   inventory_hostname1:
     dbdump: dump1
-    eth1:
-      ipaddr: 172.16.10.10
-      netmask: 255.255.255.0
+    interfaces:
+      - name: eth1
+        ipaddr: 172.16.10.10
+        netmask: 255.255.255.0
     use_separate_vmdb_disk: true
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
-  # appliance with different region, no database dump
   inventory_hostname2:
-    eth1:
-      ipaddr: 172.16.10.11
-      netmask: 255.255.255.0
+    interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 99
     vmdb_disk: /dev/vdb

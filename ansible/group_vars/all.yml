@@ -41,18 +41,17 @@ appliances:
   # Appliance that will take a database dump
   inventory_hostname1:
     dbdump: dump1
-    eth1:
-      ipaddr: 172.16.10.10
-      netmask: 255.255.255.0
+    interfaces:
+      - name: eth1
+        ipaddr: 172.16.10.10
+        netmask: 255.255.255.0
     use_separate_vmdb_disk: true
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
-  # appliance with different region, no database dump
+  # appliance with different region, no database dump, no static interfaces
   inventory_hostname2:
-    eth1:
-      ipaddr: 172.16.10.11
-      netmask: 255.255.255.0
+    interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 99
     vmdb_disk: /dev/vdb
@@ -93,6 +92,7 @@ repos:
 ###############################
 # RPMs:
 ###############################
+epel6_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
 epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 grafana_rpm: https://grafanarel.s3.amazonaws.com/builds/grafana-2.6.0-1.x86_64.rpm
 
@@ -100,7 +100,7 @@ grafana_rpm: https://grafanarel.s3.amazonaws.com/builds/grafana-2.6.0-1.x86_64.r
 ###############################
 # Time Servers
 ###############################
-chrony_servers:
+time_servers:
   - 0.pool.ntp.org
   - 1.pool.ntp.org
   - 2.pool.ntp.org
