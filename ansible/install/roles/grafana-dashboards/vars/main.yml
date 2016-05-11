@@ -907,6 +907,57 @@ per_process_panels:
       processes:
         - "Openstack::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerOpenstack"
+  # Per-Process componet of Dashboard specifically for UI Performance
+  CFME-UI:
+    - name: "MiqUiWorker"
+      processes:
+        - MiqUiWorker
+        - PumaMiqUiWorker
+    - name: "MiqWebServiceWorker"
+      processes:
+        - MiqWebServiceWorker
+        - PumaMiqWebServiceWorker
+        - PumaMiqWebSocketsWorker
+    - name: "Ruby/Postgres/Apache"
+      processes:
+        - ruby
+        - postgres
+        - httpd
+    - name: "Memcached"
+      processes:
+        - memcached
+    - name: "Collectd"
+      processes:
+        - collectd
+    - name: "Appliance"
+      processes:
+        - MIQServer
+        - evm_server.rb
+        - evm_watchdog.rb
+        - appliance_console.rb
+    - name: "Postgres"
+      processes:
+        - PostgresMaster
+        - PostgresLogger
+        - PostgresCheckpoint
+        - PostgresWriter
+        - PostgresWALWriter
+        - PostgresAutovacuum
+        - PostgresStats
+        - PostgresPgLogical
+        - PostgresServers
+    - name: "MiqGenericWorker"
+      processes:
+        - MiqGenericWorker
+    - name: "MiqPriorityWorker"
+      processes:
+        - MiqPriorityWorker
+    - name: "MiqScheduleWorker"
+      processes:
+        - MiqScheduleWorker
+    - name: "MiqReportingWorker"
+      processes:
+        - MiqReportingWorker
   CFME-RedHat:
     - name: "Summerized"
       processes:

@@ -4,7 +4,7 @@
 #
 
 - name: Remove existing dashboards
-  command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item.process_list_name|lower}}-general-system-performance"
+  command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item.dashboard_name|lower|regex_replace(' ', '-')}}"
   when: overwrite_existing
   with_items: "{{dashboards}}"
 
@@ -13,14 +13,14 @@
 
 - name: Generate dashboards
   template:
-    src: "{{item.template_name}}_general_system_performance.json.j2"
-    dest: "{{role_path}}/files/{{item.process_list_name}}_general_system_performance.json"
+    src: "{{item.template_name}}.json.j2"
+    dest: "{{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json"
   with_items: "{{dashboards}}"
 
 - name: Upload dashboards to grafana
-  command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/{{item.process_list_name}}_general_system_performance.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
+  command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
   with_items: "{{dashboards}}"
 
 - name: Remove leftover json file(s)
-  file: path={{role_path}}/files/{{item.process_list_name}}_general_system_performance.json state=absent
+  file: path={{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json state=absent
   with_items: "{{dashboards}}"
