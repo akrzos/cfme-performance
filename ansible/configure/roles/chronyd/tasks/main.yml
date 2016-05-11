@@ -1,12 +1,12 @@
 ---
 #
-# Setup chronyd time servers
+# Setup chronyd service
 #
 
 - name: Ensure chrony is installed
   yum: name=chrony state=present
 
-- name: Set up chronyd config file
+- name: Setup chrony config file
   template:
     src: chronyd.conf.j2
     dest: /etc/chrony.conf

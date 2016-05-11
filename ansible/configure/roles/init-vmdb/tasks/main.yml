@@ -30,6 +30,6 @@
     --password {{appliances[inventory_hostname].vmdb_password}}
     --dbdisk={{appliances[inventory_hostname].vmdb_disk}}
 
-# Occassionally I have seen evmserverd not running after above initialization of vmdb
+# Occasionally I have seen evmserverd not running after above initialization of vmdb
 - name: Ensure evmserverd is enabled and started
   service: name=evmserverd state=started enabled=true

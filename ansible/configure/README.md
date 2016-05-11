@@ -46,7 +46,7 @@ Installs a cfme-performance.repo file into /etc/yum.repos.d directory with neces
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/time.yml
 ```
-Installs and configures ntp/chronyd service to ensure time is synchronized.
+Installs and configures chronyd/ntpd service to ensure time is synchronized.
 
 ### config-interface.yml
 ```

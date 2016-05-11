@@ -1,6 +1,6 @@
 ---
 #
-# Configure second interface with static ip address
+# Configure interfaces with static ip address
 #
 
 - name: Deploy static ifcfg

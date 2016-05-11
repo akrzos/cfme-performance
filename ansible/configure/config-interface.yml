@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to configure 2nd network interface to CFME/Miq appliances
+# Playbook to set static interfaces on CFME/Miq appliances
 #
 
 - hosts: cfme-vmdb,cfme,cfme-all-in-one

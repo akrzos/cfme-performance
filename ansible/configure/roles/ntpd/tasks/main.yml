@@ -3,8 +3,12 @@
 # Setup ntpd service
 #
 
-- name: Start ntp services
+- name: Set up ntp config file
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+
+- name: Start ntpd
   service: name={{item}} state=started enabled=true
   with_items:
-    - ntpdate
     - ntpd

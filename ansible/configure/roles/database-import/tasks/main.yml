@@ -1,16 +1,17 @@
 ---
 #
-# Import a database role
+# Import a database
 #
 
+# On 5.4 appliances / has 9.8GiB total space, typically 7.5GiB available
 - name: Get database dump (5.4.x appliances)
   get_url:
     url: "{{db_dumps[appliances[inventory_hostname].dbdump]}}"
     dest: "/opt/rh/postgresql92/root/var/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
   when: is54
 
-# Due to Ansible pulling the file into a /tmp directory, wget appears to be the best option to
-# prevent out of space issues by using the destination directory for holding the database dump
+# 5.5 appliances have ~1GiB in the /tmp directory, thus most database exports will fill the
+# tmp partition and we must rely on wget rather than the ansible get_url module
 - name: Get database dump (5.5.x appliances)
   shell: "wget {{db_dumps[appliances[inventory_hostname].dbdump]}} -O /var/opt/rh/rh-postgresql94/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
   when: is55
