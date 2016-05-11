@@ -13,12 +13,22 @@
   when: (epel_installed.rc != 0) and (is55 or is56)
 
 - name: Install epel repo (rhel6)
-  command: rpm -ivh {{ epel7_rpm }}
+  command: rpm -ivh {{ epel6_rpm }}
   when: (epel_installed.rc != 0) and is54
 
-- name: Install collectd rpms
+- name: Install collectd rpms (rhel7)
   yum: name={{ item }} state=present
   with_items: "{{collectd_packages[config_type]}}"
+  when: (is55 or is56)
+
+- name: Install collectd rpms (rhel6)
+  yum: name={{ item }} state=present
+  with_items:
+    - "{{el6_collectd}}"
+    - "{{el6_collectd_apache}}"
+    - "{{el6_collectd_disk}}"
+    - "{{el6_collectd_postgres}}"
+  when: is54
 
 - name: Copy cfme-http.conf for apache monitoring
   copy:
@@ -31,23 +41,13 @@
   notify:
     - restart httpd
 
-- name: Configure collectd.conf for 5.5/5.6
+- name: Configure collectd.conf
   template:
     src={{config_type}}.collectd.conf.j2
     dest=/etc/collectd.conf
     owner=root
     group=root
     mode=0644
-  when: is55 or is56
-
-- name: Configure collectd.conf
-  template:
-    src={{config_type}}.54.collectd.conf.j2
-    dest=/etc/collectd.conf
-    owner=root
-    group=root
-    mode=0644
-  when: is54
 
 - name: Set SELinux Boolean collectd_tcp_network_connect
   seboolean: name=collectd_tcp_network_connect state=yes persistent=yes

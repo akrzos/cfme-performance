@@ -96,6 +96,10 @@ epel6_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rp
 epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 grafana_rpm: https://grafanarel.s3.amazonaws.com/builds/grafana-2.6.0-1.x86_64.rpm
 
+el6_collectd: http://download.example.com/el6-collectd/collectd-5.5.0-1.el6.x86_64.rpm
+el6_collectd_apache: http://download.example.com/el6-collectd/collectd-apache-5.5.0-1.el6.x86_64.rpm
+el6_collectd_disk: http://download.example.com/el6-collectd/collectd-disk-5.5.0-1.el6.x86_64.rpm
+el6_collectd-postgres: http://download.example.com/el6-collectd/collectd-postgresql-5.5.0-1.el6.x86_64.rpm
 
 ###############################
 # Time Servers
