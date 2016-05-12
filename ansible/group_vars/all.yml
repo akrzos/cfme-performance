@@ -8,6 +8,8 @@ export_datastore: export
 
 # Template:
 appliance_template: http://manageiq.org/download/manageiq-ovirt-capablanca-2.ova
+template_name: manageiq-ovirt-capablanca-2.ova
+template_dest: /root/{{template_name}}
 
 
 ########################################
