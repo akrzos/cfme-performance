@@ -1,0 +1,103 @@
+---
+#
+# Automate deploying Collectd/Carbon/Graphite/Grafana and dashboards to an appliance
+#
+
+- hosts: cfme-all-in-one
+  gather_facts: false
+  vars:
+    ansible_connection: ssh
+    ansible_user: root
+    ansible_ssh_pass: smartvm
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
+  roles:
+    - sshkey
+
+- hosts: cfme-all-in-one
+  gather_facts: false
+  remote_user: root
+  vars:
+    config_type: cfme-all-in-one
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
+    - ../group_vars/allinone.yml
+  roles:
+    - version
+    - hostname
+    - repos
+    - { role: ntpd, when: (is54)}
+    - { role: chronyd, when: (is55 or is56)}
+    - { role: config-interface, when: "{{appliances[inventory_hostname].interfaces|length}} > 0" }
+    - proctitle-patch
+    - init-vmdb
+    - graphite
+    - grafana
+    - collectd
+
+- hosts: cfme-all-in-one
+  gather_facts: false
+  remote_user: root
+  vars:
+    overwrite_existing: true
+    dashboards:
+      - template_name: baremetal_general_system_performance
+        process_list_name: Baremetal
+        dashboard_name: Baremetal General System Performance
+
+      - template_name: guest_general_system_performance
+        process_list_name: Guest
+        dashboard_name: Guest General System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME
+        dashboard_name: CFME General System Performance
+
+      - template_name: cfme_ui_system_performance
+        process_list_name: CFME-UI
+        dashboard_name: CFME UI System Performance
+
+      - template_name: cfmeallinone_general_system_performance
+        process_list_name: CFME-All-In-One
+        dashboard_name: CFME-All-In-One System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-Amazon
+        dashboard_name: CFME-Amazon System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-Azure
+        dashboard_name: CFME-Azure System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-Containers
+        dashboard_name: CFME-Containers System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-Microsoft
+        dashboard_name: CFME-Microsoft System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-Openstack
+        dashboard_name: CFME-Openstack System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-RedHat
+        dashboard_name: CFME-RedHat System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-VMware
+        dashboard_name: CFME-VMware System Performance
+
+      - template_name: monitorhost_general_system_performance
+        process_list_name: MonitorHost
+        dashboard_name: MonitorHost System Performance
+
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
+    - ../group_vars/allinone.yml
+  roles:
+    - grafana-dashboards

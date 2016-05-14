@@ -5,22 +5,43 @@
 
 - name: Remove existing dashboards
   command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item.dashboard_name|lower|regex_replace(' ', '-')}}"
-  when: overwrite_existing
   with_items: "{{dashboards}}"
+  when: overwrite_existing and (grafana_host != "localhost")
 
 - name: Ensure {{role_path}}/files directory exists
   file: path={{role_path}}/files state=directory
+  when: grafana_host != "localhost"
 
 - name: Generate dashboards
   template:
     src: "{{item.template_name}}.json.j2"
     dest: "{{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json"
   with_items: "{{dashboards}}"
+  when: grafana_host != "localhost"
 
 - name: Upload dashboards to grafana
   command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
   with_items: "{{dashboards}}"
+  when: grafana_host != "localhost"
 
 - name: Remove leftover json file(s)
   file: path={{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json state=absent
   with_items: "{{dashboards}}"
+  when: grafana_host != "localhost"
+
+- name: Remove existing dashboards
+  command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item.dashboard_name|lower|regex_replace(' ', '-')}}"
+  with_items: "{{dashboards}}"
+  when: overwrite_existing and (grafana_host == "localhost")
+
+- name: Generate dashboards
+  template:
+    src: "{{item.template_name}}.json.j2"
+    dest: "/root/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json"
+  with_items: "{{dashboards}}"
+  when: grafana_host == "localhost"
+
+- name: Upload dashboards to grafana
+  command: "curl -X POST -H 'Content-Type: application/json' -d @/root/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
+  with_items: "{{dashboards}}"
+  when: grafana_host == "localhost"

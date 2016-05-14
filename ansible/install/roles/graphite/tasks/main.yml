@@ -8,9 +8,13 @@
   ignore_errors: true
   register: epel_installed
 
-- name: Install epel repo
+- name: Install epel repo (rhel7)
   command: rpm -ivh {{ epel7_rpm }}
-  when: epel_installed.rc != 0
+  when: (epel_installed.rc != 0) and (is55 or is56)
+
+- name: Install epel repo (rhel6)
+  command: rpm -ivh {{ epel6_rpm }}
+  when: (epel_installed.rc != 0) and is54
 
 - name: Install carbon/graphite rpms
   yum: name={{ item }} state=present
@@ -44,18 +48,16 @@
     group=root
     mode=0644
 
-- name: Ensure apache is started and enabled
-  service: name=httpd state=started enabled=true
-
 - name: Add firewall rules for carbon-cache and graphite
   command: "{{ item }}"
   with_items:
-    - "firewall-cmd --zone=public --add-port=2003/tcp --permanent"
-    - "firewall-cmd --zone=public --add-port={{graphite_port}}/tcp --permanent"
+    - "firewall-cmd --zone={{firewall_zone}} --add-port=2003/tcp --permanent"
+    - "firewall-cmd --zone={{firewall_zone}} --add-port={{graphite_port}}/tcp --permanent"
     - firewall-cmd --reload
 
 - name: Restart apache
   service: name=httpd state=restarted enabled=true
+  ignore_errors: true
 
 - name: Ensure carbon-cache service is started and enabled
   service: name=carbon-cache state=started enabled=true

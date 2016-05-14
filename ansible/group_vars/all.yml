@@ -30,6 +30,7 @@ grafana_password: admin
 cfme_apache_monitoring: false
 cfme_carbon_prefix: manageiq
 carbon_host_prefix: carbon
+firewall_zone: public
 collectd_interval: 10
 
 

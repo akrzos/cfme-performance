@@ -1,0 +1,20 @@
+---
+########################################
+# Monitor Host Configuration
+########################################
+# Carbon/Graphite:
+carbon_host: localhost
+graphite_port: 9000
+graphite_username: root
+graphite_password: calvin
+# Grafana:
+grafana_host: localhost
+grafana_port: 9001
+grafana_username: admin
+grafana_password: admin
+# Collectd:
+# Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
+cfme_apache_monitoring: false
+cfme_carbon_prefix: manageiq
+firewall_zone: manageiq
+collectd_interval: 10

@@ -8,9 +8,13 @@
   ignore_errors: true
   register: epel_installed
 
-- name: Install epel repo
+- name: Install epel repo (rhel7)
   command: rpm -ivh {{ epel7_rpm }}
-  when: epel_installed.rc != 0
+  when: (epel_installed.rc != 0) and (is55 or is56)
+
+- name: Install epel repo (rhel6)
+  command: rpm -ivh {{ epel6_rpm }}
+  when: (epel_installed.rc != 0) and is54
 
 - name: Install grafana rpm
   yum: name={{grafana_rpm}} state=present
@@ -33,7 +37,7 @@
 - name: Add firewall rules for grafana
   command: "{{ item }}"
   with_items:
-    - "firewall-cmd --zone=public --add-port={{grafana_port}}/tcp --permanent"
+    - "firewall-cmd --zone={{firewall_zone}} --add-port={{grafana_port}}/tcp --permanent"
     - firewall-cmd --reload
 
 - name: Setup grafana-server service
@@ -51,14 +55,27 @@
     src: data_source.json.j2
     dest: "{{role_path}}/files/data_source.json"
   connection: local
+  when: grafana_host != "localhost"
 
 - name: Create Data Source on grafana server
   command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/data_source.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/datasources"
   connection: local
+  when: grafana_host != "localhost"
 
 - name: Remove leftover json file
   file: path={{role_path}}/files/data_source.json state=absent
   connection: local
+  when: grafana_host != "localhost"
+
+- name: Create data_source.json
+  template:
+    src: data_source.json.j2
+    dest: "/root/data_source.json"
+  when: grafana_host == "localhost"
+
+- name: Create Data Source on grafana server
+  command: "curl -X POST -H 'Content-Type: application/json' -d @/root/data_source.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/datasources"
+  when: grafana_host == "localhost"
 
 - name: Disable EPEL
   shell: rpm -e epel-release

@@ -5,6 +5,7 @@ Playbooks that configure an appliance for Performance Analysis and Testing. Play
 **Table of Contents**
 ========
 - [Playbooks](#playbooks)
+  - [all-in-one.yml](#all-in-oneyml)
   - [postdeploy.yml](#postdeployyml)
     - [sshkey.yml](#sshkeyyml)
     - [hostname.yml](#hostnameyml)
@@ -17,6 +18,12 @@ Playbooks that configure an appliance for Performance Analysis and Testing. Play
   - [database-import.yml](#database-importyml)
 
 # Playbooks
+
+## all-in-one.yml
+```
+[root@perf ansible]# ansible-playbook -i hosts.local configure/all-in-one.yml
+```
+Runs all of the roles required to create an All-In-One Performance Monitored CFME/Miq appliance.  See this [document](README.allinone.md) for further details.
 
 ## postdeploy.yml
 ```
