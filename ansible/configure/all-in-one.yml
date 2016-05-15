@@ -16,7 +16,7 @@
     - sshkey
 
 - hosts: cfme-all-in-one
-  gather_facts: false
+  gather_facts: true
   remote_user: root
   vars:
     config_type: cfme-all-in-one

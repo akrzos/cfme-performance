@@ -10,11 +10,11 @@
 
 - name: Install epel repo (rhel7)
   command: rpm -ivh {{ epel7_rpm }}
-  when: (epel_installed.rc != 0) and (is55 or is56)
+  when: (epel_installed.rc != 0) and (ansible_os_family == "RedHat" and ansible_distribution_version|int == 7)
 
 - name: Install epel repo (rhel6)
   command: rpm -ivh {{ epel6_rpm }}
-  when: (epel_installed.rc != 0) and is54
+  when: (epel_installed.rc != 0) and (ansible_os_family == "RedHat" and ansible_distribution_version|int == 6)
 
 - name: Install grafana rpm
   yum: name={{grafana_rpm}} state=present
@@ -34,11 +34,16 @@
       value: true
   become: true
 
-- name: Add firewall rules for grafana
+- name: Add firewall rules for grafana (rhel7)
   command: "{{ item }}"
   with_items:
     - "firewall-cmd --zone={{firewall_zone}} --add-port={{grafana_port}}/tcp --permanent"
     - firewall-cmd --reload
+  when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 7
+
+- name:  Add firewall rules for grafana (rhel6)
+  iptables: chain=INPUT protocol=tcp destination_port={{grafana_port}}
+  when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 6
 
 - name: Setup grafana-server service
   service: name=grafana-server state=started enabled=true

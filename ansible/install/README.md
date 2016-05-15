@@ -18,7 +18,7 @@ Playbooks for installing/configuring associated infrastructure with Performance 
 ## Infrastructure Install Playbooks
 Three major infrastructure hosts:
 1. Workload Driver - Hosts cfme-performance and cfme_tests (perf fork)
-2. Monitoring Host - Hosts Carbon/Graphite/Grafana for system performance monitoring
+2. Monitoring Host - RHEL7 Machine that Hosts Carbon/Graphite/Grafana for system performance monitoring
 3. Results/Logs Host - Hosts an ELK stack to review testing results and log files from appliances
 All should be built on RHEL7/Centos7
 
@@ -26,7 +26,7 @@ All should be built on RHEL7/Centos7
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local install/monitorhost.yml
 ```
-Creates a monitoring host machine by installing carbon/graphite/grafana and collectd on a single machine.  This basically combines graphite.yml, grafana.yml, grafana-dashboards.yml in a single playbook.
+Creates a monitoring host machine by installing carbon/graphite/grafana and collectd on a single machine.  This basically combines graphite.yml, grafana.yml, grafana-dashboards.yml in a single playbook.  Before running, create a RHEL 7 machine with large enough disk space in /var/lib/carbon to accommodate the number of CFME/Miq appliances you plan on monitoring. (~5-7GiB per appliance with included CFME collectd configs)
 
 #### graphite.yml
 ```

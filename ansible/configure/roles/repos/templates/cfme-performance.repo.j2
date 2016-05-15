@@ -1,14 +1,14 @@
 # Installed by cfme-performance
 
 {% for key in repos %}
-{% if is54 and '6' in key %}
+{% if (ansible_os_family == "RedHat" and ansible_distribution_version|int == 6) and '6' in key %}
 [{{key}}]
 name={{key}}
 baseurl={{repos[key].baseurl}}
 gpgcheck=0
 enabled=1
 
-{% elif (is55 or is56) and '7' in key %}
+{% elif (ansible_os_family == "RedHat" and ansible_distribution_version|int == 7) and '7' in key %}
 [{{key}}]
 name={{key}}
 baseurl={{repos[key].baseurl}}

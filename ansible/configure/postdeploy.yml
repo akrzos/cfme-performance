@@ -16,7 +16,7 @@
     - sshkey
 
 - hosts: cfme-vmdb
-  gather_facts: false
+  gather_facts: true
   remote_user: root
   vars:
     config_type: cfme-vmdb

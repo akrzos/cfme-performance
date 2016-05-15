@@ -4,7 +4,7 @@
 #
 # if run manually, the following is the expected output.
 # Would you like to create one now? (yes/no): yes
-# Username (leave blank to use 'root'): 
+# Username (leave blank to use 'root'):
 # Email address:
 # Password:
 # Password (again):
@@ -16,7 +16,11 @@
 set timeout 20
 set superuser [lindex $argv 0]
 set password [lindex $argv 1]
+{% if ansible_os_family == "RedHat" and ansible_distribution_version|int == 7 %}
 spawn /usr/lib/python2.7/site-packages/graphite/manage.py syncdb
+{% else %}
+spawn /usr/lib/python2.6/site-packages/graphite/manage.py syncdb
+{% endif %}
 expect "Would you like to create one now? (yes/no):"
 send "yes\r";
 expect "Username (leave blank to use 'root'):"
@@ -29,4 +33,3 @@ expect "Password (again):"
 send "$password\r";
 
 interact
-

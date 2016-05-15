@@ -10,11 +10,11 @@
 
 - name: Install epel repo (rhel7)
   command: rpm -ivh {{ epel7_rpm }}
-  when: (epel_installed.rc != 0) and (is55 or is56)
+  when: (epel_installed.rc != 0) and (ansible_os_family == "RedHat" and ansible_distribution_version|int == 7)
 
 - name: Install epel repo (rhel6)
   command: rpm -ivh {{ epel6_rpm }}
-  when: (epel_installed.rc != 0) and is54
+  when: (epel_installed.rc != 0) and (ansible_os_family == "RedHat" and ansible_distribution_version|int == 6)
 
 - name: Install carbon/graphite rpms
   yum: name={{ item }} state=present
@@ -29,8 +29,8 @@
   register: graphite_db_installed
 
 - name: Copy setup-graphite-db.exp
-  copy:
-    src=setup-graphite-db.exp
+  template:
+    src=setup-graphite-db.exp.j2
     dest=/root/setup-graphite-db.exp
     owner=root
     group=root
@@ -48,12 +48,20 @@
     group=root
     mode=0644
 
-- name: Add firewall rules for carbon-cache and graphite
+- name: Add firewall rules for carbon-cache and graphite (rhel7)
   command: "{{ item }}"
   with_items:
     - "firewall-cmd --zone={{firewall_zone}} --add-port=2003/tcp --permanent"
     - "firewall-cmd --zone={{firewall_zone}} --add-port={{graphite_port}}/tcp --permanent"
     - firewall-cmd --reload
+  when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 7
+
+- name:  Add firewall rules for carbon-cache and graphite (rhel6)
+  iptables: chain=INPUT protocol=tcp destination_port={{item}}
+  with_items:
+    - 2003
+    - "{{graphite_port}}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 6
 
 - name: Restart apache
   service: name=httpd state=restarted enabled=true

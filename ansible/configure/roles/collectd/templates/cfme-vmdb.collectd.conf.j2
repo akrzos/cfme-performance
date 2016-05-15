@@ -68,6 +68,15 @@ LoadPlugin uptime
 </Plugin>
 
 <Plugin postgresql>
+  <Query vms_count_by_state>
+    Statement "select raw_power_state,count(*) from vms group by raw_power_state"
+    <Result>
+      Type gauge
+      InstancePrefix "raw_power_state"
+      InstancesFrom "raw_power_state"
+      ValuesFrom "count"
+    </Result>
+  </Query>
   <Query miq_queue_by_state>
     Statement "select state,count(*) from miq_queue group by state"
     <Result>
@@ -172,6 +181,7 @@ LoadPlugin uptime
     Query disk_io
     Query disk_usage
     # Defined in Query blocks:
+    #Query vms_count_by_state
     Query miq_queue_by_state
     Query miq_queue_by_zone
     Query miq_queue_by_role
