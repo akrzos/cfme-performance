@@ -2,15 +2,19 @@
 #
 # Upload Grafana Dashboards
 #
+# Below set of tasks is for when grafana_host is set in vars and thus the tasks occur from localhost (curl to grafana_host)
+#
 
-- name: Remove existing dashboards
+- name: Remove existing dashboards (static)
+  command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item|lower|regex_replace(' ', '-')}}"
+  with_items:
+    - system-performance-comparsion
+  when: overwrite_existing and (grafana_host != "localhost")
+
+- name: Remove existing dashboards (generated)
   command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item.dashboard_name|lower|regex_replace(' ', '-')}}"
   with_items: "{{dashboards}}"
   when: overwrite_existing and (grafana_host != "localhost")
-
-- name: Ensure {{role_path}}/files directory exists
-  file: path={{role_path}}/files state=directory
-  when: grafana_host != "localhost"
 
 - name: Generate dashboards
   template:
@@ -19,7 +23,13 @@
   with_items: "{{dashboards}}"
   when: grafana_host != "localhost"
 
-- name: Upload dashboards to grafana
+- name: Upload dashboards to grafana (static)
+  command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/{{item|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
+  with_items:
+    - system_performance_comparsion
+  when: grafana_host != "localhost"
+
+- name: Upload dashboards to grafana (generated)
   command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
   with_items: "{{dashboards}}"
   when: grafana_host != "localhost"
@@ -29,7 +39,13 @@
   with_items: "{{dashboards}}"
   when: grafana_host != "localhost"
 
-- name: Remove existing dashboards
+#
+# When operating against monitorhosts (Set grafana_host to localhost in vars file)
+#
+# Below tasks occur on monitorhost(ansible sshes to host) and curl goes directly to localhost
+#
+
+- name: Remove existing dashboards (generated)
   command: "curl -X DELETE -H 'Content-Type: application/json' http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db/{{item.dashboard_name|lower|regex_replace(' ', '-')}}"
   with_items: "{{dashboards}}"
   when: overwrite_existing and (grafana_host == "localhost")
@@ -41,7 +57,21 @@
   with_items: "{{dashboards}}"
   when: grafana_host == "localhost"
 
-- name: Upload dashboards to grafana
+- name: Copy static dashboards
+  copy:
+    src: "{{item}}.json"
+    dest: "/root/{{item|lower|regex_replace(' ', '-')}}.json"
+  with_items:
+    - system_performance_comparsion
+  when: grafana_host == "localhost"
+
+- name: Upload dashboards to grafana (static)
+  command: "curl -X POST -H 'Content-Type: application/json' -d @{{role_path}}/files/{{item|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
+  with_items:
+    - system_performance_comparsion
+  when: grafana_host == "localhost"
+
+- name: Upload dashboards to grafana (generated)
   command: "curl -X POST -H 'Content-Type: application/json' -d @/root/{{item.dashboard_name|lower|regex_replace(' ', '-')}}.json http://{{grafana_username}}:{{grafana_password}}@{{grafana_host}}:{{grafana_port}}/api/dashboards/db"
   with_items: "{{dashboards}}"
   when: grafana_host == "localhost"
