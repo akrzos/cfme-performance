@@ -28,6 +28,10 @@ grafana_password: admin
 # Collectd:
 # Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
 cfme_apache_monitoring: false
+# Query vmdb_production for insight on MiqQueue/VMs/Workers
+vmdb_miq_queue_queries: true
+vmdb_vms_queries: true
+vmdb_workers_queries: true
 cfme_carbon_prefix: manageiq
 carbon_host_prefix: carbon
 firewall_zone: public

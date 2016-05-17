@@ -67,88 +67,8 @@ LoadPlugin uptime
   IgnoreSelected false
 </Plugin>
 
+# Connection to vmdb_production
 <Plugin postgresql>
-  <Query vms_count_by_state>
-    Statement "select raw_power_state,count(*) from vms group by raw_power_state"
-    <Result>
-      Type gauge
-      InstancePrefix "raw_power_state"
-      InstancesFrom "raw_power_state"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_state>
-    Statement "select state,count(*) from miq_queue group by state"
-    <Result>
-      Type gauge
-      InstancePrefix "state"
-      InstancesFrom "state"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_zone>
-    Statement "select zone,count(*) from miq_queue group by zone"
-    <Result>
-      Type gauge
-      InstancePrefix "zone"
-      InstancesFrom "zone"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_role>
-    Statement "select role,count(*) from miq_queue group by role"
-    <Result>
-      Type gauge
-      InstancePrefix "role"
-      InstancesFrom "role"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_priority>
-    Statement "select priority,count(*) from miq_queue group by priority"
-    <Result>
-      Type gauge
-      InstancePrefix "priority"
-      InstancesFrom "priority"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_name>
-    Statement "select queue_name,count(*) from miq_queue group by queue_name"
-    <Result>
-      Type gauge
-      InstancePrefix "queue"
-      InstancesFrom "queue_name"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_class>
-    Statement "select class_name,count(*) from miq_queue group by class_name"
-    <Result>
-      Type gauge
-      InstancePrefix "class"
-      InstancesFrom "class_name"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_by_method>
-    Statement "select method_name,count(*) from miq_queue group by method_name"
-    <Result>
-      Type gauge
-      InstancePrefix "method"
-      InstancesFrom "method_name"
-      ValuesFrom "count"
-    </Result>
-  </Query>
-  <Query miq_queue_qcm>
-    Statement "select REPLACE(CONCAT(queue_name, '-',class_name,'-',method_name), 'ManageIQ::Providers::', '') as queue,count(*) from miq_queue group by queue_name,class_name,method_name"
-    <Result>
-      Type gauge
-      InstancePrefix "all"
-      InstancesFrom "queue"
-      ValuesFrom "count"
-    </Result>
-  </Query>
   <Query row_stats>
     Statement "SELECT sum(n_tup_ins) AS inserts, sum(n_tup_upd) AS updates, sum(n_tup_del) AS deletes FROM pg_stat_user_tables"
     <Result>
@@ -167,6 +87,117 @@ LoadPlugin uptime
       ValuesFrom "deletes"
     </Result>
   </Query>
+  # miq_queue table queries
+  <Query miq_queue_by_state>
+    Statement "select state,count(*) from miq_queue group by state"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-state"
+      InstancesFrom "state"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_by_zone>
+    Statement "select zone,count(*) from miq_queue group by zone"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-zone"
+      InstancesFrom "zone"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_by_role>
+    Statement "select role,count(*) from miq_queue group by role"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-role"
+      InstancesFrom "role"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_by_priority>
+    Statement "select priority,count(*) from miq_queue group by priority"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-priority"
+      InstancesFrom "priority"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_by_name>
+    Statement "select queue_name,count(*) from miq_queue group by queue_name"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-name"
+      InstancesFrom "queue_name"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_by_class>
+    Statement "select class_name,count(*) from miq_queue group by class_name"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-class"
+      InstancesFrom "class_name"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_by_method>
+    Statement "select method_name,count(*) from miq_queue group by method_name"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-method"
+      InstancesFrom "method_name"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query miq_queue_qcm>
+    Statement "select REPLACE(CONCAT(queue_name, '-',class_name,'-',method_name), 'ManageIQ::Providers::', '') as queue,count(*) from miq_queue group by queue_name,class_name,method_name"
+    <Result>
+      Type gauge
+      InstancePrefix "queue-all"
+      InstancesFrom "queue"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  # vms table query
+  <Query vms_count_by_state>
+    Statement "select raw_power_state,count(*) from vms group by raw_power_state"
+    <Result>
+      Type gauge
+      InstancePrefix "vms-rps"
+      InstancesFrom "raw_power_state"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  # miq_workers table queries
+  <Query workers_count_by_type>
+    Statement "select REPLACE(type, 'ManageIQ::Providers::', '') as type,count(*) from miq_workers group by type"
+    <Result>
+      Type gauge
+      InstancePrefix "workers-type"
+      InstancesFrom "type"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query workers_count_by_status>
+    Statement "select status,count(*) from miq_workers group by status"
+    <Result>
+      Type gauge
+      InstancePrefix "workers-status"
+      InstancesFrom "status"
+      ValuesFrom "count"
+    </Result>
+  </Query>
+  <Query workers_count_by_queue>
+    Statement "select queue_name,count(*) from miq_workers group by queue_name"
+    <Result>
+      Type gauge
+      InstancePrefix "workers-queue"
+      InstancesFrom "queue_name"
+      ValuesFrom "count"
+    </Result>
+  </Query>
   <Database vmdb_production>
     Host "localhost"
     Port "5432"
@@ -180,8 +211,12 @@ LoadPlugin uptime
     Query table_states
     Query disk_io
     Query disk_usage
+
     # Defined in Query blocks:
-    #Query vms_count_by_state
+    Query row_stats
+
+    # miq_queue queries
+{% if vmdb_miq_queue_queries %}
     Query miq_queue_by_state
     Query miq_queue_by_zone
     Query miq_queue_by_role
@@ -190,7 +225,34 @@ LoadPlugin uptime
     Query miq_queue_by_class
     Query miq_queue_by_method
     Query miq_queue_qcm
-    Query row_stats
+{% else %}
+    #Query miq_queue_by_state
+    #Query miq_queue_by_zone
+    #Query miq_queue_by_role
+    #Query miq_queue_by_priority
+    #Query miq_queue_by_name
+    #Query miq_queue_by_class
+    #Query miq_queue_by_method
+    #Query miq_queue_qcm
+{% endif %}
+
+    # vms query
+{% if vmdb_vms_queries %}
+    Query vms_count_by_state
+{% else %}
+    #Query vms_count_by_state
+{% endif %}
+
+    # workers queries
+{% if vmdb_workers_queries %}
+    Query workers_count_by_type
+    Query workers_count_by_status
+    Query workers_count_by_queue
+{% else %}
+    #Query workers_count_by_type
+    #Query workers_count_by_status
+    #Query workers_count_by_queue
+{% endif %}
   </Database>
 </Plugin>
 
