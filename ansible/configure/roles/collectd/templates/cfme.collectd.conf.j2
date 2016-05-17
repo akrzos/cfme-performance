@@ -116,12 +116,17 @@ LoadPlugin uptime
   ProcessMatch "MiqEmsRefreshWorkerAmazon" "MiqEmsRefreshWorkerAmazon.*"
   ProcessMatch "MiqEmsRefreshWorkerOpenstack" "MiqEmsRefreshWorkerOpenstack.*"
 
+  ProcessMatch "Amazon::NetworkManager::RefreshWorker" "Amazon::NetworkManager::RefreshWorker.*"
+  ProcessMatch "Azure::NetworkManager::RefreshWorker" "Azure::NetworkManager::RefreshWorker.*"
+  ProcessMatch "Openstack::NetworkManager::RefreshWorker" "Openstack::NetworkManager::RefreshWorker.*"
+
   ProcessMatch "Atomic::ContainerManager::RefreshWorker" "Atomic::ContainerManager::RefreshWorker.*"
   ProcessMatch "AtomicEnterprise::ContainerManager::RefreshWorker" "AtomicEnterprise::ContainerManager::RefreshWorker.*"
   ProcessMatch "Hawkular::MiddlewareManager::RefreshWorker" "Hawkular::MiddlewareManager::RefreshWorker.*"
   ProcessMatch "Kubernetes::ContainerManager::RefreshWorker" "Kubernetes::ContainerManager::RefreshWorker.*"
   ProcessMatch "Openshift::ContainerManager::RefreshWorker" "Openshift::ContainerManager::RefreshWorker.*"
   ProcessMatch "OpenshiftEnterprise::ContainerManager::RefreshWorker" "OpenshiftEnterprise::ContainerManager::RefreshWorker.*"
+
   ProcessMatch "MiqNetappRefreshWorker" "MiqNetappRefreshWorker.*"
   ProcessMatch "MiqSmisRefreshWorker" "MiqSmisRefreshWorker.*"
 
@@ -135,12 +140,16 @@ LoadPlugin uptime
 
   ProcessMatch "Amazon::CloudManager::EventCatcher" "Amazon::CloudManager::EventCatcher.*"
   ProcessMatch "Azure::CloudManager::EventCatcher" "Azure::CloudManager::EventCatcher.*"
+  ProcessMatch "Google::CloudManager::EventCatcher" "Google::CloudManager::EventCatcher.*"
   ProcessMatch "Openstack::CloudManager::EventCatcher" "Openstack::CloudManager::EventCatcher.*"
   ProcessMatch "MiqEventCatcherAmazon" "MiqEventCatcherAmazon.*"
   ProcessMatch "MiqEventCatcherOpenstack" "MiqEventCatcherOpenstack.*"
 
+  ProcessMatch "Openstack::NetworkManager::EventCatcher" "Openstack::NetworkManager::EventCatcher.*"
+
   ProcessMatch "Atomic::ContainerManager::EventCatcher" "Atomic::ContainerManager::EventCatcher.*"
   ProcessMatch "AtomicEnterprise::ContainerManager::EventCatcher" "AtomicEnterprise::ContainerManager::EventCatcher.*"
+  ProcessMatch "Hawkular::MiddlewareManager::EventCatcher" "Hawkular::MiddlewareManager::EventCatcher.*"
   ProcessMatch "Kubernetes::ContainerManager::EventCatcher" "Kubernetes::ContainerManager::EventCatcher.*"
   ProcessMatch "Openshift::ContainerManager::EventCatcher" "Openshift::ContainerManager::EventCatcher.*"
   ProcessMatch "OpenshiftEnterprise::ContainerManager::EventCatcher" "OpenshiftEnterprise::ContainerManager::EventCatcher.*"
@@ -154,9 +163,12 @@ LoadPlugin uptime
   ProcessMatch "MiqEmsMetricsCollectorWorkerRedhat" "MiqEmsMetricsCollectorWorkerRedhat.*"
 
   ProcessMatch "Amazon::CloudManager::MetricsCollectorWorker" "Amazon::CloudManager::MetricsCollectorWorker.*"
+  ProcessMatch "Azure::CloudManager::MetricsCollectorWorker" "Azure::CloudManager::MetricsCollectorWorker.*"
   ProcessMatch "Openstack::CloudManager::MetricsCollectorWorker" "Openstack::CloudManager::MetricsCollectorWorker.*"
   ProcessMatch "MiqEmsMetricsCollectorWorkerAmazon" "MiqEmsMetricsCollectorWorkerAmazon.*"
   ProcessMatch "MiqEmsMetricsCollectorWorkerOpenstack" "MiqEmsMetricsCollectorWorkerOpenstack.*"
+
+  ProcessMatch "Openstack::NetworkManager::MetricsCollectorWorker" "Openstack::NetworkManager::MetricsCollectorWorker.*"
 
   ProcessMatch "Atomic::ContainerManager::MetricsCollectorWorker" "Atomic::ContainerManager::MetricsCollectorWorker.*"
   ProcessMatch "AtomicEnterprise::ContainerManager::MetricsCollectorWorker" "AtomicEnterprise::ContainerManager::MetricsCollectorWorker.*"
