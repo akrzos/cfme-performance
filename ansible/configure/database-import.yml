@@ -11,4 +11,4 @@
     - ../group_vars/all.local.yml
   roles:
     - version
-    - {role: database-import, when: "{{appliances[inventory_hostname].dbdump}} is defined" }
+    - {role: database-import, when: "'{{appliances[inventory_hostname].dbdump}}' is defined" }
