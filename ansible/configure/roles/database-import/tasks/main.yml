@@ -41,11 +41,11 @@
 - name: Invalidate all passwords since the v2_key is now different
   shell: "cd /var/www/miq/vmdb/; bundle exec tools/fix_auth.rb --v2 --invalid bogus"
 
-- name: Run rake evm:automate:reset
-  shell: "cd /var/www/miq/vmdb/; bin/rake evm:automate:reset"
-
 - name: Run rake db:migrate
   shell: "cd /var/www/miq/vmdb/; bin/rake db:migrate"
+
+- name: Run rake evm:automate:reset
+  shell: "cd /var/www/miq/vmdb/; bin/rake evm:automate:reset"
 
 # Ignore_errors since appliances might not have collectd
 - name: Start CFME/Miq Services

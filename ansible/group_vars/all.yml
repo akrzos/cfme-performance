@@ -21,20 +21,16 @@ graphite_port: 9000
 graphite_username: root
 graphite_password: calvin
 # Grafana:
-grafana_host: 1.1.1.1
+grafana_host: "{{carbon_host}}"
 grafana_port: 9001
 grafana_username: admin
 grafana_password: admin
-# Collectd:
-# Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
-cfme_apache_monitoring: false
-# Query vmdb_production for insight on MiqQueue/VMs/Workers
-vmdb_miq_queue_queries: true
-vmdb_vms_queries: true
-vmdb_workers_queries: true
-cfme_carbon_prefix: manageiq
-carbon_host_prefix: carbon
+# Carbon/Graphite/Grafana:
 firewall_zone: public
+# Collectd:
+carbon_host_prefix: carbon
+
+# Collectd applies to all Hosts (MonitorHost/CFME/Miq)
 collectd_interval: 10
 
 
@@ -43,6 +39,16 @@ collectd_interval: 10
 ###############################
 # Use false if patching before init-vmdb playbook/role
 proctitle_restart: false
+
+# CFME Collectd Configuration items, applies to all appliances (currently)
+# Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
+cfme_apache_monitoring: false
+# Query vmdb_production for insight on MiqQueue/VMs/Workers
+vmdb_miq_queue_queries: true
+vmdb_vms_queries: true
+vmdb_workers_queries: true
+cfme_carbon_prefix: manageiq
+
 # Per appliance settings:
 appliances:
   # Appliance that will take a database dump

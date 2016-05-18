@@ -1,4 +1,5 @@
 ---
+# Overrides that apply to running Carbon/Graphite/Grafana/Collectd on CFME (All-In-One Performane Monitoring)
 ########################################
 # Monitor Host Configuration
 ########################################
@@ -12,9 +13,10 @@ grafana_host: localhost
 grafana_port: 9001
 grafana_username: admin
 grafana_password: admin
-# Collectd:
-# Apache Monitoring needs improvement to prevent wrecking standard http://(ip addr)/ access
-cfme_apache_monitoring: false
-cfme_carbon_prefix: manageiq
+# Carbon/Graphite/Grafana:
 firewall_zone: manageiq
+# Collectd:
+carbon_host_prefix: manageiq
+
+# Collectd applies to all Hosts (MonitorHost/CFME/Miq)
 collectd_interval: 10
