@@ -54,6 +54,7 @@ per_process_metrics:
     nullPointMode: "null"
 
 per_process_panels:
+  # Representative of a baremetal machine with example httpd process
   Baremetal:
     - name: "httpd"
       processes:
@@ -61,6 +62,8 @@ per_process_panels:
     - name: "Collectd"
       processes:
         - collectd
+
+  # Representative of a guest machine with example httpd process
   Guest:
     - name: "httpd"
       processes:
@@ -68,6 +71,7 @@ per_process_panels:
     - name: "Collectd"
       processes:
         - collectd
+
   # This list aims to be comprehensive to all CFME Workers/Processes
   CFME:
     - name: "Summerized"
@@ -181,6 +185,15 @@ per_process_panels:
       processes:
         - "Openstack::CloudManager::RefreshWorker"
         - "MiqEmsRefreshWorkerOpenstack"
+    - name: "Amazon::NetworkManager::RefreshWorker"
+      processes:
+        - "Amazon::NetworkManager::RefreshWorker"
+    - name: "Azure::NetworkManager::RefreshWorker"
+      processes:
+        - "Azure::NetworkManager::RefreshWorker"
+    - name: "Openstack::NetworkManager::RefreshWorker"
+      processes:
+        - "Openstack::NetworkManager::RefreshWorker"
     - name: "Atomic::ContainerManager::RefreshWorker"
       processes:
         - "Atomic::ContainerManager::RefreshWorker"
@@ -224,16 +237,25 @@ per_process_panels:
     - name: "Azure::CloudManager::EventCatcher"
       processes:
         - "Azure::CloudManager::EventCatcher"
+    - name: "Google::CloudManager::EventCatcher"
+      processes:
+        - "Google::CloudManager::EventCatcher"
     - name: "Openstack::CloudManager::EventCatcher"
       processes:
         - "Openstack::CloudManager::EventCatcher"
         - "MiqEventCatcherOpenstack"
+    - name: "Openstack::NetworkManager::EventCatcher"
+      processes:
+        - "Openstack::NetworkManager::EventCatcher"
     - name: "Atomic::ContainerManager::EventCatcher"
       processes:
         - "Atomic::ContainerManager::EventCatcher"
     - name: "AtomicEnterprise::ContainerManager::EventCatcher"
       processes:
         - "AtomicEnterprise::ContainerManager::EventCatcher"
+    - name: "Hawkular::MiddlewareManager::EventCatcher"
+      processes:
+        - "Hawkular::MiddlewareManager::EventCatcher"
     - name: "Kubernetes::ContainerManager::EventCatcher"
       processes:
         - "Kubernetes::ContainerManager::EventCatcher"
@@ -259,10 +281,16 @@ per_process_panels:
       processes:
         - "Amazon::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerAmazon"
+    - name: "Azure::CloudManager::MetricsCollectorWorker"
+      processes:
+        - "Azure::CloudManager::MetricsCollectorWorker"
     - name: "Openstack::CloudManager::MetricsCollectorWorker"
       processes:
         - "Openstack::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerOpenstack"
+    - name: "Openstack::NetworkManager::MetricsCollectorWorker"
+      processes:
+        - "Openstack::NetworkManager::MetricsCollectorWorker"
     - name: "Atomic::ContainerManager::MetricsCollectorWorker"
       processes:
         - "Atomic::ContainerManager::MetricsCollectorWorker"
@@ -281,6 +309,7 @@ per_process_panels:
     - name: "MiqStorageMetricsCollectorWorker"
       processes:
         - "MiqStorageMetricsCollectorWorker"
+
   CFME-All-In-One:
     - name: "Summerized"
       processes:
@@ -398,6 +427,15 @@ per_process_panels:
       processes:
         - "Openstack::CloudManager::RefreshWorker"
         - "MiqEmsRefreshWorkerOpenstack"
+    - name: "Amazon::NetworkManager::RefreshWorker"
+      processes:
+        - "Amazon::NetworkManager::RefreshWorker"
+    - name: "Azure::NetworkManager::RefreshWorker"
+      processes:
+        - "Azure::NetworkManager::RefreshWorker"
+    - name: "Openstack::NetworkManager::RefreshWorker"
+      processes:
+        - "Openstack::NetworkManager::RefreshWorker"
     - name: "Atomic::ContainerManager::RefreshWorker"
       processes:
         - "Atomic::ContainerManager::RefreshWorker"
@@ -441,16 +479,25 @@ per_process_panels:
     - name: "Azure::CloudManager::EventCatcher"
       processes:
         - "Azure::CloudManager::EventCatcher"
+    - name: "Google::CloudManager::EventCatcher"
+      processes:
+        - "Google::CloudManager::EventCatcher"
     - name: "Openstack::CloudManager::EventCatcher"
       processes:
         - "Openstack::CloudManager::EventCatcher"
         - "MiqEventCatcherOpenstack"
+    - name: "Openstack::NetworkManager::EventCatcher"
+      processes:
+        - "Openstack::NetworkManager::EventCatcher"
     - name: "Atomic::ContainerManager::EventCatcher"
       processes:
         - "Atomic::ContainerManager::EventCatcher"
     - name: "AtomicEnterprise::ContainerManager::EventCatcher"
       processes:
         - "AtomicEnterprise::ContainerManager::EventCatcher"
+    - name: "Hawkular::MiddlewareManager::EventCatcher"
+      processes:
+        - "Hawkular::MiddlewareManager::EventCatcher"
     - name: "Kubernetes::ContainerManager::EventCatcher"
       processes:
         - "Kubernetes::ContainerManager::EventCatcher"
@@ -476,10 +523,16 @@ per_process_panels:
       processes:
         - "Amazon::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerAmazon"
+    - name: "Azure::CloudManager::MetricsCollectorWorker"
+      processes:
+        - "Azure::CloudManager::MetricsCollectorWorker"
     - name: "Openstack::CloudManager::MetricsCollectorWorker"
       processes:
         - "Openstack::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerOpenstack"
+    - name: "Openstack::NetworkManager::MetricsCollectorWorker"
+      processes:
+        - "Openstack::NetworkManager::MetricsCollectorWorker"
     - name: "Atomic::ContainerManager::MetricsCollectorWorker"
       processes:
         - "Atomic::ContainerManager::MetricsCollectorWorker"
@@ -498,6 +551,7 @@ per_process_panels:
     - name: "MiqStorageMetricsCollectorWorker"
       processes:
         - "MiqStorageMetricsCollectorWorker"
+
   CFME-Amazon:
     - name: "Summerized"
       processes:
@@ -565,6 +619,9 @@ per_process_panels:
       processes:
         - "Amazon::CloudManager::RefreshWorker"
         - "MiqEmsRefreshWorkerAmazon"
+    - name: "Amazon::NetworkManager::RefreshWorker"
+      processes:
+        - "Amazon::NetworkManager::RefreshWorker"
     - name: "Amazon::CloudManager::EventCatcher"
       processes:
         - "Amazon::CloudManager::EventCatcher"
@@ -573,6 +630,7 @@ per_process_panels:
       processes:
         - "Amazon::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerAmazon"
+
   CFME-Azure:
     - name: "Summerized"
       processes:
@@ -639,9 +697,16 @@ per_process_panels:
     - name: "Azure::CloudManager::RefreshWorker"
       processes:
         - "Azure::CloudManager::RefreshWorker"
+    - name: "Azure::NetworkManager::RefreshWorker"
+      processes:
+        - "Azure::NetworkManager::RefreshWorker"
     - name: "Azure::CloudManager::EventCatcher"
       processes:
         - "Azure::CloudManager::EventCatcher"
+    - name: "Azure::CloudManager::MetricsCollectorWorker"
+      processes:
+        - "Azure::CloudManager::MetricsCollectorWorker"
+
   CFME-Containers:
     - name: "Summerized"
       processes:
@@ -731,6 +796,9 @@ per_process_panels:
     - name: "AtomicEnterprise::ContainerManager::EventCatcher"
       processes:
         - "AtomicEnterprise::ContainerManager::EventCatcher"
+    - name: "Hawkular::MiddlewareManager::EventCatcher"
+      processes:
+        - "Hawkular::MiddlewareManager::EventCatcher"
     - name: "Kubernetes::ContainerManager::EventCatcher"
       processes:
         - "Kubernetes::ContainerManager::EventCatcher"
@@ -756,6 +824,7 @@ per_process_panels:
     - name: "OpenshiftEnterprise::ContainerManager::MetricsCollectorWorker"
       processes:
         - "OpenshiftEnterprise::ContainerManager::MetricsCollectorWorker"
+
   CFME-Microsoft:
     - name: "Summerized"
       processes:
@@ -823,6 +892,7 @@ per_process_panels:
       processes:
         - "Microsoft::InfraManager::RefreshWorker"
         - "MiqEmsRefreshWorkerMicrosoft"
+
   CFME-Openstack:
     - name: "Summerized"
       processes:
@@ -893,6 +963,9 @@ per_process_panels:
       processes:
         - "Openstack::CloudManager::RefreshWorker"
         - "MiqEmsRefreshWorkerOpenstack"
+    - name: "Openstack::NetworkManager::RefreshWorker"
+      processes:
+        - "Openstack::NetworkManager::RefreshWorker"
     - name: "Openstack::InfraManager::EventCatcher"
       processes:
         - "Openstack::InfraManager::EventCatcher"
@@ -900,6 +973,9 @@ per_process_panels:
       processes:
         - "Openstack::CloudManager::EventCatcher"
         - "MiqEventCatcherOpenstack"
+    - name: "Openstack::NetworkManager::EventCatcher"
+      processes:
+        - "Openstack::NetworkManager::EventCatcher"
     - name: "Openstack::InfraManager::MetricsCollectorWorker"
       processes:
         - "Openstack::InfraManager::MetricsCollectorWorker"
@@ -907,6 +983,10 @@ per_process_panels:
       processes:
         - "Openstack::CloudManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerOpenstack"
+    - name: "Openstack::NetworkManager::MetricsCollectorWorker"
+      processes:
+        - "Openstack::NetworkManager::MetricsCollectorWorker"
+
   # Per-Process componet of Dashboard specifically for UI Performance
   CFME-UI:
     - name: "MiqUiWorker"
@@ -958,6 +1038,7 @@ per_process_panels:
     - name: "MiqReportingWorker"
       processes:
         - MiqReportingWorker
+
   CFME-RedHat:
     - name: "Summerized"
       processes:
@@ -1033,6 +1114,7 @@ per_process_panels:
       processes:
         - "Redhat::InfraManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerRedhat"
+
   CFME-VMware:
     - name: "Summerized"
       processes:
@@ -1114,6 +1196,7 @@ per_process_panels:
       processes:
         - "Vmware::InfraManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerVmware"
+
   MonitorHost:
     - name: "Summerized"
       processes:
