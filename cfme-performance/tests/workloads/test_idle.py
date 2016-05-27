@@ -1,4 +1,5 @@
 """Runs Idle Workload by enabling all roles with no providers."""
+from utils.appliance import clean_appliance
 from utils.conf import cfme_performance
 from utils.log import logger
 from utils.smem_memory_monitor import SmemMemoryMonitor

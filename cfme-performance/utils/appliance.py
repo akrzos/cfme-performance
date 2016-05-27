@@ -7,7 +7,7 @@ def clean_appliance():
     ssh_client.run_command('service evmserverd stop')
     ssh_client.run_command('sync; sync; echo 3 > /proc/sys/vm/drop_caches')
     ssh_client.run_command('service collectd stop')
-    ssh_client.run_command('service {}-postgresql restart'.format(db.scl_name()))
+    ssh_client.run_command('service rh-postgresql94-postgresql restart')
     ssh_client.run_rake_command('evm:dbsync:local_uninstall')
     # 5.6 requires DISABLE_DATABASE_ENVIRONMENT_CHECK=1
     ssh_client.run_command(
