@@ -1,1 +1,6 @@
-ansible
+# Currently tested versions:
+ansible==2.1.0.0
+matplotlib==1.5.1
+numpy==1.11.0
+pytest==2.9.1
+yaycl==0.2.0

@@ -1,0 +1,41 @@
+# Appliance Under Test
+appliance:
+  ip_address: 10.20.30.40
+  ssh:
+    username: root
+    password: smartvm
+# Performance Tools/Framework Configuration
+tools:
+  grafana:
+    enabled: false
+    ip_address: 10.20.30.40
+    port: 9001
+logging:
+  level: DEBUG
+# Providers for Testing
+providers:
+  - name: vmware-small
+    type: ManageIQ::Providers::Vmware::InfraManager
+    ip_address: 10.20.30.40
+    credentials:
+      username: administrator@vsphere.local
+      password: password
+  - name: rhevm-small
+    type: ManageIQ::Providers::Redhat::InfraManager
+    ip_address: 10.20.30.40
+    credentials:
+      username: admin@internal
+      password: password
+# Tests Configuration
+workloads:
+  test_idle:
+    total_time: 3600
+  test_cap_util:
+    scenarios:
+      - name: vmware-small
+        providers:
+          - vmware-small
+      - name: 2xsmall-vmware-rhevm
+        providers:
+          - vmware-small
+          - rhevm-small

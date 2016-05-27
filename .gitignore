@@ -1,18 +1,32 @@
-*.py[cod]
-
-
-# Ansible files:
+# cfme-performance git ignored files
+# Ansible files
 *.retry
 
-
+# Config files
 # Ignore local copies of files that require configuration:
+
 # ssh-config file
 ansible/ssh-config.local
+
 # inventory file
 ansible/hosts.local
+
 # group_vars/all.local.yml file
 ansible/group_vars/all.local.yml
 
+# Performance Tests yaml config files
+cfme-performance/conf/*.yml
+!cfme-performance/conf/*.template.yml
 
+# Log Files
+cfme-performance/log/*.log
+
+# Python files
+*.py[cod]
+
+# pytest files
+.cache/
+
+# Editor files
 # Swap files
 *.sw[po]
