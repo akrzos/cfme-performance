@@ -21,7 +21,7 @@ class SSHClient(paramiko.SSHClient):
     Constructor kwargs are handed directly to paramiko.SSHClient.connect()
     """
     def __init__(self, stream_output=False, **connect_kwargs):
-        logger.debug('ssh.__init__')
+        logger.vdebug('ssh.__init__')
         super(SSHClient, self).__init__()
         self._streaming = stream_output
 
@@ -48,7 +48,7 @@ class SSHClient(paramiko.SSHClient):
             repr(self._connect_kwargs.get("port", 22)))
 
     def __call__(self, **connect_kwargs):
-        logger.debug('ssh.__call__')
+        logger.vdebug('ssh.__call__')
         # Update a copy of this instance's connect kwargs with passed in kwargs,
         # then return a new instance with the updated kwargs
         new_connect_kwargs = dict(self._connect_kwargs)
@@ -59,7 +59,7 @@ class SSHClient(paramiko.SSHClient):
         return new_client
 
     def __enter__(self):
-        logger.debug('ssh.__enter__')
+        logger.vdebug('ssh.__enter__')
         self.connect()
         return self
 
@@ -84,7 +84,7 @@ class SSHClient(paramiko.SSHClient):
 
     def connect(self, hostname=None, **kwargs):
         """See paramiko.SSHClient.connect"""
-        logger.debug('ssh.connect')
+        logger.vdebug('ssh.connect')
         if hostname and hostname != self._connect_kwargs['hostname']:
             self._connect_kwargs['hostname'] = hostname
             self.close()
@@ -94,20 +94,23 @@ class SSHClient(paramiko.SSHClient):
             return super(SSHClient, self).connect(**self._connect_kwargs)
 
     def open_sftp(self, *args, **kwargs):
-        logger.debug('ssh.open_sftp')
+        logger.vdebug('ssh.open_sftp')
         self.connect()
         return super(SSHClient, self).open_sftp(*args, **kwargs)
 
     def get_transport(self, *args, **kwargs):
         if self.connected:
-            logger.debug('reusing ssh transport')
+            logger.vdebug('reusing ssh transport')
         else:
-            logger.debug('connecting new ssh transport')
+            logger.vdebug('connecting new ssh transport')
             self.connect()
         return super(SSHClient, self).get_transport(*args, **kwargs)
 
-    def run_command(self, command, timeout=RUNCMD_TIMEOUT, reraise=False):
-        logger.info("Running command `%s`", command)
+    def run_command(self, command, timeout=RUNCMD_TIMEOUT, reraise=False, log_less=False):
+        if log_less:
+            logger.info("Running command `{}...(truncated)...`".format(command[:30]))
+        else:
+            logger.info("Running command `{}`".format(command))
         template = '{}\n'
         command = template.format(command)
 

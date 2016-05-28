@@ -12,6 +12,8 @@
     mode=0644
   with_items: "{{appliances[inventory_hostname].interfaces}}"
 
+# Ignore Errors incase interface did not exist
 - name: Bounce interface
   shell: "ifdown {{item.name}}; ifup {{item.name}}"
   with_items: "{{appliances[inventory_hostname].interfaces}}"
+  ignore_errors: true

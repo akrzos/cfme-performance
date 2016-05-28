@@ -712,7 +712,7 @@ def generate_summary_html(directory, appliance_results, process_results, provide
                         pid, ordered_name))
                     html_file.write('</tr>\n')
             else:
-                logger.debug('Process/Worker not part of test: {}'.format(ordered_name))
+                logger.vdebug('Process/Worker not part of test: {}'.format(ordered_name))
 
         html_file.write('</table>\n')
 

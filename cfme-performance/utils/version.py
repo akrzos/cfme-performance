@@ -5,4 +5,4 @@ from utils.ssh import SSHClient
 def get_current_version():
     ssh_client = SSHClient()
     exit_status, current_version = ssh_client.run_command('cat /var/www/miq/vmdb/VERSION')
-    return current_version
+    return current_version.strip()
