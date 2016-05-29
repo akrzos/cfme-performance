@@ -11,6 +11,19 @@ if result != true
   exit 255
 end""")
 
+roles56_all = ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
+    'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations',
+    'event', 'git_owner', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy',
+    'smartstate', 'user_interface', 'web_services', 'websocket']
+
+roles56_default = ['automate', 'database_operations', 'ems_inventory', 'ems_operations', 'event',
+    'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
+
+roles56_idle = ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
+    'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations',
+    'event', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate',
+    'user_interface', 'web_services']
+
 
 def clean_appliance(ssh_client):
     ssh_client.run_command('service evmserverd stop')
@@ -52,13 +65,29 @@ def set_vmdb_yaml_config(ssh_client, yaml_data):
         logger.info('Set VMDB Config')
 
 
-def set_server_roles_workload_idle(ssh_client):
-    """Turns on all server roles used for idle workload including database_synchronization role."""
+def get_server_roles_all_idle(separator=','):
+    return separator.join(roles56_all)
+
+
+def get_server_roles_default_idle(separator=','):
+    return separator.join(roles56_default)
+
+
+def get_server_roles_idle(separator=','):
+    return separator.join(roles56_idle)
+
+
+def set_server_roles_workload_all_idle(ssh_client):
+    """Turns on all server roles used for all idle workload."""
     yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = ('automate,database_operations,database_synchronization,'
-        'ems_inventory,ems_metrics_collector,ems_metrics_coordinator,ems_metrics_processor,'
-        'ems_operations,event,notifier,reporting,rhn_mirror,scheduler,smartproxy,smartstate,'
-        'user_interface,web_services')
+    yaml['server']['role'] = get_server_roles_all_idle()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles_workload_idle(ssh_client):
+    """Turns on all server roles except for git owner and websocket used for idle workload."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_idle()
     set_vmdb_yaml_config(ssh_client, yaml)
 
 

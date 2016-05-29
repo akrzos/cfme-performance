@@ -28,7 +28,11 @@ providers:
       password: password
 # Tests Configuration
 workloads:
+  test_idle_default:
+    total_time: 3600
   test_idle:
+    total_time: 3600
+  test_idle_all:
     total_time: 3600
   test_cap_util:
     scenarios:

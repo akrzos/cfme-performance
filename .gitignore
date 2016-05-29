@@ -15,8 +15,8 @@ ansible/hosts.local
 ansible/group_vars/all.local.yml
 
 # Performance Tests yaml config files
-cfme-performance/conf/*.yml
-!cfme-performance/conf/*.template.yml
+!cfme-performance/conf/*.yml
+cfme-performance/conf/*.local.yml
 
 # Log Files
 cfme-performance/log/*.log

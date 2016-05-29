@@ -93,17 +93,19 @@ ruby_processes.extend(['evm:dbsync:replicate', 'MIQ Server (evm_server.rb)', 'ev
     'appliance_console.rb'])
 
 process_order = list(ruby_processes)
-process_order.extend(['memcached', 'postgres', 'httpd'])
+process_order.extend(['memcached', 'postgres', 'httpd', 'collectd'])
 
 test_ts = time.strftime('%Y%m%d%H%M%S')
 
 
 class SmemMemoryMonitor(Thread):
-    def __init__(self, ssh_client, test_name, results_dir, provider_names):
+    def __init__(self, ssh_client, test_dir, results_dir, test_name, app_roles, provider_names):
         super(SmemMemoryMonitor, self).__init__()
         self.ssh_client = ssh_client
-        self.test_name = test_name
+        self.test_dir = test_dir
         self.results_dir = results_dir
+        self.test_name = test_name
+        self.app_roles = app_roles
         self.provider_names = provider_names
         self.use_slab = False
         self.signal = True
@@ -267,6 +269,9 @@ class SmemMemoryMonitor(Thread):
                 elif memory_by_pid[pid]['name'] == 'memcached':
                     self.create_process_result(process_results, plottime, pid, 'memcached',
                         memory_by_pid)
+                elif memory_by_pid[pid]['name'] == 'collectd':
+                    self.create_process_result(process_results, plottime, pid, 'collectd',
+                        memory_by_pid)
                 elif memory_by_pid[pid]['name'] == 'ruby':
                     if 'evm_server.rb' in memory_by_pid[pid]['cmd']:
                         self.create_process_result(process_results, plottime, pid,
@@ -295,8 +300,8 @@ class SmemMemoryMonitor(Thread):
             time.sleep(time_to_sleep)
         logger.info('Monitoring CFME Memory Terminating')
 
-        create_report(self.test_name, self.results_dir, self.provider_names, appliance_results,
-            process_results, self.use_slab)
+        create_report(self.test_dir, self.results_dir, self.test_name, self.app_roles,
+            self.provider_names, appliance_results, process_results, self.use_slab)
 
     def run(self):
         try:
@@ -307,24 +312,25 @@ class SmemMemoryMonitor(Thread):
 
 
 def install_smem(ssh_client):
-    logger.info('Installing smem.')
+    # smem is included by default in 5.6 appliances
+    # logger.info('Installing smem.')
     # ip_a = IPAppliance(urlparse(env['base_url']).netloc)
     # if ip_a.version >= "5.5":
-    #
     #     ssh_client.run_command('rpm -i {}'.format(cfme_data['basic_info']['epel7_rpm']))
     # else:
     #     ssh_client.run_command('rpm -i {}'.format(cfme_data['basic_info']['epel6_rpm']))
     # ssh_client.run_command('yum install -y smem')
     # Patch smem to display longer command line names
+    logger.info('Patching smem')
     ssh_client.run_command('sed -i s/\.27s/\.200s/g /usr/bin/smem')
 
 
-def create_report(test_name, results_dir, provider_names, appliance_results, process_results,
-        use_slab):
+def create_report(test_dir, results_dir, test_name, app_roles, provider_names, appliance_results,
+        process_results, use_slab):
     logger.info('Creating Memory Monitoring Report.')
     ver = get_current_version()
 
-    memory_path = results_path.join('{}-{}-{}'.format(test_ts, test_name, ver))
+    memory_path = results_path.join('{}-{}-{}'.format(test_ts, test_dir, ver))
     if not os.path.exists(str(memory_path)):
         os.mkdir(str(memory_path))
 
@@ -348,8 +354,8 @@ def create_report(test_name, results_dir, provider_names, appliance_results, pro
     generate_summary_csv(mem_provider_path.join('{}-summary.csv'.format(ver)), appliance_results,
         process_results, provider_names)
     generate_raw_data_csv(mem_rawdata_path, appliance_results, process_results)
-    generate_summary_html(mem_provider_path, appliance_results, process_results, provider_names,
-        test_name)
+    generate_summary_html(mem_provider_path, appliance_results, process_results, test_name,
+        app_roles, provider_names)
 
     logger.info('Finished Creating Report')
 
@@ -445,7 +451,8 @@ def generate_summary_csv(file_name, appliance_results, process_results, provider
     logger.info('Generated Summary CSV in: {}'.format(timediff))
 
 
-def generate_summary_html(directory, appliance_results, process_results, provider_names, test_name):
+def generate_summary_html(directory, appliance_results, process_results, test_name, app_roles,
+        provider_names):
     starttime = time.time()
     ver = get_current_version()
     file_name = str(directory.join('index.html'))
@@ -456,7 +463,8 @@ def generate_summary_html(directory, appliance_results, process_results, provide
 
         html_file.write('<body>\n')
         html_file.write('<b>CFME {} {} Test Results</b><br>\n'.format(ver,
-            test_name.replace('-', ' ').title()))
+            test_name.title()))
+        html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(app_roles.replace(',', ', ')))
         html_file.write('<b>Provider:</b> {}<br>\n'.format(provider_names))
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
@@ -619,6 +627,28 @@ def generate_summary_html(directory, appliance_results, process_results, provide
         tt_swap += t_swap
         html_file.write('<tr>\n')
         html_file.write('<td>httpd</td>\n')
+        html_file.write('<td>{}</td>\n'.format(a_pids + r_pids))
+        html_file.write('<td>{}</td>\n'.format(a_pids))
+        html_file.write('<td>{}</td>\n'.format(r_pids))
+        html_file.write('<td>{}</td>\n'.format(round(t_rss, 2)))
+        html_file.write('<td>{}</td>\n'.format(round(t_pss, 2)))
+        html_file.write('<td>{}</td>\n'.format(round(t_uss, 2)))
+        html_file.write('<td>{}</td>\n'.format(round(t_vss, 2)))
+        html_file.write('<td>{}</td>\n'.format(round(t_swap, 2)))
+        html_file.write('</tr>\n')
+
+        # collectd Summary
+        a_pids, r_pids, t_rss, t_pss, t_uss, t_vss, t_swap = compile_per_process_results(
+            ['collectd'], process_results, end)
+        t_a_pids += a_pids
+        t_r_pids += r_pids
+        tt_rss += t_rss
+        tt_pss += t_pss
+        tt_uss += t_uss
+        tt_vss += t_vss
+        tt_swap += t_swap
+        html_file.write('<tr>\n')
+        html_file.write('<td>collectd</td>\n')
         html_file.write('<td>{}</td>\n'.format(a_pids + r_pids))
         html_file.write('<td>{}</td>\n'.format(a_pids))
         html_file.write('<td>{}</td>\n'.format(r_pids))
