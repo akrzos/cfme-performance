@@ -1,6 +1,7 @@
 from utils.ssh import SSHClient
 from utils.log import logger
 from textwrap import dedent
+import time
 import yaml
 
 yaml_loader = dedent("""\
@@ -11,11 +12,6 @@ if result != true
   exit 255
 end""")
 
-roles56_all = ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
-    'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations',
-    'event', 'git_owner', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy',
-    'smartstate', 'user_interface', 'web_services', 'websocket']
-
 roles56_default = ['automate', 'database_operations', 'ems_inventory', 'ems_operations', 'event',
     'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
 
@@ -24,8 +20,18 @@ roles56_idle = ['automate', 'database_operations', 'database_synchronization', '
     'event', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate',
     'user_interface', 'web_services']
 
+roles56_all = ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
+    'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations',
+    'event', 'git_owner', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy',
+    'smartstate', 'user_interface', 'web_services', 'websocket']
+
+roles56_cap_and_util = ['automate', 'database_operations', 'ems_inventory', 'ems_metrics_collector',
+    'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations', 'event', 'notifier',
+    'reporting', 'scheduler', 'user_interface', 'web_services']
+
 
 def clean_appliance(ssh_client):
+    starttime = time.time()
     ssh_client.run_command('service evmserverd stop')
     ssh_client.run_command('sync; sync; echo 3 > /proc/sys/vm/drop_caches')
     ssh_client.run_command('service collectd stop')
@@ -40,6 +46,7 @@ def clean_appliance(ssh_client):
     ssh_client.run_command('service httpd stop')
     ssh_client.run_command('rm -rf /run/httpd/*')
     ssh_client.run_command('service evmserverd start')
+    logger.debug('Cleaned appliance in: {}'.format(time.time() - starttime))
 
 
 def get_vmdb_yaml_config(ssh_client):
@@ -65,10 +72,6 @@ def set_vmdb_yaml_config(ssh_client, yaml_data):
         logger.info('Set VMDB Config')
 
 
-def get_server_roles_all_idle(separator=','):
-    return separator.join(roles56_all)
-
-
 def get_server_roles_default_idle(separator=','):
     return separator.join(roles56_default)
 
@@ -77,11 +80,12 @@ def get_server_roles_idle(separator=','):
     return separator.join(roles56_idle)
 
 
-def set_server_roles_workload_all_idle(ssh_client):
-    """Turns on all server roles used for all idle workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_all_idle()
-    set_vmdb_yaml_config(ssh_client, yaml)
+def get_server_roles_all_idle(separator=','):
+    return separator.join(roles56_all)
+
+
+def get_server_roles_cap_and_util(separator=','):
+    return separator.join(roles56_cap_and_util)
 
 
 def set_server_roles_workload_idle(ssh_client):
@@ -91,12 +95,17 @@ def set_server_roles_workload_idle(ssh_client):
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
+def set_server_roles_workload_all_idle(ssh_client):
+    """Turns on all server roles used for all idle workload."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_all_idle()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
 def set_server_roles_workload_cap_and_util(ssh_client):
     """Sets server roles used for all C&U workloads."""
-    yaml = get_vmdb_yaml_config('vmdb')
-    yaml['server']['role'] = ('automate,database_operations,ems_inventory,ems_metrics_collector'
-        ',ems_metrics_coordinator,ems_metrics_processor,ems_operations,event,notifier,reporting'
-        ',scheduler,user_interface,web_services')
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_cap_and_util()
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
@@ -110,7 +119,7 @@ def set_server_roles_workload_smartstate(ssh_client):
 
 def set_server_roles_workload_provisioning(ssh_client):
     """Sets server roles for Provisioning workload."""
-    yaml = get_vmdb_yaml_config('vmdb')
+    yaml = get_vmdb_yaml_config(ssh_client)
     yaml['server']['role'] = ('automate,database_operations,ems_inventory,ems_operations,event'
         ',notifier,reporting,scheduler,user_interface,web_services')
     set_vmdb_yaml_config(ssh_client, yaml)
@@ -124,3 +133,9 @@ def set_server_roles_workload_all(ssh_client):
         ',ems_metrics_coordinator,ems_metrics_processor,ems_operations,event,notifier,reporting'
         ',rhn_mirror,scheduler,smartproxy,smartstate,user_interface,web_services')
     set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_cap_and_util_all_via_rails(ssh_client):
+    """Turns on Collect for All Clusters and Collect for all Datastores without using the UI."""
+    command = ('Metric::Targets.perf_capture_always = {:storage=>true, :host_and_cluster=>true};')
+    ssh_client.run_rails_console(command, timeout=None, log_less=True)
