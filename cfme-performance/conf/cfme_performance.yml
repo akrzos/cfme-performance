@@ -13,6 +13,9 @@ tools:
     enabled: false
     ip_address: 10.20.30.40
     port: 9001
+  rpms:
+    epel6_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+    epel7_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 logging:
   level: DEBUG
 # Providers for Testing

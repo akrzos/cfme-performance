@@ -1,4 +1,4 @@
-"""Monitor Memory of a CFME/Miq appliance and build report/graphs displaying usage per process."""
+"""Monitor Memory on a CFME/Miq appliance and builds report&graphs displaying usage per process."""
 from utils.log import logger
 from utils.path import results_path
 from utils.version import get_current_version
@@ -22,71 +22,101 @@ miq_workers = [
     'MiqUiWorker',
     'MiqWebServiceWorker',
     'MiqWebsocketWorker',
+    'MiqReportingWorker',
     'MiqReplicationWorker',
+    'MiqSmartProxyWorker'
 
     'MiqVimBrokerWorker',
     'MiqEmsRefreshCoreWorker',
 
-    'ManageIQ::Providers::Vmware::InfraManager::RefreshWorker',
-    'ManageIQ::Providers::Redhat::InfraManager::RefreshWorker',
+    # Refresh Workers:
     'ManageIQ::Providers::Microsoft::InfraManager::RefreshWorker',
-    'MiqEmsRefreshWorkerVmware',
-    'MiqEmsRefreshWorkerRedhat',
+    'ManageIQ::Providers::Openstack::InfraManager::RefreshWorker',
+    'ManageIQ::Providers::Redhat::InfraManager::RefreshWorker',
+    'ManageIQ::Providers::Vmware::InfraManager::RefreshWorker',
     'MiqEmsRefreshWorkerMicrosoft',
+    'MiqEmsRefreshWorkerRedhat',
+    'MiqEmsRefreshWorkerVmware',
 
+    'ManageIQ::Providers::Amazon::CloudManager::RefreshWorker',
+    'ManageIQ::Providers::Azure::CloudManager::RefreshWorker',
+    'ManageIQ::Providers::Google::CloudManager::RefreshWorker',
+    'ManageIQ::Providers::Openstack::CloudManager::RefreshWorker',
+    'MiqEmsRefreshWorkerAmazon',
+    'MiqEmsRefreshWorkerOpenstack',
+
+    'ManageIQ::Providers::AnsibleTower::ConfigurationManager::RefreshWorker',
     'ManageIQ::Providers::Foreman::ConfigurationManager::RefreshWorker',
     'ManageIQ::Providers::Foreman::ProvisioningManager::RefreshWorker',
     'MiqEmsRefreshWorkerForemanConfiguration',
     'MiqEmsRefreshWorkerForemanProvisioning',
 
-    'ManageIQ::Providers::Amazon::CloudManager::RefreshWorker',
-    'ManageIQ::Providers::Azure::CloudManager::RefreshWorker',
-    'ManageIQ::Providers::Openstack::CloudManager::RefreshWorker',
-    'MiqEmsRefreshWorkerAmazon',
-    'MiqEmsRefreshWorkerOpenstack',
-
     'ManageIQ::Providers::Atomic::ContainerManager::RefreshWorker',
+    'ManageIQ::Providers::AtomicEnterprise::ContainerManager::RefreshWorker',
     'ManageIQ::Providers::Kubernetes::ContainerManager::RefreshWorker',
     'ManageIQ::Providers::Openshift::ContainerManager::RefreshWorker',
     'ManageIQ::Providers::OpenshiftEnterprise::ContainerManager::RefreshWorker',
 
-    'ManageIQ::Providers::Vmware::InfraManager::EventCatcher',
+    'ManageIQ::Providers::Hawkular::MiddlewareManager::RefreshWorker',
+
+    'ManageIQ::Providers::Amazon::NetworkManager::RefreshWorker',
+    'ManageIQ::Providers::Azure::NetworkManager::RefreshWorker',
+    'ManageIQ::Providers::Openstack::NetworkManager::RefreshWorker',
+
+    'MiqNetappRefreshWorker',
+    'MiqSmisRefreshWorker',
+
+    # Event Workers:
+    'MiqEventHandler',
+
+    'ManageIQ::Providers::Openstack::InfraManager::EventCatcher',
     'ManageIQ::Providers::Redhat::InfraManager::EventCatcher',
-    'MiqEventCatcherVmware',
+    'ManageIQ::Providers::Vmware::InfraManager::EventCatcher',
     'MiqEventCatcherRedhat',
+    'MiqEventCatcherVmware',
 
     'ManageIQ::Providers::Amazon::CloudManager::EventCatcher',
-    'ManageIQ::Providers::Azure::CloudManager::RefreshWorker',
+    'ManageIQ::Providers::Azure::CloudManager::EventCatcher',
+    'ManageIQ::Providers::Google::CloudManager::EventCatcher',
     'ManageIQ::Providers::Openstack::CloudManager::EventCatcher',
     'MiqEventCatcherAmazon',
     'MiqEventCatcherOpenstack',
 
     'ManageIQ::Providers::Atomic::ContainerManager::EventCatcher',
+    'ManageIQ::Providers::AtomicEnterprise::ContainerManager::EventCatcher',
     'ManageIQ::Providers::Kubernetes::ContainerManager::EventCatcher',
     'ManageIQ::Providers::Openshift::ContainerManager::EventCatcher',
     'ManageIQ::Providers::OpenshiftEnterprise::ContainerManager::EventCatcher',
 
-    'MiqEventHandler',
+    'ManageIQ::Providers::Hawkular::MiddlewareManager::EventCatcher',
 
-    'ManageIQ::Providers::Vmware::InfraManager::MetricsCollectorWorker',
+    'ManageIQ::Providers::Openstack::NetworkManager::EventCatcher',
+
+    # Metrics Processor/Collector Workers
+    'MiqEmsMetricsProcessorWorker',
+
+    'ManageIQ::Providers::Openstack::InfraManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Redhat::InfraManager::MetricsCollectorWorker',
-    'MiqEmsMetricsCollectorWorkerVmware',
+    'ManageIQ::Providers::Vmware::InfraManager::MetricsCollectorWorker',
     'MiqEmsMetricsCollectorWorkerRedhat',
+    'MiqEmsMetricsCollectorWorkerVmware',
 
     'ManageIQ::Providers::Amazon::CloudManager::MetricsCollectorWorker',
+    'ManageIQ::Providers::Azure::CloudManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Openstack::CloudManager::MetricsCollectorWorker',
     'MiqEmsMetricsCollectorWorkerAmazon',
     'MiqEmsMetricsCollectorWorkerOpenstack',
 
     'ManageIQ::Providers::Atomic::ContainerManager::MetricsCollectorWorker',
+    'ManageIQ::Providers::AtomicEnterprise::ContainerManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Kubernetes::ContainerManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Openshift::ContainerManager::MetricsCollectorWorker',
     'ManageIQ::Providers::OpenshiftEnterprise::ContainerManager::MetricsCollectorWorker',
 
-    'MiqEmsMetricsProcessorWorker',
+    'ManageIQ::Providers::Openstack::NetworkManager::MetricsCollectorWorker',
 
-    'MiqReportingWorker',
-    'MiqSmartProxyWorker']
+    'MiqStorageMetricsCollectorWorker',
+    'MiqVmdbStorageBridgeWorker']
 
 ruby_processes = list(miq_workers)
 ruby_processes.extend(['evm:dbsync:replicate', 'MIQ Server (evm_server.rb)', 'evm_watchdog.rb',
@@ -95,7 +125,11 @@ ruby_processes.extend(['evm:dbsync:replicate', 'MIQ Server (evm_server.rb)', 'ev
 process_order = list(ruby_processes)
 process_order.extend(['memcached', 'postgres', 'httpd', 'collectd'])
 
+# Timestamp created at first import, thus grouping all reports of like workload
 test_ts = time.strftime('%Y%m%d%H%M%S')
+
+# 10s sample interval (occasionally sampling can take almost 4s on an appliance doing a lot of work)
+SAMPLE_INTERVAL = 10
 
 
 class SmemMemoryMonitor(Thread):
@@ -134,7 +168,7 @@ class SmemMemoryMonitor(Thread):
             logger.error('Process {} PID, not found: {}'.format(process_name, process_pid))
 
     def get_appliance_memory(self, appliance_results, plottime):
-        # 5.5 - RHEL 7 / Centos 7
+        # 5.5/5.6 - RHEL 7 / Centos 7
         # Application Memory Used : MemTotal - (MemFree + Slab + Cached)
         # 5.4 - RHEL 6 / Centos 6
         # Application Memory Used : MemTotal - (MemFree + Buffers + Cached)
@@ -181,6 +215,7 @@ class SmemMemoryMonitor(Thread):
         else:
             return {}
 
+    # Old method of obtaining per process memory (Appliances without smem)
     # def get_pids_memory(self):
     #     exit_status, ps_memory = self.ssh_client.run_command(
     #         'ps -A -o pid,rss,vsz,comm,cmd | sed 1d')
@@ -296,7 +331,7 @@ class SmemMemoryMonitor(Thread):
 
             # Sleep Monitoring interval
             # Roughly 10s samples, accounts for collection of memory measurements
-            time_to_sleep = abs(10 - timediff)
+            time_to_sleep = abs(SAMPLE_INTERVAL - timediff)
             time.sleep(time_to_sleep)
         logger.info('Monitoring CFME Memory Terminating')
 
@@ -314,11 +349,10 @@ class SmemMemoryMonitor(Thread):
 def install_smem(ssh_client):
     # smem is included by default in 5.6 appliances
     # logger.info('Installing smem.')
-    # ip_a = IPAppliance(urlparse(env['base_url']).netloc)
-    # if ip_a.version >= "5.5":
-    #     ssh_client.run_command('rpm -i {}'.format(cfme_data['basic_info']['epel7_rpm']))
+    # if version >= EL7
+    #     ssh_client.run_command('rpm -i {}'.format(cfme_performance['tools']['rpms']['epel7_rpm']))
     # else:
-    #     ssh_client.run_command('rpm -i {}'.format(cfme_data['basic_info']['epel6_rpm']))
+    #     ssh_client.run_command('rpm -i {}'.format(cfme_performance['tools']['rpms']['epel6_rpm']))
     # ssh_client.run_command('yum install -y smem')
     # Patch smem to display longer command line names
     logger.info('Patching smem')
