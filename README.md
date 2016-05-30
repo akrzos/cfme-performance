@@ -1,6 +1,6 @@
 # cfme-performance
 
-A WIP repo with the goal to provide end-to-end CFME/Miq Performance Analysis/Testing Framework and tooling.
+A WIP repo with the goal to provide end-to-end CFME/Miq performance analysis and testing.
 
 ## Major Components
 
@@ -8,9 +8,9 @@ This repo is contains two major components to facilitate its goals:
 * Ansible Playbooks
 * Python Testing Framework (pytest)
 
-Browse the Ansible folder for more details on the playbooks which automates standing up appliances and installing Performance Analysis tooling.  Borwse the cfme-performance folder to explore the pytest driven workloads and benchmarks.
+Browse the Ansible folder for more details on the playbooks which automate standing up appliances and installing performance analysis tools.  Browse the cfme-performance folder to explore the pytest driven workloads and benchmarks.
 
-## Install
+## Installing for testing
 
 ```shell
 # virtualenv cfme-perf-test
@@ -24,4 +24,4 @@ Browse the Ansible folder for more details on the playbooks which automates stan
 # py.test --verbose cfme-performance/tests/workloads/
 ```
 
-When workloads complete, view `cfme-performance/results` for workload output and check Grafana for System metrics while workload was run.
+When workloads complete, view `cfme-performance/results` for workload output and check Grafana for system metrics while workload was run.

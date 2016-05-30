@@ -465,7 +465,7 @@ def generate_summary_html(directory, appliance_results, process_results, test_na
         html_file.write('<b>CFME {} {} Test Results</b><br>\n'.format(ver,
             test_name.title()))
         html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(app_roles.replace(',', ', ')))
-        html_file.write('<b>Provider:</b> {}<br>\n'.format(provider_names))
+        html_file.write('<b>Provider(s):</b> {}<br>\n'.format(provider_names))
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
         html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')

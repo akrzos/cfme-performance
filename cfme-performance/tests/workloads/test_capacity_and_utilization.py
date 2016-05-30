@@ -1,8 +1,9 @@
 """Runs Capacity and Utilization Workload."""
 from utils.appliance import clean_appliance
-from utils.appliance import get_server_roles_cap_and_util
+from utils.appliance import get_server_roles_workload_cap_and_util
 from utils.appliance import set_cap_and_util_all_via_rails
 from utils.appliance import set_server_roles_workload_cap_and_util
+from utils.appliance import wait_for_miq_server_ready
 from utils.conf import cfme_performance
 from utils.log import logger
 from utils.providers import add_providers
@@ -19,12 +20,12 @@ def test_workload_capacity_and_utilization(request, scenario):
     Memory Monitor creates graphs and summary at the end of each scenario."""
     from_ts = int(time.time() * 1000)
     ssh_client = SSHClient()
-    logger.debug('Scenario: {}'.format(scenario))
+    logger.debug('Scenario: {}'.format(scenario['name']))
 
     clean_appliance(ssh_client)
 
     monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-cap-and-util', scenario['name'],
-        'Capacity and Utilization', get_server_roles_cap_and_util(separator=', '),
+        'Capacity and Utilization', get_server_roles_workload_cap_and_util(separator=', '),
         ', '.join(scenario['providers']))
 
     def cleanup_workload(from_ts):
@@ -38,11 +39,10 @@ def test_workload_capacity_and_utilization(request, scenario):
 
     monitor_thread.start()
 
-    # TODO: Finish Scenario
-    # Wait for Web Service Ready
-    time.sleep(45)
+    wait_for_miq_server_ready(poll_interval=2)
     set_server_roles_workload_cap_and_util(ssh_client)
     add_providers(scenario['providers'])
+    logger.info('Sleeping for Refresh: {}s'.format(scenario['refresh_sleep_time']))
     time.sleep(scenario['refresh_sleep_time'])
     set_cap_and_util_all_via_rails(ssh_client)
 

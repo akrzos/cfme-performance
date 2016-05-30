@@ -1,6 +1,9 @@
 # Appliance Under Test
 appliance:
   ip_address: 10.20.30.40
+  rest_api:
+    username: admin
+    password: smartvm
   ssh:
     username: root
     password: smartvm
@@ -15,16 +18,21 @@ logging:
 # Providers for Testing
 providers:
   vmware-small:
+    name: vmware-small
     type: ManageIQ::Providers::Vmware::InfraManager
     ip_address: 10.20.30.40
     credentials:
       username: administrator@vsphere.local
       password: password
   rhevm-small:
+    name: rhevm-small
     type: ManageIQ::Providers::Redhat::InfraManager
     ip_address: 10.20.30.40
     credentials:
       username: admin@internal
+      password: password
+    metrics_credentials:
+      username: cloudforms
       password: password
 # Tests Configuration
 workloads:
@@ -41,6 +49,11 @@ workloads:
           - vmware-small
         refresh_sleep_time: 600
         total_time: 1800
+      - name: 30m-rhevm-small
+        providers:
+          - rhevm-small
+        refresh_sleep_time: 600
+        total_time: 1800
       - name: 30m-2xsmall-vmware-rhevm
         providers:
           - vmware-small
@@ -50,6 +63,11 @@ workloads:
       - name: 4hr-vmware-small
         providers:
           - vmware-small
+        refresh_sleep_time: 600
+        total_time: 14400
+      - name: 4hr-rhevm-small
+        providers:
+          - rhevm-small
         refresh_sleep_time: 600
         total_time: 14400
       - name: 4hr-2xsmall-vmware-rhevm

@@ -1,6 +1,6 @@
 # Layout of Performance Testing Code
 
-1. conf - Contains Yaml configuration files for testing
+1. conf - Contains YAML configuration files for testing
 2. log - Contains test framework logs
 3. results - Contains results from Workloads/Benchmarks/Tests
 4. tests - Contains Workloads/Benchmarks/Tests

@@ -1,6 +1,7 @@
 """Runs Idle Workload by resetting appliance and idling with no providers."""
 from utils.appliance import clean_appliance
-from utils.appliance import get_server_roles_default_idle
+from utils.appliance import get_server_roles_workload_idle_default
+from utils.appliance import wait_for_miq_server_ready
 from utils.conf import cfme_performance
 from utils.log import logger
 from utils.smem_memory_monitor import SmemMemoryMonitor
@@ -17,7 +18,8 @@ def test_idle_default(request):
     clean_appliance(ssh_client)
 
     monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-idle', 'default',
-        'Idle with Default Roles', get_server_roles_default_idle(separator=', '), 'No Providers')
+        'Idle with Default Roles', get_server_roles_workload_idle_default(separator=', '),
+        'No Providers')
 
     def cleanup_workload(from_ts):
         starttime = time.time()
@@ -30,7 +32,8 @@ def test_idle_default(request):
 
     monitor_thread.start()
 
-    # No need to set server roles as we are using the default set of roles which could change
+    wait_for_miq_server_ready(poll_interval=2)
+    # No need to set server roles as we are using the default set of roles
 
     s_time = cfme_performance['workloads']['test_idle_default']['total_time']
     logger.info('Idling appliance for {}s'.format(s_time))

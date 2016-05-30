@@ -1,7 +1,8 @@
 """Runs Idle Workload by resetting appliance and enabling specific roles with no providers."""
 from utils.appliance import clean_appliance
-from utils.appliance import get_server_roles_idle
+from utils.appliance import get_server_roles_workload_idle
 from utils.appliance import set_server_roles_workload_idle
+from utils.appliance import wait_for_miq_server_ready
 from utils.conf import cfme_performance
 from utils.log import logger
 from utils.smem_memory_monitor import SmemMemoryMonitor
@@ -18,7 +19,8 @@ def test_idle(request):
     clean_appliance(ssh_client)
 
     monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-idle', 'all-no-websocketworker',
-        'Idle with All Roles Except websocket/git_owner', get_server_roles_idle(separator=', '),
+        'Idle with All Roles Except websocket/git_owner',
+        get_server_roles_workload_idle(separator=', '),
         'No Providers')
 
     def cleanup_workload(from_ts):
@@ -32,8 +34,7 @@ def test_idle(request):
 
     monitor_thread.start()
 
-    # Allow evmserverd to be started before attempting to reload/adjust the vmdb yml
-    time.sleep(45)
+    wait_for_miq_server_ready(poll_interval=2)
     set_server_roles_workload_idle(ssh_client)
 
     s_time = cfme_performance['workloads']['test_idle']['total_time']
