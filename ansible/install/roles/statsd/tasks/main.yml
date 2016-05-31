@@ -1,0 +1,39 @@
+---
+#
+# Install/Configure Statsd
+#
+
+- name: Check for epel
+  shell: rpm -qa | grep -q epel-release
+  ignore_errors: true
+  register: epel_installed
+
+- name: Install epel repo (rhel7)
+  command: rpm -ivh {{ epel7_rpm }}
+  when: (epel_installed.rc != 0) and (ansible_os_family == "RedHat" and ansible_distribution_version|int == 7)
+
+- name: Install epel repo (rhel6)
+  command: rpm -ivh {{ epel6_rpm }}
+  when: (epel_installed.rc != 0) and (ansible_os_family == "RedHat" and ansible_distribution_version|int == 6)
+
+- name: Install Statsd
+  yum: name=statsd state=present
+
+- name: Setup Statsd
+  copy:
+    src=config.js
+    dest=/etc/statsd/config.js
+    owner=root
+    group=root
+    mode=0644
+
+- name: Add firewall rules for statsd (rhel7)
+  command: "{{ item }}"
+  with_items:
+    - "firewall-cmd --zone={{firewall_zone}} --add-port=8125/udp --permanent"
+    - firewall-cmd --reload
+  when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 7
+
+- name: Disable EPEL
+  shell: rpm -e epel-release
+  ignore_errors: true

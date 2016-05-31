@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to install an entire monitorhost (carbon/graphite/grafana/dashboards/collectd)
+# Playbook to install an entire monitorhost (carbon/graphite/statsd/grafana/dashboards/collectd)
 #
 
 - hosts: monitorhost
@@ -13,6 +13,7 @@
     - hostname
     - repos
     - graphite
+    - statsd
     - collectd-monitorhost
     - grafana
 
