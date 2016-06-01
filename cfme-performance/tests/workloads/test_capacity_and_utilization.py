@@ -9,12 +9,12 @@ from utils.log import logger
 from utils.providers import add_providers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
+from utils.workloads import get_capacity_and_utilization_scenarios
 import time
 import pytest
 
 
-@pytest.mark.parametrize('scenario',
-    cfme_performance['workloads']['test_cap_and_util']['scenarios'])
+@pytest.mark.parametrize('scenario', get_capacity_and_utilization_scenarios())
 def test_workload_capacity_and_utilization(request, scenario):
     """Runs through provider based scenarios enabling C&U and running for a set period of time.
     Memory Monitor creates graphs and summary at the end of each scenario."""

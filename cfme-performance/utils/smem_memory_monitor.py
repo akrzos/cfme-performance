@@ -24,7 +24,7 @@ miq_workers = [
     'MiqWebsocketWorker',
     'MiqReportingWorker',
     'MiqReplicationWorker',
-    'MiqSmartProxyWorker'
+    'MiqSmartProxyWorker',
 
     'MiqVimBrokerWorker',
     'MiqEmsRefreshCoreWorker',

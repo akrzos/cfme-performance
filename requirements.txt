@@ -6,5 +6,6 @@ MarkupSafe==0.23
 matplotlib==1.5.1
 numpy==1.11.0
 pytest==2.9.1
+requests==2.10.0
 scp==0.10.2
 yaycl==0.2.0

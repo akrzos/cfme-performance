@@ -1,5 +1,6 @@
 # Appliance Under Test
 appliance:
+  appliance_name: CF-R0000-DB-Workload-5608
   ip_address: 10.20.30.40
   rest_api:
     username: admin
