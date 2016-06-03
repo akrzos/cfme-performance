@@ -27,4 +27,10 @@ Stops all CFME/Miq Services, then deletes all log files in /var/www/miq/vmdb/log
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local cleanup/reset-database.yml
 ```
-Stops evmserverd, drops file system cache, restarts Postgres, removes replication, resets database, seeds database, and starts services.  Briefly stops collectd in addition to evmserverd due to the Postgres connection from the collectd configuration.
+Stops evmserverd, drops file system cache, restarts Postgres, removes replication, resets database, seeds database, deletes all files in /var/www/miq/vmdb/run/httpd/, and starts services.  Briefly stops collectd in addition to evmserverd due to the Postgres connection from the collectd configuration.
+
+## reset-all.yml
+```
+[root@perf ansible]# ansible-playbook -i hosts.local cleanup/reset-all.yml
+```
+Stops evmserverd and all CFME/Miq Services, drops file system cache, restarts Postgres, removes replication, resets database, seeds database, deletes all log files in /var/www/miq/vmdb/log/ and /var/www/miq/vmdb/log/apache/ and deletes all files in /var/www/miq/vmdb/run/httpd/, and then starts services.  Briefly stops collectd in addition to evmserverd due to the Postgres connection from the collectd configuration.

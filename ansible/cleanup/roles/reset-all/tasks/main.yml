@@ -1,6 +1,8 @@
 ---
 #
-# Tasks to Reset Cloud Forms VMDB
+# Tasks to Reset Cloud Forms VMDB and to delete all log files
+#
+# Note: deleting all log files involves restarting CFME services
 #
 
 - name: Stop services
@@ -8,6 +10,9 @@
   with_items:
     - evmserverd
     - collectd
+    - miqtop
+    - miqvmstat
+    - httpd
 
 - name: Drop FS caches
   shell: sync; sync; echo 3 > /proc/sys/vm/drop_caches
@@ -27,8 +32,17 @@
 - name: Work around for https://bugzilla.redhat.com/show_bug.cgi?id=1337525
   shell: "rm -rf /var/www/miq/vmdb/run/httpd/*"
 
+- name: Delete log files
+  shell: rm -f {{item}}
+  with_items:
+    - /var/www/miq/vmdb/log/*.log*
+    - /var/www/miq/vmdb/log/apache/*.log*
+
 - name: Start services
   service: name={{item}} state=started
   with_items:
+    - miqtop
+    - miqvmstat
     - evmserverd
     - collectd
+    - httpd
