@@ -5,8 +5,8 @@ A WIP repo with the goal to provide end-to-end CFME/Miq performance analysis and
 ## Major Components
 
 This repo is contains two major components to facilitate its goals:
-* Ansible Playbooks
-* Python Testing Framework (pytest)
+* [Ansible Playbooks](ansible/)
+* [Python Testing Framework](cfme-performance/)
 
 Browse the Ansible folder for more details on the playbooks which automate standing up appliances and installing performance analysis tools.  Browse the cfme-performance folder to explore the pytest driven workloads and benchmarks.
 
