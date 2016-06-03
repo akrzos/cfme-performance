@@ -30,7 +30,7 @@
   shell: "cd /var/www/miq/vmdb; bin/rake db:seed"
 
 - name: Work around for https://bugzilla.redhat.com/show_bug.cgi?id=1337525
-  shell: "rm -rf /var/www/miq/vmdb/run/httpd/*"
+  shell: "rm -rf /run/httpd/*"
 
 - name: Delete log files
   shell: rm -f {{item}}
