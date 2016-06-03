@@ -1,3 +1,4 @@
+"""Autoload yaml config files."""
 from py.path import local
 from yaycl import Config
 import os

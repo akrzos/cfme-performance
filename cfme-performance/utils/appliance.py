@@ -1,3 +1,4 @@
+"""Appliance specific settings and functions."""
 from utils.log import logger
 from utils.ssh import SSHClient
 from utils.ssh import SSHTail

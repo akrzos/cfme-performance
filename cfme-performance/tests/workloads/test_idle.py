@@ -4,6 +4,7 @@ from utils.appliance import get_server_roles_workload_idle
 from utils.appliance import set_server_roles_workload_idle
 from utils.appliance import wait_for_miq_server_ready
 from utils.conf import cfme_performance
+from utils.grafana import get_default_dashboard_url
 from utils.log import logger
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
@@ -25,7 +26,10 @@ def test_idle(request):
 
     def cleanup_workload(from_ts):
         starttime = time.time()
+        to_ts = int(starttime * 1000)
+        g_url = get_default_dashboard_url(from_ts, to_ts)
         logger.debug('Started cleaning up monitoring thread.')
+        monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
         timediff = time.time() - starttime

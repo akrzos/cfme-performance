@@ -1,3 +1,4 @@
+"""SSH client and SSH Tailing client."""
 from collections import namedtuple
 from os import path as os_path
 from utils.conf import cfme_performance

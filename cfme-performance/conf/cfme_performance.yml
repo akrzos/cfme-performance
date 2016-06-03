@@ -12,6 +12,7 @@ appliance:
 tools:
   grafana:
     enabled: false
+    default_dashboard: cfme-general-system-performance
     ip_address: 10.20.30.40
     port: 9001
   rpms:
@@ -53,11 +54,13 @@ workloads:
           - vmware-small
         refresh_sleep_time: 600
         total_time: 1800
+        grafana_dashboard: cfme-vmware-system-performance
       - name: 30m-rhevm-small
         providers:
           - rhevm-small
         refresh_sleep_time: 600
         total_time: 1800
+        grafana_dashboard: cfme-redhat-system-performance
       - name: 30m-2xsmall-vmware-rhevm
         providers:
           - vmware-small
@@ -69,11 +72,13 @@ workloads:
           - vmware-small
         refresh_sleep_time: 600
         total_time: 14400
+        grafana_dashboard: cfme-vmware-system-performance
       - name: 4hr-rhevm-small
         providers:
           - rhevm-small
         refresh_sleep_time: 600
         total_time: 14400
+        grafana_dashboard: cfme-redhat-system-performance
       - name: 4hr-2xsmall-vmware-rhevm
         providers:
           - vmware-small

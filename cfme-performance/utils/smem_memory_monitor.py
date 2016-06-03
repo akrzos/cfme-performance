@@ -141,6 +141,7 @@ class SmemMemoryMonitor(Thread):
         self.test_name = test_name
         self.app_roles = app_roles
         self.provider_names = provider_names
+        self.grafana_url = ''
         self.use_slab = False
         self.signal = True
 
@@ -165,7 +166,7 @@ class SmemMemoryMonitor(Thread):
             process_results[process_name][process_pid][starttime]['swap'] = swap_mem
             del memory_by_pid[process_pid]
         else:
-            logger.error('Process {} PID, not found: {}'.format(process_name, process_pid))
+            logger.warn('Process {} PID, not found: {}'.format(process_name, process_pid))
 
     def get_appliance_memory(self, appliance_results, plottime):
         # 5.5/5.6 - RHEL 7 / Centos 7
@@ -336,7 +337,8 @@ class SmemMemoryMonitor(Thread):
         logger.info('Monitoring CFME Memory Terminating')
 
         create_report(self.test_dir, self.results_dir, self.test_name, self.app_roles,
-            self.provider_names, appliance_results, process_results, self.use_slab)
+            self.provider_names, appliance_results, process_results, self.use_slab,
+            self.grafana_url)
 
     def run(self):
         try:
@@ -360,7 +362,7 @@ def install_smem(ssh_client):
 
 
 def create_report(test_dir, results_dir, test_name, app_roles, provider_names, appliance_results,
-        process_results, use_slab):
+        process_results, use_slab, grafana_url):
     logger.info('Creating Memory Monitoring Report.')
     ver = get_current_version()
 
@@ -389,7 +391,7 @@ def create_report(test_dir, results_dir, test_name, app_roles, provider_names, a
         process_results, provider_names)
     generate_raw_data_csv(mem_rawdata_path, appliance_results, process_results)
     generate_summary_html(mem_provider_path, appliance_results, process_results, test_name,
-        app_roles, provider_names)
+        app_roles, provider_names, grafana_url)
 
     logger.info('Finished Creating Report')
 
@@ -486,7 +488,7 @@ def generate_summary_csv(file_name, appliance_results, process_results, provider
 
 
 def generate_summary_html(directory, appliance_results, process_results, test_name, app_roles,
-        provider_names):
+        provider_names, grafana_url):
     starttime = time.time()
     ver = get_current_version()
     file_name = str(directory.join('index.html'))
@@ -500,6 +502,9 @@ def generate_summary_html(directory, appliance_results, process_results, test_na
             test_name.title()))
         html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(app_roles.replace(',', ', ')))
         html_file.write('<b>Provider(s):</b> {}<br>\n'.format(provider_names))
+        if grafana_url:
+            html_file.write(
+                '<b><a href=\'{}\' target="_blank">Grafana URL</a></b><br>\n'.format(grafana_url))
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
         html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')

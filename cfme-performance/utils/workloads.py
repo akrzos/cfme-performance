@@ -1,4 +1,4 @@
-"""Fixtures for workloads."""
+"""Functions for workloads."""
 from utils.conf import cfme_performance
 
 
