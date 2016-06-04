@@ -1,0 +1,9 @@
+---
+#
+# Handler for statsd-patch
+#
+
+- name: restart evmserverd for statsd
+  service:
+    name: evmserverd
+    state: restarted

@@ -1,0 +1,50 @@
+--- miq_queue.rb.orig	2016-06-03 17:02:35.075163552 -0400
++++ miq_queue.rb	2016-06-03 18:38:29.918499974 -0400
+@@ -120,6 +120,15 @@
+     options[:args] = [options[:args]] if options[:args] && !options[:args].kind_of?(Array)
+
+     msg = MiqQueue.create!(options)
++    # cfme-performance statsd
++    # Send a +1 to each counter via statsd
++    $hostname = Socket.gethostname
++    $statsd = Statsd.new '{{statsd_host}}', 8125
++    $statsd.increment "manageiq.#{$hostname}.queue.queue_name.#{options[:queue_name]}"
++    $statsd.increment "manageiq.#{$hostname}.queue.priority.#{options[:priority]}"
++    $statsd.increment "manageiq.#{$hostname}.queue.role.#{options[:role]}"
++    $statsd.increment "manageiq.#{$hostname}.queue.zone.#{options[:zone]}"
++    # End cfme-performance statsd
+     _log.info("#{MiqQueue.format_full_log_msg(msg)}")
+     msg
+   end
+@@ -178,7 +187,15 @@
+     if result == :stale
+       _log.debug("All #{prefetch_max_per_worker} messages stale, returning...")
+     else
+-      _log.info("#{MiqQueue.format_full_log_msg(result)}, Dequeued in: [#{Time.now - result.created_on}] seconds")
++      # cfme-performance statsd Log dequeue timings
++      seconds_taken = Time.now - result.created_on
++      _log.info("#{MiqQueue.format_full_log_msg(result)}, Dequeued in: [#{seconds_taken}] seconds")
++      $hostname = Socket.gethostname
++      $statsd = Statsd.new '{{statsd_host}}', 8125
++      map = {'ManageIQ::Providers::' => '', '::InfraManager::' => '_', '::' => '_' }
++      re = Regexp.new(map.keys.map { |x| Regexp.escape(x) }.join('|'))
++      $statsd.timing "manageiq.#{$hostname}.dequeue_stat.#{result.queue_name}.#{result.class_name.gsub(re, map)}.#{result.method_name}", seconds_taken * 1000
++      # End cfme-performance statsd
+     end
+     result
+   end
+@@ -380,6 +397,14 @@
+   def delivered(state, msg, result)
+     self.state = state
+     _log.info("#{MiqQueue.format_short_log_msg(self)}, State: [#{state}], Delivered in [#{Time.now - delivered_on}] seconds")
++    # cfme-performance statsd Log deliver timings
++    seconds_taken = Time.now - delivered_on
++    $hostname = Socket.gethostname
++    $statsd = Statsd.new '{{statsd_host}}', 8125
++    map = {'ManageIQ::Providers::' => '', '::InfraManager::' => '_', '::' => '_' }
++    re = Regexp.new(map.keys.map { |x| Regexp.escape(x) }.join('|'))
++    $statsd.timing "manageiq.#{$hostname}.deliver_stat.#{self.queue_name}.#{self.class_name.gsub(re, map)}.#{self.method_name}", seconds_taken * 1000
++    # End cfme-performance statsd
+     m_callback(msg, result) unless miq_callback.blank?
+   rescue => err
+     _log.error("#{MiqQueue.format_short_log_msg(self)}, #{err.message}")

@@ -382,6 +382,9 @@ LoadPlugin uptime
   ProcessMatch "carbon-cache" "python.+carbon-cache"
   Process "grafana-server"
   ProcessMatch "collectd" "/usr/sbin/collectd.+-C.+/etc/collectd.conf"
+{% if run_statsd %}
+  Process "statsd"
+{% endif %}
   Process "httpd"
   Process "memcached"
   ProcessMatch "postgres" "postgres.*"

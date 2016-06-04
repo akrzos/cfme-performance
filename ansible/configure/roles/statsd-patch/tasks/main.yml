@@ -1,0 +1,38 @@
+---
+#
+# Patches files to run statsd
+#
+
+- name: Install statsd-ruby gem
+  shell: "cd /var/wwww/miq/vmdb/; gem install statsd-ruby"
+
+- name: Add statsd-ruby to /var/www/miq/vmdb/Gemfile
+  lineinfile:
+    dest=/var/www/miq/vmdb/Gemfile
+    line='gem "statsd-ruby"'
+    insertbefore='gem "rails",'
+
+- name: Create patched files for statsd
+  template:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+  with_items:
+    - src: miq_queue.rb.patch.j2
+      dest: /root/miq_queue.rb.patch
+    - src: runner.rb.patch.j2
+      dest: /root/runner.rb.patch
+
+- name: Deploy patched files for statsd
+  patch:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    remote_src: true
+    backup: true
+  when: is56
+  with_items:
+    - src: /root/miq_queue.rb.patch
+      dest: /var/www/miq/vmdb/app/models/miq_queue.rb
+    - src: /root/runner.rb.patch
+      dest: /var/www/miq/vmdb/app/models/miq_queue_worker_base/runner.rb
+  notify:
+    - restart evmserverd for statsd

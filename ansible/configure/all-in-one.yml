@@ -36,6 +36,8 @@
     - graphite
     - grafana
     - collectd
+    - { role: cfme-statsd, when: (is56 and run_statsd)}
+    - { role: statsd-patch, when: (is56 and run_statsd)}
 
 - hosts: cfme-all-in-one
   gather_facts: false
@@ -55,6 +57,10 @@
         process_list_name: CFME
         dashboard_name: CFME General System Performance
 
+      - template_name: cfme_general_system_performance_with_statsd
+        process_list_name: CFME
+        dashboard_name: CFME General System Performance With Statsd
+
       - template_name: cfme_ui_system_performance
         process_list_name: CFME-UI
         dashboard_name: CFME UI System Performance
@@ -62,6 +68,10 @@
       - template_name: cfmeallinone_general_system_performance
         process_list_name: CFME-All-In-One
         dashboard_name: CFME-All-In-One System Performance
+
+      - template_name: cfmeallinone_general_system_performance_with_statsd
+        process_list_name: CFME-All-In-One
+        dashboard_name: CFME-All-In-One System Performance With Statsd
 
       - template_name: cfme_general_system_performance
         process_list_name: CFME-Amazon

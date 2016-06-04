@@ -20,3 +20,7 @@ carbon_host_prefix: manageiq
 
 # Collectd applies to all Hosts (MonitorHost/CFME/Miq)
 collectd_interval: 10
+
+# Determines if we run statsd
+run_statsd: true
+statsd_host: 127.0.0.1

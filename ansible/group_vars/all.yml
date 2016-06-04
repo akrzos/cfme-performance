@@ -33,6 +33,10 @@ carbon_host_prefix: carbon
 # Collectd applies to all Hosts (MonitorHost/CFME/Miq)
 collectd_interval: 10
 
+# Disable for now
+run_statsd: false
+statsd_host: "{{carbon_host}}"
+
 
 ###############################
 # CFME Configuration items

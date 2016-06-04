@@ -1,7 +1,8 @@
 ---
 #
-# Install/Configure Statsd
+# Install/Configure Statsd and gem statsd on CFME
 #
+# Tested on 5.6.0.9
 
 - name: Check for epel
   shell: rpm -qa | grep -q epel-release
@@ -33,6 +34,9 @@
     - "firewall-cmd --zone={{firewall_zone}} --add-port=8125/udp --permanent"
     - firewall-cmd --reload
   when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 7
+
+- name: Set /etc/ld.so.conf.d/statsd.conf
+  shell: 'echo "/opt/rh/nodejs010/root/usr/lib64" > /etc/ld.so.conf.d/statsd.conf; ldconfig'
 
 - name: Start statsd
   service: name=statsd state=started enabled=true

@@ -328,6 +328,9 @@ per_process_panels:
     - name: "Collectd"
       processes:
         - collectd
+    - name: "Statsd"
+      processes:
+        - statsd
     - name: "Appliance"
       processes:
         - evm_server.rb
@@ -1215,3 +1218,6 @@ per_process_panels:
     - name: "Collectd"
       processes:
         - collectd
+    - name: "Statsd"
+      processes:
+        - statsd
