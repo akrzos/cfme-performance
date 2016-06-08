@@ -30,6 +30,14 @@ roles56_cap_and_util = ['automate', 'database_operations', 'ems_inventory', 'ems
     'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations', 'event', 'notifier',
     'reporting', 'scheduler', 'user_interface', 'web_services']
 
+# TODO: set the roles
+roles56_refresh_providers = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
+    'event', 'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
+
+# TODO: set the roles
+roles56_refresh_vms = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
+    'event', 'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
+
 roles56_smartstate = ['automate', 'database_operations', 'ems_inventory', 'ems_operations', 'event',
     'notifier', 'reporting', 'scheduler', 'smartproxy', 'smartstate', 'user_interface',
     'web_services']
@@ -85,6 +93,12 @@ def set_vmdb_yaml_config(ssh_client, yaml_data):
         logger.info('Set VMDB Config')
 
 
+def set_full_refresh_threshold(ssh_client, threshold=100):
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['ems_refresh']['full_refresh_threshold'] = threshold
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
 def get_server_roles_workload_idle_default(separator=','):
     return separator.join(roles56_default)
 
@@ -99,6 +113,14 @@ def get_server_roles_workload_idle_all(separator=','):
 
 def get_server_roles_workload_cap_and_util(separator=','):
     return separator.join(roles56_cap_and_util)
+
+
+def get_server_roles_workload_refresh_providers(separator=','):
+    return separator.join(roles56_refresh_providers)
+
+
+def get_server_roles_workload_refresh_vms(separator=','):
+    return separator.join(roles56_refresh_vms)
 
 
 def get_server_roles_workload_smartstate(separator=','):
@@ -131,6 +153,20 @@ def set_server_roles_workload_cap_and_util(ssh_client):
     """Sets server roles used for all C&U workloads."""
     yaml = get_vmdb_yaml_config(ssh_client)
     yaml['server']['role'] = get_server_roles_workload_cap_and_util()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles_workload_refresh_providers(ssh_client):
+    """Sets server roles used for all refresh_providers workloads."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_workload_refresh_providers()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles_workload_refresh_vms(ssh_client):
+    """Sets server roles used for all refresh_vms workloads"""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_workload_refresh_vms()
     set_vmdb_yaml_config(ssh_client, yaml)
 
 

@@ -85,3 +85,41 @@ workloads:
           - rhevm-small
         refresh_sleep_time: 600
         total_time: 14400
+  test_refresh_providers:
+    scenarios:
+      - name: 30m-refresh-providers-vmware-small
+        providers:
+          - vmware-small
+        refresh_sleep_time: 600
+        refresh_size: 5
+        wait_time: 10
+        total_time: 1800
+        grafana_dashboard: cfme-vmware-system-performance
+      - name: 4hr-refresh-providers-rhevm-small
+        providers:
+          - rhevm-small
+        refresh_sleep_time: 600
+        refresh_size: 5
+        wait_time: 10
+        total_time: 14400
+        grafana_dashboard: cfme-redhat-system-performance
+  test_refresh_vms:
+    scenarios:
+      - name: 30m-vm-refresh-vms-vmware-small
+        providers:
+          - vmware-small
+        refresh_sleep_time: 600
+        refresh_size: 5
+        refresh_threshold: 100
+        wait_time: 10
+        total_time: 1800
+        grafana_dashboard: cfme-vmware-system-performance
+      - name: 4hr-vm-refresh-vms-rhevm-small
+        providers:
+          - rhevm-small
+        refresh_sleep_time: 600
+        refresh_size: 5
+        refresh_threshold: 100
+        wait_time: 10
+        total_time: 14400
+        grafana_dashboard: cfme-redhat-system-performance
