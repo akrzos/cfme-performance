@@ -21,7 +21,7 @@
         process_list_name: CFME
         dashboard_name: CFME General System Performance
 
-      - template_name: cfme_general_system_performance_with_statsd
+     - template_name: cfme_general_system_performance_with_statsd
         process_list_name: CFME
         dashboard_name: CFME General System Performance With Statsd
 
@@ -60,6 +60,10 @@
       - template_name: cfme_general_system_performance
         process_list_name: CFME-VMware
         dashboard_name: CFME-VMware System Performance
+
+      - template_name: cfme_general_system_performance
+        process_list_name: CFME-VMware-RedHat
+        dashboard_name: CFME-VMware-RedHat System Performance
 
       - template_name: monitorhost_general_system_performance
         process_list_name: MonitorHost
