@@ -1,4 +1,4 @@
-""""Rest API interactions to the appliance for provider configuration/testing."""
+"""Rest API interactions to the appliance for provider and VM configuration/testing."""
 from utils.conf import cfme_performance
 from utils.log import logger
 import json
@@ -83,7 +83,9 @@ def get_vm_details(vm_id):
 
     vmid_details['name'] = str(vmid_json['name'])
     vmid_details['type'] = str(vmid_json['type'])
-
+    vmid_details['vendor'] = str(vmid_json['vendor'])
+    vmid_details['host_id'] = str(vmid_json['host_id'])
+    vmid_details['power_state'] = str(vmid_json['power_state'])
     return vmid_details
 
 
@@ -110,8 +112,32 @@ def add_provider(provider):
             "password": provider['metrics_credentials']['password'],
             "auth_type": "metrics"
         })
+    elif 'password_credentials' in provider:
+        data_dict['resources'][0]['credentials'].append({
+            "userid": provider['password_credentials']['username'],
+            "password": provider['password_credentials']['password'],
+            "auth_type": "password"
+        })
+    elif 'bearer_credentials' in provider:
+        data_dict['resources'][0]['credentials'].append({
+            "userid": provider['bearer_credentials']['username'],
+            "password": provider['bearer_credentials']['password'],
+            "auth_type": "bearer"
+        })
+    elif 'amqp_credentials' in provider:
+        data_dict['resources'][0]['credentials'].append({
+            "userid": provider['amqp_credentials']['username'],
+            "password": provider['amqp_credentials']['password'],
+            "auth_type": "amqp"
+        })
+    elif 'ssh_keypair_credentials' in provider:
+        data_dict['resources'][0]['credentials'].append({
+            "userid": provider['ssh_keypair_credentials']['username'],
+            "password": provider['ssh_keypair_credentials']['password'],
+            "auth_type": "ssh_keypair"
+        })
 
-    # else if '<OTHER_AUTH_TYPES>' in cfme_performance[provider]:
+    # elif '<OTHER_AUTH_TYPES>' in cfme_performance[provider]:
     #     # TODO implement for other appropriate auth_types
 
     json_data = json.dumps(data_dict)
@@ -144,7 +170,15 @@ def refresh_provider(provider_id):
                              headers={"content-type": "application/json"},
                              allow_redirects=False)
 
+    if response.status_code != 200:
+        logger.debug(response.text)
+
     logger.debug('Refreshed Provider: {}, Response: {}'.format(provider_id, response))
+
+
+def refresh_providers(provider_ids):
+    for provider in provider_ids:
+        refresh_provider(provider)
 
 
 def refresh_provider_host(provider):
@@ -163,4 +197,120 @@ def refresh_provider_vm(vm_id):
                              headers={"content-type": "application/json"},
                              allow_redirects=False)
 
+    if response.status_code != 200:
+        logger.debug(response.text)
+
     logger.debug('Refreshed VM: {}, Response: {}'.format(vm_id, response))
+
+
+def refresh_provider_vms(vm_ids):
+    for vm in vm_ids:
+        refresh_provider_vm(vm)
+
+
+def shutdown_vm_guest(vm_id):
+    logger.debug('Shutting down guest VM with ID: {}'.format(vm_id))
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "shutdown_guest"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Shutdown guest VM: {}, Response: {}'.format(vm_id, response))
+
+
+def reboot_vm_guest(vm_id):
+    logger.debug('Rebooting guest VM with ID: {}'.format(vm_id))
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "reboot_guest"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Rebooted guest VM: {}, Response: {}'.format(vm_id, response))
+
+
+def start_vm(vm_id):
+    logger.debug('Starting VM with ID: {}'.format(vm_id))
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "start"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Started VM: {}, Response: {}'.format(vm_id, response))
+
+
+def stop_vm(vm_id):
+    logger.debug('Stopping VM with ID: {}'.format(vm_id))
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "stop"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Stopped VM: {}, Response: {}'.format(vm_id, response))
+
+
+def suspend_vm(vm_id):
+    logger.debug('Suspending VM with ID: {}'.format(vm_id))
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "suspend"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Suspended VM: {}, Response: {}'.format(vm_id, response))
+
+
+def reset_vm(vm_id):
+    logger.debug('Reseting VM with ID: {}'.format(vm_id))
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "reset"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Reset VM: {}, Response: {}'.format(vm_id, response))
