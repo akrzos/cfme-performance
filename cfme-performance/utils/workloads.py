@@ -23,7 +23,7 @@ def get_refresh_vms_scenarios():
     return []
 
 
-def get_smartstate_scenarios():
+def get_smartstate_analysis_scenarios():
     if(cfme_performance['workloads']['test_smartstate']['scenarios'] and
             len(cfme_performance['workloads']['test_smartstate']['scenarios']) > 0):
         return cfme_performance['workloads']['test_smartstate']['scenarios']

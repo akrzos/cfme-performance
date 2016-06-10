@@ -1,4 +1,5 @@
 """Appliance specific settings and functions."""
+from utils.conf import cfme_performance
 from utils.log import logger
 from utils.ssh import SSHTail
 from textwrap import dedent
@@ -30,11 +31,9 @@ roles56_cap_and_util = ['automate', 'database_operations', 'ems_inventory', 'ems
     'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations', 'event', 'notifier',
     'reporting', 'scheduler', 'user_interface', 'web_services']
 
-# TODO: set the roles
 roles56_refresh_providers = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
     'event', 'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
 
-# TODO: set the roles
 roles56_refresh_vms = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
     'event', 'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
 
@@ -97,6 +96,27 @@ def set_full_refresh_threshold(ssh_client, threshold=100):
     yaml = get_vmdb_yaml_config(ssh_client)
     yaml['ems_refresh']['full_refresh_threshold'] = threshold
     set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def install_vddk(ssh_client, vddk_version='vddk6_0'):
+    """Install the vddk on a appliance"""
+    logger.debug('Installing the VDDK RPM')
+    if ssh_client.run_command('test -d /usr/lib/vmware-vix-disklib/lib64')[0] == 0:
+        logger.info('VDDK is installed already.')
+    else:
+        vddk_url = cfme_performance['resources'][vddk_version]
+        file_name = vddk_url.split('/')[-1]
+        if ssh_client.run_command('test -e /root/{}'.format(file_name))[0] == 0:
+            logger.info('VDDK already downloaded')
+        else:
+            ssh_client.run_command('wget {}'.format(vddk_url))
+        rc, output = ssh_client.run_command('yum -y install {}'.format(file_name))
+        if rc != 0:
+            logger.error('VDDK Install Failure: {}'.format(output))
+        rc, output = ssh_client.run_command('ldconfig -p | grep vix')
+        if len(output) < 2:
+            logger.error('VDDK Install Failure libraries detected ({})'.format(output))
+    logger.debug('VDDK Install finished')
 
 
 def get_server_roles_workload_idle_default(separator=','):
