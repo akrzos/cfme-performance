@@ -1,9 +1,7 @@
 """Framework for the logger and provides additional verbose debug logging."""
-from py.path import local
 from utils.conf import cfme_performance
 from utils.path import get_rel_path, log_path
 import logging
-import os
 import warnings
 
 # Additional Verbose Debug level

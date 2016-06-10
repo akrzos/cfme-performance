@@ -4,7 +4,6 @@ from utils.appliance import get_server_roles_workload_cap_and_util
 from utils.appliance import set_cap_and_util_all_via_rails
 from utils.appliance import set_server_roles_workload_cap_and_util
 from utils.appliance import wait_for_miq_server_ready
-from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers

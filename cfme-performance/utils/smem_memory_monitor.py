@@ -5,7 +5,6 @@ from utils.version import get_current_version
 from collections import OrderedDict
 from cycler import cycler
 from datetime import datetime
-from urlparse import urlparse
 from threading import Thread
 import matplotlib as mpl
 mpl.use('Agg')
