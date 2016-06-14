@@ -213,9 +213,18 @@ def set_server_roles_workload_all(ssh_client):
 
 
 def set_cap_and_util_all_via_rails(ssh_client):
-    """Turns on Collect for All Clusters and Collect for all Datastores without using the UI."""
+    """Turns on Collect for All Clusters and Collect for all Datastores without using the Web UI."""
     command = ('Metric::Targets.perf_capture_always = {:storage=>true, :host_and_cluster=>true};')
     ssh_client.run_rails_console(command, timeout=None, log_less=True)
+
+
+def set_cfme_server_relationship(ssh_client, vm_name, server_id=1):
+    """Set MiqServer record to the id of a VM by name, effectively setting the CFME Server
+    Relationship without using the Web UI."""
+    command = ('miq_server = MiqServer.find_by(id: {});'
+               'miq_server.vm_id = Vm.find_by(name: \'{}\').id;'
+               'miq_server.save'.format(server_id, vm_name))
+    ssh_client.run_rails_console(command, timeout=None, log_less=False)
 
 
 def wait_for_miq_server_ready(poll_interval=5):

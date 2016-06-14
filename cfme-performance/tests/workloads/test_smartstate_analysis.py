@@ -2,8 +2,10 @@
 from utils.appliance import clean_appliance
 from utils.appliance import get_server_roles_workload_smartstate
 from utils.appliance import install_vddk
+from utils.appliance import set_cfme_server_relationship
 from utils.appliance import set_server_roles_workload_smartstate
 from utils.appliance import wait_for_miq_server_ready
+from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
@@ -51,6 +53,7 @@ def test_workload_smartstate_analysis(request, scenario):
 
     # TODO: add credentials to hosts via REST API here (VMware)
     # TODO: Set appliance host/relationship (RHEVM)
+    set_cfme_server_relationship(ssh_client, cfme_performance['appliance']['appliance_name'])
     # TODO: Implement Smart state analysis workload here
 
     logger.info('Test Ending...')

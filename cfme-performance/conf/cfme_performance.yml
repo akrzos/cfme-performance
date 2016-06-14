@@ -104,10 +104,10 @@ workloads:
           - rhevm-small
         wait_time: 60
         total_time: 1800
-        grafana_dashboard: cfme-vmware-system-performance
+        grafana_dashboard: cfme-general-system-performance
   test_refresh_vms:
     scenarios:
-      - name: 30m-vm-refresh-vms-vmware-small
+      - name: 30m-vmware-small
         providers:
           - vmware-small
         refresh_size: 5
@@ -115,14 +115,17 @@ workloads:
         wait_time: 10
         total_time: 1800
         grafana_dashboard: cfme-vmware-system-performance
-      - name: 4hr-vm-refresh-vms-rhevm-small
+      - name: 30m-2xsmall-vmware-rhevm
         providers:
+          - vmware-small
           - rhevm-small
         refresh_size: 5
         refresh_threshold: 100
         wait_time: 10
-        total_time: 14400
-    test_smartstate:
+        total_time: 1800
+        grafana_dashboard: cfme-general-system-performance
+  test_smartstate:
+    scenarios:
       - name: 30m-vmware-small
         providers:
           - vmware-small
