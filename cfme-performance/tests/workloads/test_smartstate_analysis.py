@@ -9,6 +9,9 @@ from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
+from utils.providers import get_all_vm_ids
+from utils.providers import add_host_credentials
+from utils.providers import scan_provider_vm
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_smartstate_analysis_scenarios
@@ -52,8 +55,23 @@ def test_workload_smartstate_analysis(request, scenario):
     time.sleep(scenario['refresh_sleep_time'])
 
     # TODO: add credentials to hosts via REST API here (VMware)
-    # TODO: Set appliance host/relationship (RHEVM)
-    set_cfme_server_relationship(ssh_client, cfme_performance['appliance']['appliance_name'])
+    for provider in scenario['providers']:
+        add_host_credentials(provider)
+        if provider['type'] == "ManageIQ::Providers::Redhat::InfraManager":
+            set_cfme_server_relationship(ssh_client, cfme_performance['appliance']['appliance_name'])
+
     # TODO: Implement Smart state analysis workload here
+    time_between_analyses = scenario['time_between_analyses']
+    total_time = scenario['total_time']
+    total_waited = 0
+    while (total_waited < total_time):
+        for vm_to_scan in get_all_vm_ids():
+            start_scan_time = time.time()
+            scan_provider_vm(vm_to_scan)
+            scan_time = time.time() - start_scan_time
+
+
+
+
 
     logger.info('Test Ending...')

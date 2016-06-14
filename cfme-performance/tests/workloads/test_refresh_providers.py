@@ -52,18 +52,23 @@ def test_refresh_providers(request, scenario):
     # Variable amount of time for refresh workload
     total_time = scenario['total_time']
     start_time = time.time()
-    wait_time = scenario['wait_time']
+    time_between_refresh = scenario['time_between_refresh']
     elapsed_time = 0
 
     while (elapsed_time < total_time):
         elapsed_time = time.time() - start_time
         time_left = abs(total_time - elapsed_time)
         logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
+        start_refresh_time = time.time()
         refresh_providers(id_list)
+        refresh_time = time.time() - start_refresh_time
 
-        if time_left < wait_time:
+        if refresh_time > time_between_refresh:
+            logger.warning('refresh_time: {} is longer than time_between_refresh'.format(refresh_time))
+
+        if time_left < time_between_refresh:
             time.sleep(time_left)
         else:
-            time.sleep(wait_time)
+            time.sleep(time_between_refresh)
 
     logger.info('Test Ending...')

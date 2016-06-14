@@ -9,10 +9,11 @@ from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
 from utils.providers import get_all_vm_ids
-from utils.providers import refresh_provider_vms
+from utils.providers import refresh_provider_vm
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_refresh_vms_scenarios
+from cycler import cycler
 import time
 import pytest
 
@@ -50,47 +51,38 @@ def test_refresh_vms(request, scenario):
     add_providers(scenario['providers'])
     logger.info('Sleeping for refresh: {}s'.format(scenario['refresh_sleep_time']))
     time.sleep(scenario['refresh_sleep_time'])
-    set_full_refresh_threshold(ssh_client, scenario['refresh_threshold'])
 
-    def get_refresh_ids(start_id, size, list):
-        """"""
-        refresh_list = []
-        if start_id != 0:
-            list = list[start_id:] + list[0:start_id]
-        if size > len(list):
-                fullTimes = size / len(list)
-                leftOver = size % len(list)
-        else:
-                fullTimes = 0
-                leftOver = size
-        i = 0
-        while i < fullTimes:
-                refresh_list = refresh_list + list
-                i += 1
-        refresh_list = refresh_list + list[0:leftOver]
-        return {'new_start_id': (start_id + size) % len(list), 'ids_to_refresh': refresh_list}
+    set_full_refresh_threshold(ssh_client, scenario['full_refresh_threshold'])
 
-    start_id = 0
     refresh_size = scenario['refresh_size']
     id_list = get_all_vm_ids()
+    id_cycler = cycler(ids=id_list)
+    id_cycle = id_cycler()
 
     # Variable amount of time for refresh workload
     total_time = scenario['total_time']
     start_time = time.time()
-    wait_time = scenario['wait_time']
+    time_between_refresh = scenario['time_between_refresh']
     elapsed_time = 0
 
     while (elapsed_time < total_time):
         elapsed_time = time.time() - start_time
         time_left = abs(total_time - elapsed_time)
         logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
-        refresh_dict = get_refresh_ids(start_id, refresh_size, id_list)
-        start_id = refresh_dict['new_start_id']
-        refresh_provider_vms(refresh_dict['ids_to_refresh'])
+        start_refresh_time = time.time()
 
-        if time_left < wait_time:
-            time.sleep(time_left)
+        for num, id in zip(range(refresh_size), id_cycle):
+            refresh_provider_vm(id['ids'])
+        refresh_time = time.time() - start_refresh_time
+
+        if refresh_time > time_between_refresh:
+            logger.warning('refresh_time: {} is longer than time_between_refresh'.format(refresh_time))
+
+        if time_left < time_between_refresh - refresh_time:
+            sleep_time = time_left
         else:
-            time.sleep(wait_time)
-        logger.info('sleeping for {}s between refresh cycles'.format(wait_time))
+            sleep_time = abs(time_between_refresh - refresh_time)
+        logger.vdebug('sleeping for {}s between refresh cycles'.format(sleep_time))
+        time.sleep(sleep_time)
+
     logger.info('Test Ending...')

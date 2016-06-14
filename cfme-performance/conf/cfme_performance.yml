@@ -34,6 +34,9 @@ providers:
     credentials:
       username: administrator@vsphere.local
       password: password
+    host_credentials:
+      username: administrator@vsphere.local
+      password: password
   rhevm-small:
     name: rhevm-small
     type: ManageIQ::Providers::Redhat::InfraManager
@@ -95,14 +98,14 @@ workloads:
       - name: 30m-vmware-small
         providers:
           - vmware-small
-        wait_time: 60
+        time_between_refresh: 60
         total_time: 1800
         grafana_dashboard: cfme-vmware-system-performance
       - name: 30m-2xsmall-vmware-rhevm
         providers:
           - vmware-small
           - rhevm-small
-        wait_time: 60
+        time_between_refresh: 60
         total_time: 1800
         grafana_dashboard: cfme-general-system-performance
   test_refresh_vms:
@@ -110,18 +113,20 @@ workloads:
       - name: 30m-vmware-small
         providers:
           - vmware-small
+        refresh_sleep_time: 60
         refresh_size: 5
-        refresh_threshold: 100
-        wait_time: 10
+        full_refresh_threshold: 100
+        time_between_refresh: 10
         total_time: 1800
         grafana_dashboard: cfme-vmware-system-performance
       - name: 30m-2xsmall-vmware-rhevm
         providers:
           - vmware-small
           - rhevm-small
+        refresh_sleep_time: 60
         refresh_size: 5
-        refresh_threshold: 100
-        wait_time: 10
+        full_refresh_threshold: 100
+        time_between_refresh: 10
         total_time: 1800
         grafana_dashboard: cfme-general-system-performance
   test_smartstate:
