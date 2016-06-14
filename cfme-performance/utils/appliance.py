@@ -227,6 +227,25 @@ def set_cfme_server_relationship(ssh_client, vm_name, server_id=1):
     ssh_client.run_rails_console(command, timeout=None, log_less=False)
 
 
+def set_pglogical_replication(ssh_client, replication_type=':none'):
+    """Set pglogical replication type (:none, :remote, :global) without using the Web UI."""
+    command = ('MiqRegion.replication_type = {}'.format(replication_type))
+    ssh_client.run_rails_console(command, timeout=None, log_less=False)
+
+
+def set_rubyrep_replication(ssh_client, host, database='vmdb_production', username='root',
+        password='v2:{I2SQ5PdmGPwN7t5goRiyaQ==}', port='5432'):
+    """Sets up rubyrep replication via advanced configuration settings yaml."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    dest = yaml['workers']['worker_base']['replication_worker']['replication']['destination']
+    dest['database'] = database
+    dest['username'] = username
+    dest['password'] = password
+    dest['port'] = port
+    dest['host'] = host
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
 def wait_for_miq_server_ready(poll_interval=5):
     """Waits for the CFME to be ready by tailing evm.log for:
     'INFO -- : MIQ(MiqServer#start) Server starting complete'
