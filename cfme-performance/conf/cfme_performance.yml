@@ -137,6 +137,14 @@ workloads:
         providers:
           - vmware-small
         refresh_sleep_time: 600
+        vms_to_scan:
+            - perf-smartstate-rhel6
+            - perf-smartstate-rhel7
+            - perf-smartstate-windows2012
+        hosts_to_scan:
+            - perf-host.example.com
+        storage_to_scan:
+            - perf-datastore
         time_between_analyses: 45
         total_time: 1800
         grafana_dashboard: cfme-vmware-system-performance
@@ -144,6 +152,14 @@ workloads:
         providers:
           - rhevm-small
         refresh_sleep_time: 600
+        vms_to_scan:
+            - perf-smartstate-rhel6
+            - perf-smartstate-rhel7
+            - perf-smartstate-windows2012
+        hosts_to_scan:
+            - perf-host.example.com
+        storage_to_scan:
+            - perf-datastore
         time_between_analyses: 45
         total_time: 1800
         grafana_dashboard: cfme-redhat-system-performance
