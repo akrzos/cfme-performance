@@ -10,8 +10,9 @@ from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
 from utils.providers import get_all_vm_ids
+from utils.providers import get_provider_id
 from utils.providers import add_host_credentials
-from utils.providers import scan_provider_vm
+from utils.providers import scan_provider_vms
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_smartstate_analysis_scenarios
@@ -55,39 +56,34 @@ def test_workload_smartstate_analysis(request, scenario):
     time.sleep(scenario['refresh_sleep_time'])
 
     # TODO: add credentials to hosts via REST API here (VMware)
-    for provider in scenario['providers']:
+    for provider_name in scenario['providers']:
+        provider = cfme_performance['providers'][provider_name]
         add_host_credentials(provider)
-        if (cfme_performance['providers'][provider]['type'] ==
-                "ManageIQ::Providers::Redhat::InfraManager"):
+        if provider['type'] == "ManageIQ::Providers::Redhat::InfraManager":
             set_cfme_server_relationship(ssh_client,
-                cfme_performance['appliance']['appliance_name'])
+                                         cfme_performance['appliance']['appliance_name'])
 
-    # Variable amount of time for SmartState Analysis workload
+    for vm_name in scenario['']
+    # TODO: Implement Smart state analysis workload here
+    time_between_analyses = scenario['time_between_analysis']
     total_time = scenario['total_time']
-    starttime = time.time()
-    time_between_analyses = scenario['time_between_analyses']
+    start_time = time.time()
+    elapsed_time = 0
+    while (elapsed_time < total_time):
+        elapsed_time = time.time() - start_time
+        time_left = abs(total_time - elapsed_time)
+        start_scan_time = time.time()
+        scan_provider_vms(get_all_vm_ids())
+        scan_time = time.time() - start_scan_time
 
-    while ((time.time() - starttime) < total_time):
-        start_ssa_time = time.time()
-        # VMs to scan provided by scenario
-        time.sleep(1)  # placeholder
-        iteration_time = time.time()
+        if scan_time > time_between_analyses:
+            logger.warning('scan_time: {} > time_between_analyses'.format(scan_time))
 
-        ssa_time = round(iteration_time - start_ssa_time, 2)
-        elapsed_time = iteration_time - starttime
-        logger.debug('Time to initiate SmartState Analyses: {}'.format(ssa_time))
-        logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
-
-        if ssa_time < time_between_analyses:
-            wait_diff = time_between_analyses - ssa_time
-            if wait_diff > 0:
-                time_remaining = total_time - elapsed_time
-                if (time_remaining > 0 and time_remaining < time_between_analyses):
-                    time.sleep(time_remaining)
-                elif time_remaining > 0:
-                    time.sleep(wait_diff)
+        if time_left < time_between_analyses - scan_time:
+            sleep_time = time_left
         else:
-            logger.warn('Time to initiate SmartState Analyses ({}) exceeded time between '
-                '({})'.format(ssa_time, time_between_analyses))
+            sleep_time = abs(time_between_analyses - scan_time)
+        logger.vdebug('sleeping for {}s between refresh cycles'.format(sleep_time))
+        time.sleep(sleep_time)
 
     logger.info('Test Ending...')
