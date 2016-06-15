@@ -111,7 +111,7 @@ def get_vm_details(vm_id):
 
 
 def add_provider(provider):
-    """Adds Provider via the Rest API."""
+    """Adds a provider via the Rest API."""
     logger.vdebug('Adding Provider: {}, Type: {}'.format(provider['name'], provider['type']))
 
     data_dict = {
@@ -171,22 +171,17 @@ def add_provider(provider):
                              headers={"content-type": "application/json"},
                              allow_redirects=False)
 
-    logger.vdebug('Added Provider: {}, Response: {}'.format(provider['name'], response))
+    logger.debug('Added Provider: {}, Response: {}'.format(provider['name'], response))
 
 
 def add_providers(providers):
-    start_add_provider_time = time.time()
-
+    starttime = time.time()
     for provider in providers:
         add_provider(cfme_performance['providers'][provider])
-
-    add_provider_time = time.time() - start_add_provider_time
-    logger.debug('refresh_providers took: {}s'.format(round(add_provider_time, 2)))
+    logger.info('Added Providers in: {}s'.format(round(time.time() - starttime, 2)))
 
 
 def add_host_credentials(provider):
-    logger.vdebug('Added host credentials to provider: {}'.format(provider['name']))
-
     # REVIEW: does this work?
     data_dict = {
         "action": "edit",
@@ -212,7 +207,7 @@ def add_host_credentials(provider):
         if response.status_code != 200:
             logger.debug(response.text)
 
-    logger.vdebug('Added host credentials, Response: {}'.format(response))
+    logger.debug('Added host credentials, Response: {}'.format(response))
 
 
 def scan_provider_vm(vm_id):
@@ -234,8 +229,6 @@ def scan_provider_vm(vm_id):
 
 
 def refresh_provider(provider_id):
-    logger.vdebug('Refreshing Provider with id: {}'.format(provider_id))
-
     appliance = cfme_performance['appliance']['ip_address']
     response = requests.post("https://" + appliance + "/api/providers/" + str(provider_id),
                              data=json.dumps({"action": "refresh"}),
@@ -248,15 +241,15 @@ def refresh_provider(provider_id):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.vdebug('Refreshed Provider: {}, Response: {}'.format(provider_id, response))
+    logger.vdebug('Queued Refresh Provider: {}, Response: {}'.format(provider_id, response))
 
 
 def refresh_providers(provider_ids):
-    start_refresh_provider_time = time.time()
+    starttime = time.time()
     for provider in provider_ids:
         refresh_provider(provider)
-    refresh_provider_time = time.time() - start_refresh_provider_time
-    logger.debug('refresh_providers took: {}s'.format(round(refresh_provider_time, 2)))
+    logger.vdebug('Queued Refresh {} Provider(s) in: {}s'.format(len(provider_ids),
+        round(time.time() - starttime, 2)))
 
 
 def refresh_provider_host(provider):
@@ -264,8 +257,6 @@ def refresh_provider_host(provider):
 
 
 def refresh_provider_vm(vm_id):
-    logger.vdebug('Refreshing VM with ID: {}'.format(vm_id))
-
     appliance = cfme_performance['appliance']['ip_address']
     response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
                              data=json.dumps({"action": "refresh"}),
@@ -282,11 +273,10 @@ def refresh_provider_vm(vm_id):
 
 
 def refresh_provider_vms(vm_ids):
-    start_refresh_vms_time = time.time()
+    starttime = time.time()
     for vm in vm_ids:
         refresh_provider_vm(vm)
-    refresh_vms_time = time.time() - start_refresh_vms_time
-    logger.debug('refresh_provider_vms took: {}s'.format(round(refresh_vms_time, 2)))
+    logger.debug('Queued Refresh VMs in: {}s'.format(round(time.time() - starttime, 2)))
 
 
 def shutdown_vm_guest(vm_id):

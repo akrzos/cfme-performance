@@ -52,14 +52,14 @@ def test_workload_capacity_and_utilization(request, scenario):
     # Variable amount of time for C&U collections/processing
     total_time = scenario['total_time']
     starttime = time.time()
-    total_waited = 0
-    while (total_waited < total_time):
-        total_waited = time.time() - starttime
-        time_left = abs(total_time - total_waited)
-        logger.info('Time waited: {}/{}'.format(round(total_waited, 2), total_time))
-        if time_left < 300:
+    elapsed_time = 0
+    while (elapsed_time < total_time):
+        elapsed_time = time.time() - starttime
+        time_left = total_time - elapsed_time
+        logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
+        if (time_left > 0 and time_left < 300):
             time.sleep(time_left)
-        else:
+        elif time_left > 0:
             time.sleep(300)
 
     logger.info('Test Ending...')

@@ -57,21 +57,37 @@ def test_workload_smartstate_analysis(request, scenario):
     # TODO: add credentials to hosts via REST API here (VMware)
     for provider in scenario['providers']:
         add_host_credentials(provider)
-        if provider['type'] == "ManageIQ::Providers::Redhat::InfraManager":
-            set_cfme_server_relationship(ssh_client, cfme_performance['appliance']['appliance_name'])
+        if (cfme_performance['providers'][provider]['type'] ==
+                "ManageIQ::Providers::Redhat::InfraManager"):
+            set_cfme_server_relationship(ssh_client,
+                cfme_performance['appliance']['appliance_name'])
 
-    # TODO: Implement Smart state analysis workload here
-    time_between_analyses = scenario['time_between_analyses']
+    # Variable amount of time for SmartState Analysis workload
     total_time = scenario['total_time']
-    total_waited = 0
-    while (total_waited < total_time):
-        for vm_to_scan in get_all_vm_ids():
-            start_scan_time = time.time()
-            scan_provider_vm(vm_to_scan)
-            scan_time = time.time() - start_scan_time
+    starttime = time.time()
+    time_between_analyses = scenario['time_between_analyses']
 
+    while ((time.time() - starttime) < total_time):
+        start_ssa_time = time.time()
+        # VMs to scan provided by scenario
+        time.sleep(1)  # placeholder
+        iteration_time = time.time()
 
+        ssa_time = round(iteration_time - start_ssa_time, 2)
+        elapsed_time = iteration_time - starttime
+        logger.debug('Time to initiate SmartState Analyses: {}'.format(ssa_time))
+        logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
 
-
+        if ssa_time < time_between_analyses:
+            wait_diff = time_between_analyses - ssa_time
+            if wait_diff > 0:
+                time_remaining = total_time - elapsed_time
+                if (time_remaining > 0 and time_remaining < time_between_analyses):
+                    time.sleep(time_remaining)
+                elif time_remaining > 0:
+                    time.sleep(wait_diff)
+        else:
+            logger.warn('Time to initiate SmartState Analyses ({}) exceeded time between '
+                '({})'.format(ssa_time, time_between_analyses))
 
     logger.info('Test Ending...')

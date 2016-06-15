@@ -327,7 +327,7 @@ class SmemMemoryMonitor(Thread):
                         logger.debug('Unaccounted for ruby pid: {}'.format(pid))
 
             timediff = time.time() - starttime
-            logger.debug('Monitoring sampled in {}s'.format(timediff))
+            logger.debug('Monitoring sampled in {}s'.format(round(timediff, 4)))
 
             # Sleep Monitoring interval
             # Roughly 10s samples, accounts for collection of memory measurements
