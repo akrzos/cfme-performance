@@ -54,7 +54,7 @@ def get_all_host_ids():
 
     host_ids = []
     host_response = requests.get(
-        url="https://" + cfme_performance['appliance']['ip_address'] + "/api/hosts",
+        url="https://" + cfme_performance['appliance']['ipaddress'] + "/api/hosts",
         auth=(cfme_performance['appliance']['rest_api']['username'],
               cfme_performance['appliance']['rest_api']['password']),
         verify=False
@@ -111,7 +111,7 @@ def get_vm_details(vm_id):
 
 
 def add_provider(provider):
-    """Adds Provider via the Rest API."""
+    """Adds a provider via the Rest API."""
     logger.vdebug('Adding Provider: {}, Type: {}'.format(provider['name'], provider['type']))
 
     data_dict = {
@@ -171,22 +171,17 @@ def add_provider(provider):
                              headers={"content-type": "application/json"},
                              allow_redirects=False)
 
-    logger.vdebug('Added Provider: {}, Response: {}'.format(provider['name'], response))
+    logger.debug('Added Provider: {}, Response: {}'.format(provider['name'], response))
 
 
 def add_providers(providers):
-    start_add_provider_time = time.time()
-
+    starttime = time.time()
     for provider in providers:
         add_provider(cfme_performance['providers'][provider])
-
-    add_provider_time = time.time() - start_add_provider_time
-    logger.debug('refresh_providers took: {}s'.format(round(add_provider_time, 2)))
+    logger.info('Added Providers in: {}s'.format(round(time.time() - starttime, 2)))
 
 
 def add_host_credentials(provider):
-    logger.vdebug('Added host credentials to provider: {}'.format(provider['name']))
-
     # REVIEW: does this work?
     data_dict = {
         "action": "edit",
@@ -212,7 +207,7 @@ def add_host_credentials(provider):
         if response.status_code != 200:
             logger.debug(response.text)
 
-    logger.vdebug('Added host credentials, Response: {}'.format(response))
+    logger.debug('Added host credentials, Response: {}'.format(response))
 
 
 def scan_provider_vm(vm_id):
@@ -230,12 +225,10 @@ def scan_provider_vm(vm_id):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.vdebug('Scanned VM: {}, Response: {}'.format(vm_id, response))
+    logger.debug('Scanned VM: {}, Response: {}'.format(vm_id, response))
 
 
 def refresh_provider(provider_id):
-    logger.vdebug('Refreshing Provider with id: {}'.format(provider_id))
-
     appliance = cfme_performance['appliance']['ip_address']
     response = requests.post("https://" + appliance + "/api/providers/" + str(provider_id),
                              data=json.dumps({"action": "refresh"}),
@@ -248,37 +241,15 @@ def refresh_provider(provider_id):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.vdebug('Refreshed Provider: {}, Response: {}'.format(provider_id, response))
+    logger.vdebug('Queued Refresh Provider: {}, Response: {}'.format(provider_id, response))
 
 
 def refresh_providers(provider_ids):
-    start_refresh_provider_time = time.time()
-
-    appliance = cfme_performance['appliance']['ip_address']
-    resources = []
-    for provider_id in provider_ids:
-        resources.append({
-            "href": "https://" + appliance + "/api/providers/" + str(provider_id)
-        })
-
-    data_dict = {
-        "action": "refresh",
-        "resources": resources
-    }
-    data_json = json.dumps(data_dict)
-    response = requests.post("https://" + appliance + "/api/providers/",
-                             data=data_json,
-                             auth=(cfme_performance['appliance']['rest_api']['username'],
-                                   cfme_performance['appliance']['rest_api']['password']),
-                             verify=False,
-                             headers={"content-type": "application/json"},
-                             allow_redirects=False)
-
-    if response.status_code != 200:
-        logger.debug(response.text)
-
-    refresh_provider_time = time.time() - start_refresh_provider_time
-    logger.debug('refresh_providers took: {}s'.format(round(refresh_provider_time, 2)))
+    starttime = time.time()
+    for provider in provider_ids:
+        refresh_provider(provider)
+    logger.vdebug('Queued Refresh {} Provider(s) in: {}s'.format(len(provider_ids),
+        round(time.time() - starttime, 2)))
 
 
 def refresh_provider_host(provider):
@@ -286,8 +257,6 @@ def refresh_provider_host(provider):
 
 
 def refresh_provider_vm(vm_id):
-    logger.vdebug('Refreshing VM with ID: {}'.format(vm_id))
-
     appliance = cfme_performance['appliance']['ip_address']
     response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
                              data=json.dumps({"action": "refresh"}),
@@ -304,33 +273,10 @@ def refresh_provider_vm(vm_id):
 
 
 def refresh_provider_vms(vm_ids):
-    start_refresh_vms_time = time.time()
-
-    appliance = cfme_performance['appliance']['ip_address']
-    resources = []
-    for vm_id in vm_ids:
-        resources.append({
-            "href": "https://" + appliance + "/api/vms/" + str(vm_id)
-        })
-
-    data_dict = {
-        "action": "refresh",
-        "resources": resources
-    }
-    data_json = json.dumps(data_dict)
-    response = requests.post("https://" + appliance + "/api/vms/",
-                             data=data_json,
-                             auth=(cfme_performance['appliance']['rest_api']['username'],
-                                   cfme_performance['appliance']['rest_api']['password']),
-                             verify=False,
-                             headers={"content-type": "application/json"},
-                             allow_redirects=False)
-
-    if response.status_code != 200:
-        logger.debug(response.text)
-
-    refresh_vms_time = time.time() - start_refresh_vms_time
-    logger.debug('refresh_provider_vms took: {}s'.format(round(refresh_vms_time, 2)))
+    starttime = time.time()
+    for vm in vm_ids:
+        refresh_provider_vm(vm)
+    logger.debug('Queued Refresh VMs in: {}s'.format(round(time.time() - starttime, 2)))
 
 
 def shutdown_vm_guest(vm_id):

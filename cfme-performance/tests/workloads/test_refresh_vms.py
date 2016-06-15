@@ -13,9 +13,11 @@ from utils.providers import refresh_provider_vms
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_refresh_vms_scenarios
-from cycler import cycler
+from itertools import cycle
 import time
 import pytest
+
+FULL_REFRESH_THRESHOLD_DEFAULT = 100
 
 
 @pytest.mark.parametrize('scenario', get_refresh_vms_scenarios())
@@ -29,18 +31,18 @@ def test_refresh_vms(request, scenario):
     clean_appliance(ssh_client)
 
     monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-refresh-vm', scenario['name'],
-    'refresh-vm', get_server_roles_workload_refresh_vms(separator=','),
-    ', '.join(scenario['providers']))
+        'refresh-vm', get_server_roles_workload_refresh_vms(separator=','),
+        ', '.join(scenario['providers']))
 
     def cleanup_workload(scenario, from_ts):
-        start_time = time.time()
-        to_ts = int(start_time * 1000)
+        starttime = time.time()
+        to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
         logger.debug('Started cleaning up monitoring thread.')
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
-        timediff = time.time() - start_time
+        timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
     request.addfinalizer(lambda: cleanup_workload(scenario, from_ts))
 
@@ -52,38 +54,46 @@ def test_refresh_vms(request, scenario):
     logger.info('Sleeping for refresh: {}s'.format(scenario['refresh_sleep_time']))
     time.sleep(scenario['refresh_sleep_time'])
 
-    set_full_refresh_threshold(ssh_client, scenario['full_refresh_threshold'])
+    full_refresh_threshold_set = False
+    if 'full_refresh_threshold' in scenario:
+        if scenario['full_refresh_threshold'] != FULL_REFRESH_THRESHOLD_DEFAULT:
+            set_full_refresh_threshold(ssh_client, scenario['full_refresh_threshold'])
+            full_refresh_threshold_set = True
+    if not full_refresh_threshold_set:
+        logger.debug('Keeping full_refresh_threshold at default ({}).'.format(
+            FULL_REFRESH_THRESHOLD_DEFAULT))
 
     refresh_size = scenario['refresh_size']
-    id_list = get_all_vm_ids()
-    id_cycler = cycler(ids=id_list)
-    id_cycle = id_cycler()
+    vm_ids = get_all_vm_ids()
+    vm_ids_iter = cycle(vm_ids)
+    logger.debug('Number of VM IDs: {}'.format(len(vm_ids)))
 
     # Variable amount of time for refresh workload
     total_time = scenario['total_time']
-    start_time = time.time()
+    starttime = time.time()
     time_between_refresh = scenario['time_between_refresh']
-    elapsed_time = 0
 
-    while (elapsed_time < total_time):
-        elapsed_time = time.time() - start_time
-        time_left = abs(total_time - elapsed_time)
-        logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
+    while ((time.time() - starttime) < total_time):
         start_refresh_time = time.time()
-        refresh_ids = []
-        for num, id in zip(range(refresh_size), id_cycle):
-            refresh_ids.append(id['ids'])
-        refresh_provider_vms(refresh_ids)
-        refresh_time = time.time() - start_refresh_time
+        refresh_list = [next(vm_ids_iter) for x in range(refresh_size)]
+        refresh_provider_vms(refresh_list)
+        iteration_time = time.time()
 
-        if refresh_time > time_between_refresh:
-            logger.warning('refresh_time: {} > time_between_refresh'.format(refresh_time))
+        refresh_time = round(iteration_time - start_refresh_time, 2)
+        elapsed_time = iteration_time - starttime
+        logger.debug('Time to Queue VM Refreshes: {}'.format(refresh_time))
+        logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
 
-        if time_left < time_between_refresh - refresh_time:
-            sleep_time = time_left
+        if refresh_time < time_between_refresh:
+            wait_diff = time_between_refresh - refresh_time
+            if wait_diff > 0:
+                time_remaining = total_time - elapsed_time
+                if (time_remaining > 0 and time_remaining < time_between_refresh):
+                    time.sleep(time_remaining)
+                elif time_remaining > 0:
+                    time.sleep(wait_diff)
         else:
-            sleep_time = abs(time_between_refresh - refresh_time)
-        logger.vdebug('sleeping for {}s between refresh cycles'.format(sleep_time))
-        time.sleep(sleep_time)
+            logger.warn('Time to Queue Refreshes ({}) exceeded time between Refreshes({})'.format(
+                refresh_time, time_between_refresh))
 
     logger.info('Test Ending...')
