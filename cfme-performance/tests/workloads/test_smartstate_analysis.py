@@ -56,7 +56,7 @@ def test_workload_smartstate_analysis(request, scenario):
 
     # TODO: add credentials to hosts via REST API here (VMware)
     for provider in scenario['providers']:
-        add_host_credentials(provider)
+        add_host_credentials(cfme_performance['providers'][provider])
         if (cfme_performance['providers'][provider]['type'] ==
                 "ManageIQ::Providers::Redhat::InfraManager"):
             set_cfme_server_relationship(ssh_client,
@@ -67,9 +67,11 @@ def test_workload_smartstate_analysis(request, scenario):
     starttime = time.time()
     time_between_analyses = scenario['time_between_analyses']
 
+    # TODO Get ids of VMs/Hosts/Datastores to scan from name identifiers in cfme_performance yml
+
     while ((time.time() - starttime) < total_time):
         start_ssa_time = time.time()
-        # VMs to scan provided by scenario
+        # TODO loop through list of ids of VMs/Hosts/Datastores to scan here and initiate a scan
         time.sleep(1)  # placeholder
         iteration_time = time.time()
 
@@ -80,12 +82,11 @@ def test_workload_smartstate_analysis(request, scenario):
 
         if ssa_time < time_between_analyses:
             wait_diff = time_between_analyses - ssa_time
-            if wait_diff > 0:
-                time_remaining = total_time - elapsed_time
-                if (time_remaining > 0 and time_remaining < time_between_analyses):
-                    time.sleep(time_remaining)
-                elif time_remaining > 0:
-                    time.sleep(wait_diff)
+            time_remaining = total_time - elapsed_time
+            if (time_remaining > 0 and time_remaining < time_between_analyses):
+                time.sleep(time_remaining)
+            elif time_remaining > 0:
+                time.sleep(wait_diff)
         else:
             logger.warn('Time to initiate SmartState Analyses ({}) exceeded time between '
                 '({})'.format(ssa_time, time_between_analyses))

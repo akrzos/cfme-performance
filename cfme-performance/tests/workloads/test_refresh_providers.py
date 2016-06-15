@@ -66,12 +66,11 @@ def test_refresh_providers(request, scenario):
 
         if refresh_time < time_between_refresh:
             wait_diff = time_between_refresh - refresh_time
-            if wait_diff > 0:
-                time_remaining = total_time - elapsed_time
-                if (time_remaining > 0 and time_remaining < time_between_refresh):
-                    time.sleep(time_remaining)
-                elif time_remaining > 0:
-                    time.sleep(wait_diff)
+            time_remaining = total_time - elapsed_time
+            if (time_remaining > 0 and time_remaining < time_between_refresh):
+                time.sleep(time_remaining)
+            elif time_remaining > 0:
+                time.sleep(wait_diff)
         else:
             logger.warn('Time to Queue Refreshes ({}) exceeded time between Refreshes({})'.format(
                 refresh_time, time_between_refresh))
