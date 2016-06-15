@@ -1200,6 +1200,100 @@ per_process_panels:
         - "Vmware::InfraManager::MetricsCollectorWorker"
         - "MiqMetricsCollectorWorkerVmware"
 
+  CFME-VMware-RedHat:
+    - name: "Summerized"
+      processes:
+        - ruby
+        - postgres
+        - httpd
+    - name: "Memcached"
+      processes:
+        - memcached
+    - name: "collectd"
+      processes:
+        - collectd
+    - name: "Appliance"
+      processes:
+        - MIQServer
+        - evm_server.rb
+        - evm_watchdog.rb
+        - appliance_console.rb
+    - name: "Postgres"
+      processes:
+        - PostgresMaster
+        - PostgresLogger
+        - PostgresCheckpoint
+        - PostgresWriter
+        - PostgresWALWriter
+        - PostgresAutovacuum
+        - PostgresStats
+        - PostgresPgLogical
+        - PostgresServers
+    - name: "MiqGenericWorker"
+      processes:
+        - MiqGenericWorker
+    - name: "MiqPriorityWorker"
+      processes:
+        - MiqPriorityWorker
+    - name: "MiqScheduleWorker"
+      processes:
+        - MiqScheduleWorker
+    - name: "MiqUiWorker"
+      processes:
+        - MiqUiWorker
+        - PumaMiqUiWorker
+    - name: "MiqWebServiceWorker"
+      processes:
+        - MiqWebServiceWorker
+        - PumaMiqWebServiceWorker
+        - PumaMiqWebSocketsWorker
+    - name: "MiqReportingWorker"
+      processes:
+        - MiqReportingWorker
+    - name: "MiqEventHandler"
+      processes:
+        - MiqEventHandler
+    - name: "MiqSmartProxyWorker"
+      processes:
+        - MiqSmartProxyWorker
+    - name: "MiqReplicationWorker"
+      processes:
+        - MiqReplicationWorker
+        - "evm:dbsync:replicate"
+    - name: "MiqEmsMetricsProcessorWorker"
+      processes:
+        - MiqEmsMetricsProcessorWorker
+    - name: "Redhat::InfraManager::RefreshWorker"
+      processes:
+        - "Redhat::InfraManager::RefreshWorker"
+        - "MiqEmsRefreshWorkerRedhat"
+    - name: "Redhat::InfraManager::EventCatcher"
+      processes:
+        - "Redhat::InfraManager::EventCatcher"
+        - "MiqEventCatcherRedhat"
+    - name: "Redhat::InfraManager::MetricsCollectorWorker"
+      processes:
+        - "Redhat::InfraManager::MetricsCollectorWorker"
+        - "MiqMetricsCollectorWorkerRedhat"
+    - name: "MiqVimBrokerWorker"
+      processes:
+        - MiqVimBrokerWorker
+    - name: "MiqEmsRefreshCoreWorker"
+      processes:
+        - MiqEmsRefreshCoreWorker
+    - name: "Vmware::InfraManager::RefreshWorker"
+      processes:
+        - "Vmware::InfraManager::RefreshWorker"
+        - "MiqEmsRefreshWorkerVmware"
+    - name: "Vmware::InfraManager::EventCatcher"
+      processes:
+        - "Vmware::InfraManager::EventCatcher"
+        - "MiqEventCatcherVmware"
+    - name: "Vmware::InfraManager::MetricsCollectorWorker"
+      processes:
+        - "Vmware::InfraManager::MetricsCollectorWorker"
+        - "MiqMetricsCollectorWorkerVmware"
+
   MonitorHost:
     - name: "Summerized"
       processes:
