@@ -1,4 +1,4 @@
-"""Rest API interactions to the appliance for provider and VM configuration/testing."""
+"""REST API interactions to the appliance for provider and VM configuration/testing."""
 from utils.conf import cfme_performance
 from utils.log import logger
 import time
@@ -7,7 +7,7 @@ import requests
 
 
 def get_all_provider_ids():
-    """Returns an integer list of provider ID's via the Rest API"""
+    """Returns an integer list of provider ID's via the REST API"""
     logger.debug('Retrieving the list of provider ids')
 
     provider_ids = []
@@ -28,7 +28,7 @@ def get_all_provider_ids():
 
 
 def get_all_vm_ids():
-    """Returns an integer list of vm ID's via the Rest API"""
+    """Returns an integer list of vm ID's via the REST API"""
     logger.debug('Retrieving the list of vm ids')
 
     vm_ids = []
@@ -49,7 +49,7 @@ def get_all_vm_ids():
 
 
 def get_all_host_ids():
-    """Returns an integer list of host ID's via the Rest API"""
+    """Returns an integer list of host ID's via the REST API"""
     logger.debug('Retrieving the list of host ids')
 
     host_ids = []
@@ -69,7 +69,7 @@ def get_all_host_ids():
 
 
 def get_provider_details(provider_id):
-    """Returns the id, name, and type associated with the provider_id"""
+    """Returns the name, and type associated with the provider_id"""
     logger.debug('Retrieving the provider details for ID: {}'.format(provider_id))
 
     id_details = {}
@@ -108,6 +108,38 @@ def get_vm_details(vm_id):
     vmid_details['host_id'] = str(vmid_json['host_id'])
     vmid_details['power_state'] = str(vmid_json['power_state'])
     return vmid_details
+
+
+def get_host_details(host_id):
+    # TODO: implement me
+    pass
+
+
+def get_provider_id(provider_name):
+    """Returns the ID of the specified provider"""
+    for provider_id in get_all_provider_ids():
+        details = get_provider_details(provider_id)
+        if details['name'] == provider_name:
+            return provider_id
+    return
+
+
+def get_vm_id(vm_name):
+    """Returns the ID of the specified VM"""
+    for vm_id in get_all_vm_ids():
+        details = get_vm_details(vm_id)
+        if details['name'] == vm_name:
+            return vm_id
+    return
+
+
+def get_host_id(host_name):
+    """Returns the ID of the specified host"""
+    for host_id in get_all_host_ids():
+        details = get_host_details(host_id)
+        if details['name'] == host_name:
+            return host_id
+    return
 
 
 def add_provider(provider):
@@ -176,12 +208,15 @@ def add_provider(provider):
 
 def add_providers(providers):
     starttime = time.time()
+    """Adds multiple providers with one request per provider via the REST API"""
     for provider in providers:
         add_provider(cfme_performance['providers'][provider])
     logger.info('Added Providers in: {}s'.format(round(time.time() - starttime, 2)))
 
 
 def add_host_credentials(provider):
+    "Adds host credentials for the specified provider"
+    logger.vdebug('Added host credentials to provider: {}'.format(provider['name']))
     # REVIEW: does this work?
     data_dict = {
         "action": "edit",
@@ -211,6 +246,7 @@ def add_host_credentials(provider):
 
 
 def scan_provider_vm(vm_id):
+    """Performs SmartState Analysis on the specified VM via the REST API"""
     logger.vdebug('Scanning VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
@@ -228,7 +264,50 @@ def scan_provider_vm(vm_id):
     logger.debug('Scanned VM: {}, Response: {}'.format(vm_id, response))
 
 
+def scan_provider_vms(vm_ids):
+    """Refreshes multiple VMs with one request per VM via the REST API"""
+    start_scan_vms_time = time.time()
+    for vm in vm_ids:
+        scan_provider_vm(vm)
+    scan_vms_time = time.time() - start_scan_vms_time
+    logger.debug('scan_provider_vms took: {}s'.format(round(scan_vms_time, 2)))
+
+
+def scan_provider_vms_bulk(vm_ids):
+    """Performs SmartState Analysis with one request via the REST API"""
+    start_scan_vms_time = time.time()
+
+    appliance = cfme_performance['appliance']['ip_address']
+    resources = []
+    for vm_id in vm_ids:
+        resources.append({
+            "href": "https://" + appliance + "/api/vms/" + str(vm_id)
+        })
+
+    data_dict = {
+        "action": "scan",
+        "resources": resources
+    }
+    data_json = json.dumps(data_dict)
+    response = requests.post("https://" + appliance + "/api/vms/",
+                             data=data_json,
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    scan_vms_time = time.time() - start_scan_vms_time
+    logger.debug('refresh_provider_vms_bulk took: {}s'.format(round(scan_vms_time, 2)))
+
+
 def refresh_provider(provider_id):
+    """Refreshes the specified provider via the REST API"""
+    logger.vdebug('Refreshing Provider with id: {}'.format(provider_id))
+
     appliance = cfme_performance['appliance']['ip_address']
     response = requests.post("https://" + appliance + "/api/providers/" + str(provider_id),
                              data=json.dumps({"action": "refresh"}),
@@ -245,6 +324,7 @@ def refresh_provider(provider_id):
 
 
 def refresh_providers(provider_ids):
+    """Refreshes multiple providers with one request per provider via the REST API"""
     starttime = time.time()
     for provider in provider_ids:
         refresh_provider(provider)
@@ -252,11 +332,44 @@ def refresh_providers(provider_ids):
         round(time.time() - starttime, 2)))
 
 
+def refresh_providers_bulk(provider_ids):
+    """Refreshes multiple providers with one request via the REST API"""
+    start_refresh_providers_time = time.time()
+
+    appliance = cfme_performance['appliance']['ip_address']
+    resources = []
+    for provider_id in provider_ids:
+        resources.append({
+            "href": "https://" + appliance + "/api/providers/" + str(provider_id)
+        })
+
+    data_dict = {
+        "action": "refresh",
+        "resources": resources
+    }
+    data_json = json.dumps(data_dict)
+    response = requests.post("https://" + appliance + "/api/providers/",
+                             data=data_json,
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    refresh_providers_time = time.time() - start_refresh_providers_time
+    logger.debug('refresh_providers_bulk took: {}s'.format(round(refresh_providers_time, 2)))
+
+
 def refresh_provider_host(provider):
     logger.debug('TODO: Initiate Provider Host Refresh')
 
 
 def refresh_provider_vm(vm_id):
+    """Refreshes the specified VM via the REST API"""
+    logger.vdebug('Refreshing VM with ID: {}'.format(vm_id))
     appliance = cfme_performance['appliance']['ip_address']
     response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
                              data=json.dumps({"action": "refresh"}),
@@ -273,13 +386,46 @@ def refresh_provider_vm(vm_id):
 
 
 def refresh_provider_vms(vm_ids):
+    """Refreshes multiple VMs with one request per VM via the REST API"""
     starttime = time.time()
     for vm in vm_ids:
         refresh_provider_vm(vm)
     logger.debug('Queued Refresh VMs in: {}s'.format(round(time.time() - starttime, 2)))
 
 
+def refresh_provider_vms_bulk(vm_ids):
+    """Refreshes multiple VMs with one request via the REST API"""
+    start_refresh_vms_time = time.time()
+
+    appliance = cfme_performance['appliance']['ip_address']
+    resources = []
+    for vm_id in vm_ids:
+        resources.append({
+            "href": "https://" + appliance + "/api/vms/" + str(vm_id)
+        })
+
+    data_dict = {
+        "action": "refresh",
+        "resources": resources
+    }
+    data_json = json.dumps(data_dict)
+    response = requests.post("https://" + appliance + "/api/vms/",
+                             data=data_json,
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    refresh_vms_time = time.time() - start_refresh_vms_time
+    logger.debug('refresh_provider_vms_bulk took: {}s'.format(round(refresh_vms_time, 2)))
+
+
 def shutdown_vm_guest(vm_id):
+    """Shuts down the specified VM via the REST API"""
     logger.vdebug('Shutting down guest VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
@@ -298,6 +444,7 @@ def shutdown_vm_guest(vm_id):
 
 
 def reboot_vm_guest(vm_id):
+    """Reboots the specified VM via the REST API"""
     logger.vdebug('Rebooting guest VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
@@ -316,6 +463,7 @@ def reboot_vm_guest(vm_id):
 
 
 def start_vm(vm_id):
+    """Starts the specified VM via the REST API"""
     logger.vdebug('Starting VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
@@ -334,6 +482,7 @@ def start_vm(vm_id):
 
 
 def stop_vm(vm_id):
+    """Stops the specified VM via the REST API"""
     logger.vdebug('Stopping VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
@@ -352,6 +501,7 @@ def stop_vm(vm_id):
 
 
 def suspend_vm(vm_id):
+    """Suspends the specified VM via the REST API"""
     logger.vdebug('Suspending VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
@@ -370,6 +520,7 @@ def suspend_vm(vm_id):
 
 
 def reset_vm(vm_id):
+    """Resets the specified VM via the REST API"""
     logger.vdebug('Reseting VM with ID: {}'.format(vm_id))
 
     appliance = cfme_performance['appliance']['ip_address']
