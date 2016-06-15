@@ -64,7 +64,7 @@ def test_refresh_providers(request, scenario):
         refresh_time = time.time() - start_refresh_time
 
         if refresh_time > time_between_refresh:
-            logger.warning('refresh_time: {} is longer than time_between_refresh'.format(refresh_time))
+            logger.warning('refresh_time: {} > time_between_refresh'.format(refresh_time))
 
         if time_left < time_between_refresh:
             time.sleep(time_left)

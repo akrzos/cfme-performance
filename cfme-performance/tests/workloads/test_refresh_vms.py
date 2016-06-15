@@ -9,7 +9,7 @@ from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
 from utils.providers import get_all_vm_ids
-from utils.providers import refresh_provider_vm
+from utils.providers import refresh_provider_vms
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_refresh_vms_scenarios
@@ -70,13 +70,14 @@ def test_refresh_vms(request, scenario):
         time_left = abs(total_time - elapsed_time)
         logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
         start_refresh_time = time.time()
-
+        refresh_ids = []
         for num, id in zip(range(refresh_size), id_cycle):
-            refresh_provider_vm(id['ids'])
+            refresh_ids.append(id['ids'])
+        refresh_provider_vms(refresh_ids)
         refresh_time = time.time() - start_refresh_time
 
         if refresh_time > time_between_refresh:
-            logger.warning('refresh_time: {} is longer than time_between_refresh'.format(refresh_time))
+            logger.warning('refresh_time: {} > time_between_refresh'.format(refresh_time))
 
         if time_left < time_between_refresh - refresh_time:
             sleep_time = time_left
