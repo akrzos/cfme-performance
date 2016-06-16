@@ -9,7 +9,7 @@ from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
-from utils.providers import get_all_vm_ids
+from utils.providers import get_vm_id
 from utils.providers import add_host_credentials
 from utils.providers import scan_provider_vm
 from utils.smem_memory_monitor import SmemMemoryMonitor
@@ -54,7 +54,6 @@ def test_workload_smartstate_analysis(request, scenario):
     logger.info('Sleeping for Refresh: {}s'.format(scenario['refresh_sleep_time']))
     time.sleep(scenario['refresh_sleep_time'])
 
-    # TODO: add credentials to hosts via REST API here (VMware)
     for provider in scenario['providers']:
         add_host_credentials(cfme_performance['providers'][provider])
         if (cfme_performance['providers'][provider]['type'] ==
@@ -67,14 +66,17 @@ def test_workload_smartstate_analysis(request, scenario):
     starttime = time.time()
     time_between_analyses = scenario['time_between_analyses']
 
-    # TODO Get ids of VMs/Hosts/Datastores to scan from name identifiers in cfme_performance yml
+    vm_ids_to_scan = []
+    for vm_name in scenario['vms_to_scan']:
+        vm_ids_to_scan.append(get_vm_id(vm_name))
 
     while ((time.time() - starttime) < total_time):
         start_ssa_time = time.time()
-        # TODO loop through list of ids of VMs/Hosts/Datastores to scan here and initiate a scan
-        time.sleep(1)  # placeholder
-        iteration_time = time.time()
 
+        for vm_id in vm_ids_to_scan:
+            scan_provider_vm(vm_id)
+
+        iteration_time = time.time()
         ssa_time = round(iteration_time - start_ssa_time, 2)
         elapsed_time = iteration_time - starttime
         logger.debug('Time to initiate SmartState Analyses: {}'.format(ssa_time))
