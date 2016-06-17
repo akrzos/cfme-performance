@@ -33,3 +33,4 @@
     - proctitle-patch
     - init-vmdb
     - collectd
+    - { role: statsd-patch, when: "{{appliances[inventory_hostname].run_statsd}} == true"}

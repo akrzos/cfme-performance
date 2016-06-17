@@ -20,22 +20,24 @@ carbon_host: 1.1.1.1
 graphite_port: 9000
 graphite_username: root
 graphite_password: calvin
+
+# Statsd Client(On appliance) connects to statsd_host (Typically Monitor Host)
+statsd_host: "{{carbon_host}}"
+
 # Grafana:
 grafana_host: "{{carbon_host}}"
 grafana_port: 9001
 grafana_username: admin
 grafana_password: admin
-# Carbon/Graphite/Grafana:
+
+# Carbon/Graphite/Statsd/Grafana:
 firewall_zone: public
+
 # Collectd:
 carbon_host_prefix: carbon
 
 # Collectd applies to all Hosts (MonitorHost/CFME/Miq)
 collectd_interval: 10
-
-# Disable for now
-run_statsd: false
-statsd_host: "{{carbon_host}}"
 
 
 ###############################
@@ -66,6 +68,7 @@ appliances:
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
+    run_statsd: false
   # appliance with different region, no database dump, no static interfaces
   inventory_hostname2:
     interfaces: []
@@ -73,6 +76,7 @@ appliances:
     vmdb_region: 99
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
+    run_statsd: false
 
 
 ###############################
