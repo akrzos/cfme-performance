@@ -9,7 +9,7 @@ from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
-from utils.providers import get_vm_id
+from utils.providers import get_vm_ids
 from utils.providers import add_host_credentials
 from utils.providers import scan_provider_vm
 from utils.smem_memory_monitor import SmemMemoryMonitor
@@ -66,9 +66,8 @@ def test_workload_smartstate_analysis(request, scenario):
     starttime = time.time()
     time_between_analyses = scenario['time_between_analyses']
 
-    vm_ids_to_scan = []
-    for vm_name in scenario['vms_to_scan']:
-        vm_ids_to_scan.append(get_vm_id(vm_name))
+    vm_dict = get_vm_ids(scenario['vms_to_scan'])
+    vm_ids_to_scan = vm_dict.values()
 
     while ((time.time() - starttime) < total_time):
         start_ssa_time = time.time()
