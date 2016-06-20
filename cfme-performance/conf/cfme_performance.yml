@@ -47,6 +47,13 @@ providers:
     metrics_credentials:
       username: cloudforms
       password: password
+  amazon:
+    name: amazon-cloud
+    type: ManageIQ::Providers::Amazon::CloudManager
+    provider_region: us-east-1
+    credentials:
+      username: Access-Key
+      password: Secret-Key
 # Tests Configuration
 workloads:
   test_idle_default:
