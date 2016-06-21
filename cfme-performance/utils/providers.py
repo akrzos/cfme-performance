@@ -139,13 +139,19 @@ def add_provider(provider):
         "resources": [{
             "name": provider['name'],
             "type": provider['type'],
-            "hostname": provider['ip_address'],
             "credentials": [{
                 "userid": provider['credentials']['username'],
                 "password": provider['credentials']['password']
             }]
         }]
     }
+
+    if 'ip_address' in provider:
+        data_dict['resources'][0]['hostname'] = provider['ip_address']
+
+    if (provider['type'] == 'ManageIQ::Providers::Amazon::CloudManager' or
+    provider['type'] == 'ManageIQ::Providers::Google::CloudManager'):
+        data_dict['resources'][0]['provider_region'] = provider['provider_region']
 
     if 'metrics_credentials' in provider:
         data_dict['resources'][0]['credentials'].append({
@@ -177,9 +183,6 @@ def add_provider(provider):
             "password": provider['ssh_keypair_credentials']['password'],
             "auth_type": "ssh_keypair"
         })
-
-    # elif '<OTHER_AUTH_TYPES>' in cfme_performance[provider]:
-    #     # TODO implement for other appropriate auth_types
 
     json_data = json.dumps(data_dict)
     appliance = cfme_performance['appliance']['ip_address']
