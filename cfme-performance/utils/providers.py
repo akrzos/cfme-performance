@@ -68,6 +68,26 @@ def get_all_host_ids():
     return host_ids
 
 
+def get_all_template_ids():
+    """Returns an integer list of template ID's via the Rest API"""
+    logger.debug('Retrieving the list of template ids')
+
+    template_ids = []
+    template_response = requests.get(
+        url="https://" + cfme_performance['appliance']['ip_address'] + "/api/templates",
+        auth=(cfme_performance['appliance']['rest_api']['username'],
+              cfme_performance['appliance']['rest_api']['password']),
+        verify=False
+    )
+
+    template_json = template_response.json()
+    template_urls = template_json['resources']
+    for url in template_urls:
+        last_slash = url['href'].rfind('/')
+        template_ids.append(int(url['href'][last_slash + 1:]))
+    return template_ids
+
+
 def get_provider_details(provider_id):
     """Returns the name, and type associated with the provider_id"""
     logger.debug('Retrieving the provider details for ID: {}'.format(provider_id))
@@ -90,7 +110,7 @@ def get_provider_details(provider_id):
 
 def get_vm_details(vm_id):
     """Returns the name, type, vendor, host_id, and power_state associated with the vm_id"""
-    logger.debug('Retrieving the VM details for ID: {}'.format(vm_id))
+    logger.vdebug('Retrieving the VM details for ID: {}'.format(vm_id))
 
     vmid_details = {}
     vmid_response = requests.get(
@@ -111,6 +131,35 @@ def get_vm_details(vm_id):
     return vmid_details
 
 
+def get_template_details(template_id):
+    """Returns the name, type, and guid associated with the template_id"""
+    logger.debug('Retrieving the template details for ID: {}'.format(template_id))
+
+    template_details = {}
+    template_response = requests.get(
+        url="https://" + cfme_performance['appliance']['ip_address'] +
+            "/api/templates/" + str(template_id),
+        auth=(cfme_performance['appliance']['rest_api']['username'],
+              cfme_performance['appliance']['rest_api']['password']),
+        verify=False
+    )
+    template_json = template_response.json()
+
+    template_details['name'] = str(template_json['name'])
+    template_details['type'] = str(template_json['type'])
+    template_details['guid'] = str(template_json['guid'])
+    return template_details
+
+
+def get_all_template_details():
+    """Returns a dictionary mapping template ids to their name, type, and guid"""
+    all_details = {}
+    for id in get_all_template_ids():
+        all_details[id] = {}
+        all_details[id] = get_template_details(id)
+    return all_details
+
+
 def get_provider_id(provider_name):
     """"Return the ID associated with the specified provider name"""
     logger.debug('Retrieving the ID for provider: {}'.format(provider_name))
@@ -129,6 +178,35 @@ def get_vm_id(vm_name):
         if details['name'] == vm_name:
             return vm_id
     return
+
+
+def get_vm_ids(vm_names):
+    """Returns a dictionary mapping each VM name to it's id"""
+    name_list = vm_names[:]
+    logger.debug('Retrieving the IDs for {} VM(s)'.format(len(name_list)))
+    id_map = {}
+    for vm_id in get_all_vm_ids():
+        if len(name_list) == 0:
+            break
+        vm_name = get_vm_details(vm_id)['name']
+        if vm_name in name_list:
+            id_map[vm_name] = vm_id
+            name_list.remove(vm_name)
+    return id_map
+
+
+def get_template_guids(template_dict):
+    """Returns a list of guids given a dictionary mapping a provider to its templates"""
+    result_list = []
+    all_template_details = get_all_template_details()
+    for provider in template_dict:
+        for template_name in template_dict[provider]:
+            provider_type = cfme_performance['providers'][provider]['type']
+            for id in all_template_details:
+                if ((all_template_details[id]['name'] == template_name) and
+                        (all_template_details[id]['type'] == provider_type + '::Template')):
+                    result_list.append(all_template_details[id]['guid'])
+    return result_list
 
 
 def add_provider(provider):
@@ -408,6 +486,122 @@ def refresh_provider_vms_bulk(vm_ids):
         logger.debug(response.text)
 
     logger.debug('Queued Refresh {} VMs in: {}s'.format(len(vm_ids),
+        round(time.time() - starttime, 2)))
+
+
+def provision_vm(vm_name, template_guid):
+    """Create a provision request for a VM"""
+    starttime = time.time()
+    data_dict = {
+        'action': 'create',
+        'resources': [{
+            'template_fields': {
+                'guid': template_guid
+            },
+            'vm_fields': {
+                'number_of_sockets': 1,
+                'cores_per_socket': 1,
+                'vm_name': vm_name,
+                'vm_memory': '1024',
+                'vlan': 'VM Network',
+                'vm_auto_start': True,
+                'provision_type': 'native_clone'
+            },
+            'requester': {
+                'user_name': 'admin',
+                'owner_first_name': 'FirstName',
+                'owner_last_name': 'LastName',
+                'owner_email': 'alex@perf.com',
+                'auto_approve': True
+            },
+            'additional_values': {
+                'request_id': '1001'
+            },
+
+            'ems_custom_attributes': {},
+            'miq_custom_attributes': {}
+        }]
+    }
+
+    data_json = json.dumps(data_dict)
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/provision_requests/",
+                             data=data_json,
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+    logger.debug('Queued Provision VM {} in: {}s'.format(vm_name,
+        round(time.time() - starttime, 2)))
+
+
+def vm_exists(vm_id):
+    """Returns true if and only if CFME recognizes the vm"""
+    return vm_id in get_all_vm_ids()
+
+
+def get_remaining_vms():
+    remaining_vms = []
+    for vm_id in get_all_vm_ids():
+        details = get_vm_details(vm_id)
+        if details['name'][:4] == '2016' and 'retirement_state' not in details:
+            remaining_vms.append(details['name'])
+    return remaining_vms
+
+
+def retire_vm(vm_id):
+    """Retire the specified VM via the REST API, Returns true if successful"""
+    logger.debug('Retiring guest VM with ID: {}'.format(vm_id))
+    if (not vm_exists(vm_id)):
+        logger.warning('Attempted to Retire vm {}, which doesn\'t exist'.format(vm_id))
+        return False
+
+    appliance = cfme_performance['appliance']['ip_address']
+    response = requests.post("https://" + appliance + "/api/vms/" + str(vm_id),
+                             data=json.dumps({"action": "retire"}),
+                             auth=(cfme_performance['appliance']['rest_api']['username'],
+                                   cfme_performance['appliance']['rest_api']['password']),
+                             verify=False,
+                             headers={"content-type": "application/json"},
+                             allow_redirects=False)
+
+    if response.status_code != 200:
+        logger.debug(response.text)
+
+    logger.debug('Retired guest VM: {}, Response: {}'.format(vm_id, response))
+    return True
+
+
+def retire_provisioned_vm(vm_name):
+    """"Retire the VMs that was provisioned during a workload via the REST API
+    If the vm hasn't been provisioned yet, this method returns False"""
+    starttime = time.time()
+    vm_id = get_vm_id(vm_name)
+    result = retire_vm(vm_id)
+    logger.debug('Queued retire for VM in {}s'.format(round(time.time() - starttime, 2)))
+    return result
+
+
+def retire_provisioned_vms(name_list):
+    """"Retire the VMs that were provisioned during a workload via the REST API"""
+    starttime = time.time()
+    vm_ids = get_vm_ids(name_list).values()
+    while len(vm_ids) != len(name_list):
+        logger.warning('Not all VMs have been fully provisioned. Sleeping 30 seconds')
+        time.sleep(30)
+        vm_ids = get_vm_ids(name_list).values()
+    logger.debug('Queuing the retire of the following VMs: {}'.format(vm_ids))
+    while len(vm_ids) > 0:
+        result = retire_vm(vm_ids[0])
+        if result:
+            vm_ids.pop(0)
+        else:
+            vm_ids.append(vm_ids.pop(0))
+    logger.debug('Queued retire for {} provisioned VM(s) in {}s'.format(len(name_list),
         round(time.time() - starttime, 2)))
 
 
