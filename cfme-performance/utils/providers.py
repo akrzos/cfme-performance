@@ -105,7 +105,8 @@ def get_vm_details(vm_id):
     vmid_details['name'] = str(vmid_json['name'])
     vmid_details['type'] = str(vmid_json['type'])
     vmid_details['vendor'] = str(vmid_json['vendor'])
-    vmid_details['host_id'] = str(vmid_json['host_id'])
+    if 'host_id' in vmid_json:
+        vmid_details['host_id'] = str(vmid_json['host_id'])
     vmid_details['power_state'] = str(vmid_json['power_state'])
     return vmid_details
 
