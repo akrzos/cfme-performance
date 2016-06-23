@@ -17,7 +17,7 @@ CF-R0000-DB-Workload-5605
 
 
 # CFME worker appliances
-[cfme]
+[cfme-worker]
 
 # CFME All-In-One Performance Monitored appliances
 [cfme-all-in-one]

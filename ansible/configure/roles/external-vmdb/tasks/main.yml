@@ -1,0 +1,17 @@
+---
+#
+# Setup external vmdb on cfme-worker appliance
+#
+
+- name: Install dev v2_key
+  copy:
+    src=v2_key.dev
+    dest=/var/www/miq/vmdb/certs/v2_key
+    mode=0400
+
+- name: Setup vmdb external to appliance
+  command: appliance_console_cli >
+    --hostname {{appliances[inventory_hostname].external_vmdb_ip_address}}
+    --dbname {{appliances[inventory_hostname].external_vmdb_name}}
+    --username {{appliances[inventory_hostname].external_vmdb_username}}
+    --password {{appliances[inventory_hostname].external_vmdb_password}}

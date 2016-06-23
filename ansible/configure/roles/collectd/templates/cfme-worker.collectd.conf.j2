@@ -50,7 +50,6 @@ LoadPlugin uptime
   </Carbon>
 </Plugin>
 
-
 {% if cfme_apache_monitoring %}
 <Plugin apache>
   <Instance "status">
@@ -178,22 +177,9 @@ LoadPlugin uptime
 
   ProcessMatch "MiqStorageMetricsCollectorWorker" "MiqStorageMetricsCollectorWorker.*"
 
-
-  # Capture specific postgres processes:
-  ProcessMatch "PostgresMaster" "/opt/rh/rh-postgresql94/root/usr/bin/postgres"
-  ProcessMatch "PostgresLogger" "postgres: logger process"
-  ProcessMatch "PostgresCheckpoint" "postgres: checkpointer process"
-  ProcessMatch "PostgresWriter" "postgres: writer process"
-  ProcessMatch "PostgresWALWriter" "postgres: wal writer process"
-  ProcessMatch "PostgresAutovacuum" "postgres: autovacuum launcher process"
-  ProcessMatch "PostgresStats" "postgres: stats collector process"
-  ProcessMatch "PostgresPgLogical" "postgres: bgworker: pglogical supervisor"
-  ProcessMatch "PostgresServers" "postgres: root vmdb_production.*"
-
   ProcessMatch "collectd" "/usr/sbin/collectd.+-C.+/etc/collectd.conf"
   Process "httpd"
   Process "memcached"
-  ProcessMatch "postgres" "postgres.*"
   # Catch all-other ruby processes:
   Process "ruby"
 </Plugin>

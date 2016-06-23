@@ -8,7 +8,7 @@ collectd_packages:
     - collectd
     - collectd-postgresql
     - collectd-apache
-  cfme:
+  cfme-worker:
     - collectd
     - collectd-apache
   cfme-all-in-one:

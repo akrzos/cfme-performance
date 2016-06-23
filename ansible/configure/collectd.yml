@@ -18,11 +18,11 @@
   tags: cfme-vmdb
 
 # Cloud Forms Worker appliances
-- hosts: cfme
+- hosts: cfme-worker
   gather_facts: false
   remote_user: root
   vars:
-    config_type: cfme
+    config_type: cfme-worker
   vars_files:
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
