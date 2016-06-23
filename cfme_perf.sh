@@ -7,7 +7,7 @@ else
   YUM=yum
 fi
 
-sudo $YUM install -y python-virtualenv gcc postgresql-devel libxml2-devel libxslt-devel zeromq3-devel libcurl-devel redhat-rpm-config  gcc-c++  freetype-devel
+sudo $YUM install -y python-virtualenv gcc postgresql-devel libxml2-devel libxslt-devel zeromq3-devel libcurl-devel redhat-rpm-config  gcc-c++  freetype-devel libffi-dev
 virtualenv .cfme_perf
 echo "export PYTHONPATH='`pwd`'" | tee -a ./.cfme_perf/bin/activate
 echo "export PYTHONDONTWRITEBYTECODE=yes" | tee -a ./.cfme_perf/bin/activate
