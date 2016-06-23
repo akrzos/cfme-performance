@@ -6,18 +6,16 @@
 
 # CFME VMDB appliances
 [cfme-vmdb]
-CF-R0000-DB-Benchmark-5540
-CF-R0000-DB-Workload-5540-Patched
-CF-R0000-DB-Workload-5540
+CF-R0000-DB-Workload-5542
+CF-R0000-DB-Workload-5542-Patched
 
-CF-R0099-DB-Workload-ReplicationMaster-55013-2
-
-CF-R0000-DB-Benchmark-5605
-CF-R0000-DB-Workload-5605
+CF-R0000-DB-Workload-56012
+CF-R0099-DB-Workload-ReplicationMaster-56012
 
 
 # CFME worker appliances
 [cfme-worker]
+CF-R0000-Wkr1-Workload-56012
 
 # CFME All-In-One Performance Monitored appliances
 [cfme-all-in-one]

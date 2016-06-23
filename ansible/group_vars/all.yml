@@ -57,20 +57,40 @@ cfme_carbon_prefix: manageiq
 
 # Per appliance settings:
 appliances:
-  # Appliance that will take a database dump
-  inventory_hostname1:
-    dbdump: dump1
-    interfaces:
-      - name: eth1
-        ipaddr: 172.16.10.10
-        netmask: 255.255.255.0
+  # Examples corresponding to examples in ssh-config.local.template and hosts.local.template
+  CF-R0000-DB-Workload-5542:
+    interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
     run_statsd: false
-  # appliance with different region, no database dump, no static interfaces
-  inventory_hostname2:
+  # Example appliance with database dump
+  CF-R0000-DB-Workload-5542-Patched:
+    dbdump: dump1
+    interfaces: []
+    use_separate_vmdb_disk: true
+    vmdb_region: 0
+    vmdb_disk: /dev/vdb
+    vmdb_password: smartvm
+    run_statsd: false
+  CF-R0000-DB-Workload-56012:
+    interfaces: []
+    use_separate_vmdb_disk: true
+    vmdb_region: 0
+    vmdb_disk: /dev/vdb
+    vmdb_password: smartvm
+    run_statsd: false
+  # Example Worker appliance for "CF-R0000-DB-Workload-56012"
+  CF-R0000-Wkr1-Workload-56012:
+    interfaces: []
+    external_vmdb_ip_address: 33.22.33.44
+    external_vmdb_name: vmdb_production
+    external_vmdb_username: root
+    external_vmdb_password: smartvm
+    run_statsd: true
+  # Example Replication Master appliance
+  CF-R0099-DB-Workload-ReplicationMaster-56012:
     interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 99
