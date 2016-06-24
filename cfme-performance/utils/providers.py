@@ -1,4 +1,6 @@
 """REST API interactions to the appliance for provider and VM configuration/testing."""
+from mgmtsystem.virtualcenter import VMWareSystem
+from mgmtsystem.rhevm import RHEVMSystem
 from utils.conf import cfme_performance
 from utils.log import logger
 import copy
@@ -201,16 +203,20 @@ def get_vm_ids(vm_names):
 
 
 def get_template_guids(template_dict):
-    """Returns a list of guids given a dictionary mapping a provider to its templates"""
+    """Returns a 2D list. The inner list is formated so that each guid is in index 0, and its
+    provider is in index 1. Expects a dictionary mapping a provider to its templates"""
     result_list = []
     all_template_details = get_all_template_details()
     for provider in template_dict:
         for template_name in template_dict[provider]:
+            inner_list = []
             provider_type = cfme_performance['providers'][provider]['type']
             for id in all_template_details:
                 if ((all_template_details[id]['name'] == template_name) and
                         (all_template_details[id]['type'] == provider_type + '::Template')):
-                    result_list.append(all_template_details[id]['guid'])
+                    inner_list.append(all_template_details[id]['guid'])
+                    inner_list.append(cfme_performance['providers'][provider])
+                    result_list.append(inner_list)
     return result_list
 
 
@@ -492,7 +498,7 @@ def refresh_provider_vms_bulk(vm_ids):
         round(time.time() - starttime, 2)))
 
 
-def provision_vm(vm_name, template_guid):
+def provision_vm(vm_name, template_guid, vlan):
     """Create a provision request for a VM"""
     starttime = time.time()
     data_dict = {
@@ -506,7 +512,7 @@ def provision_vm(vm_name, template_guid):
                 'cores_per_socket': 1,
                 'vm_name': vm_name,
                 'vm_memory': '1024',
-                'vlan': 'VM Network',
+                'vlan': vlan,
                 'vm_auto_start': True,
                 'provision_type': 'native_clone'
             },
@@ -606,6 +612,56 @@ def retire_provisioned_vms(name_list):
             vm_ids.append(vm_ids.pop(0))
     logger.debug('Queued retire for {} provisioned VM(s) in {}s'.format(len(name_list),
         round(time.time() - starttime, 2)))
+
+
+def get_vm_provider(vm_name):
+    """Returns the provider name of the Vm"""
+    vm_id = get_vm_id(vm_name)
+    vm_details = get_vm_details(vm_id)
+    vm_type = vm_details['type']
+    last_colon = vm_type.rfind('::')
+    expected_provider_type = vm_type[:last_colon]
+    for provider in get_all_provider_ids():
+        details = get_provider_details(provider)
+        if details['type'] == expected_provider_type:
+            return details
+
+
+def get_mgmt_provider_class(provider):
+    if provider.type == 'ManageIQ::Providers::Vmware::InfraManager':
+        return VMWareSystem(provider.ip_address,
+                            provider.credentials.username,
+                            provider.credentials.password)
+    elif provider.type == 'ManageIQ::Providers::Redhat::InfraManager':
+        return RHEVMSystem(provider.ip_address,
+                           provider.credentials.username,
+                           provider.credentials.password)
+
+
+def delete_provisioned_vm(provision_order):
+    name_and_provider = provision_order[0]
+    """Deletes the first VM in provision order. Expects a 2D list then where the inner list contains
+    a VM name in index 0, and its provider in index 1"""
+    logger.debug('Cleaning up: {}'.format(name_and_provider[0]))
+    provider_details = (name_and_provider[1])
+    provider = get_mgmt_provider_class(provider_details)
+    try:
+        provider.delete_vm(name_and_provider[0])
+        provision_order.pop(0)
+    except Exception as e:
+        # VM potentially was not yet provisioned
+        logger.error('Could not delete VM: {} Exception: {}'.format(name_and_provider[0], e))
+
+
+def delete_provisioned_vms(provision_order):
+    """Deletes all VMs in provision_order. Expects a 2D list then where the inner list contains the
+    VM name in index 0, and its provider in index 1"""
+    while len(provision_order) > 0:
+        for vm in provision_order:
+            temp_list = [vm]
+            delete_provisioned_vm(temp_list)
+            if len(temp_list) == 0:
+                provision_order.remove(vm)
 
 
 def shutdown_vm_guest(vm_id):
