@@ -1,9 +1,10 @@
 """REST API interactions to the appliance for provider and VM configuration/testing."""
 from utils.conf import cfme_performance
 from utils.log import logger
-import time
+import copy
 import json
 import requests
+import time
 
 
 def get_all_provider_ids():
@@ -92,43 +93,47 @@ def get_provider_details(provider_id):
     """Returns the name, and type associated with the provider_id"""
     logger.debug('Retrieving the provider details for ID: {}'.format(provider_id))
 
-    id_details = {}
-    id_response = requests.get(
+    details = {}
+    response = requests.get(
         url="https://" + cfme_performance['appliance']['ip_address'] +
             "/api/providers/" + str(provider_id),
         auth=(cfme_performance['appliance']['rest_api']['username'],
               cfme_performance['appliance']['rest_api']['password']),
         verify=False
     )
-    id_json = id_response.json()
+    details_json = response.json()
 
-    id_details['name'] = str(id_json['name'])
-    id_details['type'] = str(id_json['type'])
+    details['id'] = details_json['id']
+    details['name'] = str(details_json['name'])
+    details['type'] = str(details_json['type'])
 
-    return id_details
+    return details
 
 
 def get_vm_details(vm_id):
     """Returns the name, type, vendor, host_id, and power_state associated with the vm_id"""
     logger.vdebug('Retrieving the VM details for ID: {}'.format(vm_id))
 
-    vmid_details = {}
-    vmid_response = requests.get(
+    details = {}
+    response = requests.get(
         url="https://" + cfme_performance['appliance']['ip_address'] +
             "/api/vms/" + str(vm_id),
         auth=(cfme_performance['appliance']['rest_api']['username'],
               cfme_performance['appliance']['rest_api']['password']),
         verify=False
     )
-    vmid_json = vmid_response.json()
+    details_json = response.json()
 
-    vmid_details['name'] = str(vmid_json['name'])
-    vmid_details['type'] = str(vmid_json['type'])
-    vmid_details['vendor'] = str(vmid_json['vendor'])
-    if 'host_id' in vmid_json:
-        vmid_details['host_id'] = str(vmid_json['host_id'])
-    vmid_details['power_state'] = str(vmid_json['power_state'])
-    return vmid_details
+    details['id'] = details_json['id']
+    if 'ems_id' in details_json:
+        details['ems_id'] = details_json['ems_id']
+    details['name'] = str(details_json['name'])
+    details['type'] = str(details_json['type'])
+    details['vendor'] = str(details_json['vendor'])
+    if 'host_id' in details_json:
+        details['host_id'] = str(details_json['host_id'])
+    details['power_state'] = str(details_json['power_state'])
+    return details
 
 
 def get_template_details(template_id):
@@ -698,6 +703,68 @@ def suspend_vm(vm_id):
         logger.debug(response.text)
 
     logger.debug('Suspended VM: {}, Response: {}'.format(vm_id, response))
+
+
+def map_vms_to_ids(provider_names_to_vm_names):
+    """Takes a dictionary of providers with a list of vms and generates a list of vm_ids for each
+    vm in the data structure.  We need this because more than one provider can lead to a """
+    starttime = time.time()
+    expected_num_ids = sum(len(x) for x in provider_names_to_vm_names.itervalues())
+    expected_num_providers = len(provider_names_to_vm_names.keys())
+    # Intended ouput here (List of vm ids):
+    vm_ids = []
+    # Intermediate data structure holding provider_id to list of vm names
+    provider_ids_to_vm_names = {}
+
+    # First get all providers details
+    all_providers_details = []
+    for pro_id in get_all_provider_ids():
+        details = get_provider_details(pro_id)
+        all_providers_details.append(details)
+
+    providers_to_vms_copy = dict(provider_names_to_vm_names)
+    # Next map provider_name to the provider_id
+    for provider_name in provider_names_to_vm_names:
+        for provider_detail in all_providers_details:
+            if provider_name == provider_detail['name']:
+                # Copy VMs from that provider to the Intermediate data structure
+                provider_ids_to_vm_names[provider_detail['id']] = list(
+                    provider_names_to_vm_names[provider_name])
+                del providers_to_vms_copy[provider_name]
+                break
+
+    if len(providers_to_vms_copy) > 0:
+        # Error, we did not find all providers, likely there is an issue with the scenario data
+        # inside of cfme_performance.yml or cfme_performance.local.yml
+        logger.error('Provider(s) + vm(s) not found in CFME Inventory: {}'.format(
+            providers_to_vms_copy))
+
+    provider_ids_to_vm_names_copy = copy.deepcopy(provider_ids_to_vm_names)
+    # Now map each vm_name+ems_id to the actual vm_id and append to our list
+    for vm_id in get_all_vm_ids():
+        vm_details = get_vm_details(vm_id)
+        for provider_id in provider_ids_to_vm_names:
+            if ('ems_id' in vm_details and provider_id == vm_details['ems_id']):
+                # Match provider_id, now check vm_name
+                for vm_name in provider_ids_to_vm_names[provider_id]:
+                    if vm_name == vm_details['name']:
+                        logger.debug('Matching {} to vm id: {}'.format(vm_name, vm_id))
+                        vm_ids.append(vm_id)
+                        del (provider_ids_to_vm_names_copy[provider_id]
+                            [provider_ids_to_vm_names_copy[provider_id].index(vm_name)])
+                        break
+        if (sum(len(x) for x in provider_ids_to_vm_names_copy.itervalues()) == 0):
+            break
+
+    # Now check for left over vms that we did not match:
+    leftover_num_ids = sum(len(x) for x in provider_ids_to_vm_names_copy.itervalues())
+    if leftover_num_ids > 0:
+        logger.error('(Provider_id(s)) + VM(s) not found in CFME inventory: {}'.format(
+            provider_ids_to_vm_names_copy))
+    logger.debug('Mapped {}/{} vm ids/names over {}/{} provider ids/names in {}s'.format(
+        len(vm_ids), expected_num_ids, len(provider_ids_to_vm_names.keys()), expected_num_providers,
+        round(time.time() - starttime, 2)))
+    return vm_ids
 
 
 def reset_vm(vm_id):

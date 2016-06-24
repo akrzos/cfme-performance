@@ -92,7 +92,7 @@ def test_refresh_vms(request, scenario):
             elif time_remaining > 0:
                 time.sleep(wait_diff)
         else:
-            logger.warn('Time to Queue Refreshes ({}) exceeded time between Refreshes({})'.format(
-                refresh_time, time_between_refresh))
+            logger.warn('Time to Queue VM Refreshes ({}) exceeded time between '
+                '({})'.format(refresh_time, time_between_refresh))
 
     logger.info('Test Ending...')

@@ -1,6 +1,6 @@
 # Appliance Under Test
 appliance:
-  appliance_name: CF-R0000-DB-Workload-5608
+  appliance_name: CF-R0000-DB-Workload-56012
   ip_address: 10.20.30.40
   rest_api:
     username: admin
@@ -145,13 +145,10 @@ workloads:
           - vmware-small
         refresh_sleep_time: 600
         vms_to_scan:
+          vmware-small:
             - perf-smartstate-rhel6
             - perf-smartstate-rhel7
             - perf-smartstate-windows2012
-        hosts_to_scan:
-            - perf-host.example.com
-        storage_to_scan:
-            - perf-datastore
         time_between_analyses: 45
         total_time: 1800
         grafana_dashboard: cfme-vmware-system-performance
@@ -160,16 +157,30 @@ workloads:
           - rhevm-small
         refresh_sleep_time: 600
         vms_to_scan:
+          rhevm-small:
             - perf-smartstate-rhel6
             - perf-smartstate-rhel7
             - perf-smartstate-windows2012
-        hosts_to_scan:
-            - perf-host.example.com
-        storage_to_scan:
-            - perf-datastore
         time_between_analyses: 45
         total_time: 1800
         grafana_dashboard: cfme-redhat-system-performance
+      - name: 30m-vmware-rhevm-small
+        providers:
+          - vmware-small
+          - rhevm-small
+        refresh_sleep_time: 600
+        vms_to_scan:
+          vmware-small:
+            - perf-smartstate-rhel6
+            - perf-smartstate-rhel7
+            - perf-smartstate-windows2012
+          rhevm-small:
+            - perf-smartstate-rhel6
+            - perf-smartstate-rhel7
+            - perf-smartstate-windows2012
+        time_between_analyses: 45
+        total_time: 1800
+        grafana_dashboard: cfme-vmware-redhat-system-performance
   test_provisioning:
     scenarios:
       - name: 30m-vmware-small
