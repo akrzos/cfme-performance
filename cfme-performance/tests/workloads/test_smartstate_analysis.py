@@ -10,9 +10,8 @@ from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_host_credentials
 from utils.providers import add_providers
-from utils.providers import get_vm_ids
 from utils.providers import map_vms_to_ids
-from utils.providers import scan_provider_vm
+from utils.providers import scan_provider_vms_bulk
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_smartstate_analysis_scenarios
@@ -73,8 +72,7 @@ def test_workload_smartstate_analysis(request, scenario):
 
     while ((time.time() - starttime) < total_time):
         start_ssa_time = time.time()
-        for vm_id in vm_ids_to_scan:
-            scan_provider_vm(vm_id)
+        scan_provider_vms_bulk(vm_ids_to_scan)
         iteration_time = time.time()
 
         ssa_time = round(iteration_time - start_ssa_time, 2)

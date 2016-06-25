@@ -315,8 +315,6 @@ def add_host_credentials(provider):
         if response.status_code != 200:
             logger.debug(response.text)
 
-        print response  # TODO: REMOVE
-
     logger.debug('Added host credentials, Response: {}'.format(response))
 
 
@@ -394,7 +392,7 @@ def refresh_provider(provider_id):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.vdebug('Queued Refresh Provider: {}, Response: {}'.format(provider_id, response))
+    logger.debug('Queued Refresh Provider: {}, Response: {}'.format(provider_id, response))
 
 
 def refresh_providers(provider_ids):
@@ -402,7 +400,7 @@ def refresh_providers(provider_ids):
     starttime = time.time()
     for provider in provider_ids:
         refresh_provider(provider)
-    logger.vdebug('Queued Refresh {} Provider(s) in: {}s'.format(len(provider_ids),
+    logger.debug('Queued Refresh {} Provider(s) in: {}s'.format(len(provider_ids),
         round(time.time() - starttime, 2)))
 
 
@@ -433,7 +431,7 @@ def refresh_providers_bulk(provider_ids):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.vdebug('Queued Refresh {} Provider(s) in: {}s'.format(len(provider_ids),
+    logger.debug('Queued Refresh {} Provider(s) in: {}s'.format(len(provider_ids),
         round(time.time() - starttime, 2)))
 
 
@@ -451,7 +449,7 @@ def refresh_provider_vm(vm_id):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.vdebug('Refreshed VM: {}, Response: {}'.format(vm_id, response))
+    logger.debug('Queued Refresh VM: {}, Response: {}'.format(vm_id, response))
 
 
 def refresh_provider_vms(vm_ids):
@@ -459,7 +457,7 @@ def refresh_provider_vms(vm_ids):
     starttime = time.time()
     for vm in vm_ids:
         refresh_provider_vm(vm)
-    logger.debug('Queued Refresh {} VMs in: {}s'.format(len(vm_ids),
+    logger.debug('Queued Refresh {} VM(s) in: {}s'.format(len(vm_ids),
         round(time.time() - starttime, 2)))
 
 
@@ -490,7 +488,7 @@ def refresh_provider_vms_bulk(vm_ids):
     if response.status_code != 200:
         logger.debug(response.text)
 
-    logger.debug('Queued Refresh {} VMs in: {}s'.format(len(vm_ids),
+    logger.debug('Queued Refresh {} VM(s) in: {}s'.format(len(vm_ids),
         round(time.time() - starttime, 2)))
 
 

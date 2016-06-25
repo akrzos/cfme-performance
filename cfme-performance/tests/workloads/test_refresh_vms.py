@@ -9,7 +9,7 @@ from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
 from utils.providers import get_all_vm_ids
-from utils.providers import refresh_provider_vms
+from utils.providers import refresh_provider_vms_bulk
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_refresh_vms_scenarios
@@ -76,7 +76,7 @@ def test_refresh_vms(request, scenario):
     while ((time.time() - starttime) < total_time):
         start_refresh_time = time.time()
         refresh_list = [next(vm_ids_iter) for x in range(refresh_size)]
-        refresh_provider_vms(refresh_list)
+        refresh_provider_vms_bulk(refresh_list)
         iteration_time = time.time()
 
         refresh_time = round(iteration_time - start_refresh_time, 2)
