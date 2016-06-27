@@ -4,6 +4,7 @@ from utils.appliance import get_server_roles_workload_cap_and_util
 from utils.appliance import set_cap_and_util_all_via_rails
 from utils.appliance import set_server_roles_workload_cap_and_util
 from utils.appliance import wait_for_miq_server_ready
+from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
@@ -24,9 +25,13 @@ def test_workload_capacity_and_utilization(request, scenario):
 
     clean_appliance(ssh_client)
 
-    monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-cap-and-util', scenario['name'],
-        'Capacity and Utilization', get_server_roles_workload_cap_and_util(separator=', '),
-        ', '.join(scenario['providers']))
+    scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
+        'appliance_name': cfme_performance['appliance']['appliance_name'],
+        'test_dir': 'workload-cap-and-util',
+        'test_name': 'Capacity and Utilization',
+        'appliance_roles': get_server_roles_workload_cap_and_util(separator=', '),
+        'scenario': scenario}
+    monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
     def cleanup_workload(scenario, from_ts):
         starttime = time.time()

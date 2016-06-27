@@ -4,6 +4,7 @@ from utils.appliance import clean_appliance
 from utils.appliance import get_server_roles_workload_refresh_providers
 from utils.appliance import set_server_roles_workload_refresh_providers
 from utils.appliance import wait_for_miq_server_ready
+from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
@@ -26,9 +27,13 @@ def test_refresh_providers(request, scenario):
 
     clean_appliance(ssh_client)
 
-    monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-refresh-providers', scenario['name'],
-        'refresh-providers', get_server_roles_workload_refresh_providers(separator=','),
-        ', '.join(scenario['providers']))
+    scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
+        'appliance_name': cfme_performance['appliance']['appliance_name'],
+        'test_dir': 'workload-refresh-providers',
+        'test_name': 'Refresh Providers',
+        'appliance_roles': get_server_roles_workload_refresh_providers(separator=', '),
+        'scenario': scenario}
+    monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
     def cleanup_workload(scenario, from_ts):
         starttime = time.time()

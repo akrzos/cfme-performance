@@ -5,6 +5,7 @@ from utils.appliance import get_server_roles_workload_refresh_vms
 from utils.appliance import set_server_roles_workload_refresh_vms
 from utils.appliance import wait_for_miq_server_ready
 from utils.appliance import set_full_refresh_threshold
+from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
@@ -30,9 +31,13 @@ def test_refresh_vms(request, scenario):
 
     clean_appliance(ssh_client)
 
-    monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-refresh-vm', scenario['name'],
-        'refresh-vm', get_server_roles_workload_refresh_vms(separator=','),
-        ', '.join(scenario['providers']))
+    scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
+        'appliance_name': cfme_performance['appliance']['appliance_name'],
+        'test_dir': 'workload-refresh-vm',
+        'test_name': 'Refresh VMs',
+        'appliance_roles': get_server_roles_workload_refresh_vms(separator=', '),
+        'scenario': scenario}
+    monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
     def cleanup_workload(scenario, from_ts):
         starttime = time.time()

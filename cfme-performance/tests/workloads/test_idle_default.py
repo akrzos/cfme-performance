@@ -18,9 +18,13 @@ def test_idle_default(request):
 
     clean_appliance(ssh_client)
 
-    monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-idle', 'default',
-        'Idle with Default Roles', get_server_roles_workload_idle_default(separator=', '),
-        'No Providers')
+    scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
+        'appliance_name': cfme_performance['appliance']['appliance_name'],
+        'test_dir': 'workload-idle',
+        'test_name': 'Idle with Default Roles',
+        'appliance_roles': get_server_roles_workload_idle_default(separator=', '),
+        'scenario': {'name': 'default'}}
+    monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
     def cleanup_workload(from_ts):
         starttime = time.time()

@@ -19,10 +19,13 @@ def test_idle(request):
 
     clean_appliance(ssh_client)
 
-    monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-idle', 'all-no-websocketworker',
-        'Idle with All Roles Except websocket/git_owner',
-        get_server_roles_workload_idle(separator=', '),
-        'No Providers')
+    scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
+        'appliance_name': cfme_performance['appliance']['appliance_name'],
+        'test_dir': 'workload-idle',
+        'test_name': 'Idle with All Roles Except websocket/git_owner',
+        'appliance_roles': get_server_roles_workload_idle(separator=', '),
+        'scenario': {'name': 'all-no-websocketworker'}}
+    monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
     def cleanup_workload(from_ts):
         starttime = time.time()

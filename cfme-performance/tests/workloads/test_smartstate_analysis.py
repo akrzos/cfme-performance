@@ -30,9 +30,13 @@ def test_workload_smartstate_analysis(request, scenario):
 
     clean_appliance(ssh_client)
 
-    monitor_thread = SmemMemoryMonitor(SSHClient(), 'workload-ssa', scenario['name'],
-        'SmartState Analysis', get_server_roles_workload_smartstate(separator=', '),
-        ', '.join(scenario['providers']))
+    scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
+        'appliance_name': cfme_performance['appliance']['appliance_name'],
+        'test_dir': 'workload-ssa',
+        'test_name': 'SmartState Analysis',
+        'appliance_roles': get_server_roles_workload_smartstate(separator=', '),
+        'scenario': scenario}
+    monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
     def cleanup_workload(scenario, from_ts):
         starttime = time.time()

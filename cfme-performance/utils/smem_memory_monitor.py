@@ -10,9 +10,10 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import os
 import time
 import traceback
-import os
+import yaml
 
 miq_workers = [
     'MiqGenericWorker',
@@ -132,14 +133,10 @@ SAMPLE_INTERVAL = 10
 
 
 class SmemMemoryMonitor(Thread):
-    def __init__(self, ssh_client, test_dir, results_dir, test_name, app_roles, provider_names):
+    def __init__(self, ssh_client, scenario_data):
         super(SmemMemoryMonitor, self).__init__()
         self.ssh_client = ssh_client
-        self.test_dir = test_dir
-        self.results_dir = results_dir
-        self.test_name = test_name
-        self.app_roles = app_roles
-        self.provider_names = provider_names
+        self.scenario_data = scenario_data
         self.grafana_url = ''
         self.use_slab = False
         self.signal = True
@@ -335,8 +332,7 @@ class SmemMemoryMonitor(Thread):
             time.sleep(time_to_sleep)
         logger.info('Monitoring CFME Memory Terminating')
 
-        create_report(self.test_dir, self.results_dir, self.test_name, self.app_roles,
-            self.provider_names, appliance_results, process_results, self.use_slab,
+        create_report(self.scenario_data, appliance_results, process_results, self.use_slab,
             self.grafana_url)
 
     def run(self):
@@ -360,24 +356,31 @@ def install_smem(ssh_client):
     ssh_client.run_command('sed -i s/\.27s/\.200s/g /usr/bin/smem')
 
 
-def create_report(test_dir, results_dir, test_name, app_roles, provider_names, appliance_results,
-        process_results, use_slab, grafana_url):
+def create_report(scenario_data, appliance_results, process_results, use_slab, grafana_url):
     logger.info('Creating Memory Monitoring Report.')
     ver = get_current_version()
 
-    memory_path = results_path.join('{}-{}-{}'.format(test_ts, test_dir, ver))
-    if not os.path.exists(str(memory_path)):
-        os.mkdir(str(memory_path))
+    provider_names = 'No Providers'
+    if 'providers' in scenario_data['scenario']:
+        provider_names = ', '.join(scenario_data['scenario']['providers'])
 
-    mem_provider_path = memory_path.join(results_dir)
-    if not os.path.exists(str(mem_provider_path)):
-        os.mkdir(str(mem_provider_path))
+    workload_path = results_path.join('{}-{}-{}'.format(test_ts, scenario_data['test_dir'], ver))
+    if not os.path.exists(str(workload_path)):
+        os.mkdir(str(workload_path))
 
-    mem_graphs_path = mem_provider_path.join('graphs')
+    scenario_path = workload_path.join(scenario_data['scenario']['name'])
+    if os.path.exists(str(scenario_path)):
+        logger.warn('Duplicate Workload-Scenario Name: {}'.format(scenario_path))
+        scenario_path = workload_path.join('{}-{}'.format(time.strftime('%Y%m%d%H%M%S'),
+            scenario_data['scenario']['name']))
+        logger.warn('Using: {}'.format(scenario_path))
+    os.mkdir(str(scenario_path))
+
+    mem_graphs_path = scenario_path.join('graphs')
     if not os.path.exists(str(mem_graphs_path)):
         os.mkdir(str(mem_graphs_path))
 
-    mem_rawdata_path = mem_provider_path.join('rawdata')
+    mem_rawdata_path = scenario_path.join('rawdata')
     if not os.path.exists(str(mem_rawdata_path)):
         os.mkdir(str(mem_rawdata_path))
 
@@ -386,11 +389,15 @@ def create_report(test_dir, results_dir, test_name, app_roles, provider_names, a
     graph_same_miq_workers(mem_graphs_path, process_results, provider_names)
     graph_all_miq_workers(mem_graphs_path, process_results, provider_names)
 
-    generate_summary_csv(mem_provider_path.join('{}-summary.csv'.format(ver)), appliance_results,
+    # Dump scenario Yaml:
+    with open(str(scenario_path.join('scenario.yml')), 'w') as scenario_file:
+        yaml.dump(dict(scenario_data['scenario']), scenario_file, default_flow_style=False)
+
+    generate_summary_csv(scenario_path.join('{}-summary.csv'.format(ver)), appliance_results,
         process_results, provider_names)
     generate_raw_data_csv(mem_rawdata_path, appliance_results, process_results)
-    generate_summary_html(mem_provider_path, appliance_results, process_results, test_name,
-        app_roles, provider_names, grafana_url)
+    generate_summary_html(scenario_path, appliance_results, process_results, scenario_data,
+        provider_names, grafana_url)
 
     logger.info('Finished Creating Report')
 
@@ -486,7 +493,7 @@ def generate_summary_csv(file_name, appliance_results, process_results, provider
     logger.info('Generated Summary CSV in: {}'.format(timediff))
 
 
-def generate_summary_html(directory, appliance_results, process_results, test_name, app_roles,
+def generate_summary_html(directory, appliance_results, process_results, scenario_data,
         provider_names, grafana_url):
     starttime = time.time()
     ver = get_current_version()
@@ -498,13 +505,17 @@ def generate_summary_html(directory, appliance_results, process_results, test_na
 
         html_file.write('<body>\n')
         html_file.write('<b>CFME {} {} Test Results</b><br>\n'.format(ver,
-            test_name.title()))
-        html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(app_roles.replace(',', ', ')))
+            scenario_data['test_name'].title()))
+        html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(
+            scenario_data['appliance_roles'].replace(',', ', ')))
         html_file.write('<b>Provider(s):</b> {}<br>\n'.format(provider_names))
+        html_file.write('<b><a href=\'https://{}/\' target="_blank">{}</a></b>\n'.format(
+            scenario_data['appliance_ip'], scenario_data['appliance_name']))
         if grafana_url:
             html_file.write(
-                '<b><a href=\'{}\' target="_blank">Grafana URL</a></b><br>\n'.format(grafana_url))
+                ' : <b><a href=\'{}\' target="_blank">Grafana</a></b><br>\n'.format(grafana_url))
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
+        html_file.write(' : <b><a href=\'scenario.yml\'>Scenario Yaml</a></b>')
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
         html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')
         start = appliance_results.keys()[0]
