@@ -9,6 +9,13 @@ def get_capacity_and_utilization_scenarios():
     return []
 
 
+def get_provisioning_scenarios():
+    if(cfme_performance['workloads']['test_provisioning']['scenarios'] and
+            len(cfme_performance['workloads']['test_provisioning']['scenarios']) > 0):
+        return cfme_performance['workloads']['test_provisioning']['scenarios']
+    return []
+
+
 def get_refresh_providers_scenarios():
     if (cfme_performance['workloads']['test_refresh_providers']['scenarios'] and
             len(cfme_performance['workloads']['test_refresh_providers']['scenarios']) > 0):

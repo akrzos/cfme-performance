@@ -31,6 +31,7 @@ providers:
     name: vmware-small
     type: ManageIQ::Providers::Vmware::InfraManager
     ip_address: 10.20.30.40
+    vlan_network: VM Network
     credentials:
       username: administrator@vsphere.local
       password: password
@@ -41,6 +42,7 @@ providers:
     name: rhevm-small
     type: ManageIQ::Providers::Redhat::InfraManager
     ip_address: 10.20.30.40
+    vlan_network: rhevm
     credentials:
       username: admin@internal
       password: password
