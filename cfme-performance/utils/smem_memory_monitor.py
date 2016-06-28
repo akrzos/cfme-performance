@@ -748,9 +748,9 @@ def generate_summary_html(directory, appliance_results, process_results, scenari
         html_file.write('<td><b>RSS Mem Start</b></td>\n')
         html_file.write('<td><b>RSS Mem End</b></td>\n')
         html_file.write('<td><b>RSS Mem Change</b></td>\n')
-        html_file.write('<td><b>VSS Mem Start</b></td>\n')
-        html_file.write('<td><b>VSS Mem End</b></td>\n')
-        html_file.write('<td><b>VSS Mem Change</b></td>\n')
+        html_file.write('<td><b>PSS Mem Start</b></td>\n')
+        html_file.write('<td><b>PSS Mem End</b></td>\n')
+        html_file.write('<td><b>PSS Mem Change</b></td>\n')
         html_file.write('<td><b>CSV</b></td>\n')
         html_file.write('</tr>\n')
         # By Worker Type Memory Used
@@ -780,13 +780,13 @@ def generate_summary_html(directory, appliance_results, process_results, scenari
                     html_file.write('<td>{}</td>\n'.format(
                         round(process_results[ordered_name][pid][end]['rss'], 2)))
                     html_file.write('<td>{}</td>\n'.format(round(rss_change, 2)))
-                    vss_change = process_results[ordered_name][pid][end]['vss'] - \
-                        process_results[ordered_name][pid][start]['vss']
+                    pss_change = process_results[ordered_name][pid][end]['pss'] - \
+                        process_results[ordered_name][pid][start]['pss']
                     html_file.write('<td>{}</td>\n'.format(
-                        round(process_results[ordered_name][pid][start]['vss'], 2)))
+                        round(process_results[ordered_name][pid][start]['pss'], 2)))
                     html_file.write('<td>{}</td>\n'.format(
-                        round(process_results[ordered_name][pid][end]['vss'], 2)))
-                    html_file.write('<td>{}</td>\n'.format(round(vss_change, 2)))
+                        round(process_results[ordered_name][pid][end]['pss'], 2)))
+                    html_file.write('<td>{}</td>\n'.format(round(pss_change, 2)))
                     html_file.write('<td><a href=\'rawdata/{}-{}.csv\'>csv</a></td>\n'.format(
                         pid, ordered_name))
                     html_file.write('</tr>\n')
