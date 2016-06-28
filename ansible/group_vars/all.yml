@@ -64,6 +64,7 @@ appliances:
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
+    run_collectd: true
     run_statsd: false
   # Example appliance with database dump
   CF-R0000-DB-Workload-5542-Patched:
@@ -73,6 +74,7 @@ appliances:
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
+    run_collectd: true
     run_statsd: false
   CF-R0000-DB-Workload-56012:
     interfaces: []
@@ -80,6 +82,7 @@ appliances:
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
+    run_collectd: true
     run_statsd: false
   # Example Worker appliance for "CF-R0000-DB-Workload-56012"
   CF-R0000-Wkr1-Workload-56012:
@@ -88,6 +91,7 @@ appliances:
     external_vmdb_name: vmdb_production
     external_vmdb_username: root
     external_vmdb_password: smartvm
+    run_collectd: true
     run_statsd: true
   # Example Replication Master appliance
   CF-R0099-DB-Workload-ReplicationMaster-56012:
@@ -96,6 +100,7 @@ appliances:
     vmdb_region: 99
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
+    run_collectd: true
     run_statsd: false
 
 

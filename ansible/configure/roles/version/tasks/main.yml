@@ -29,4 +29,12 @@
     is56: true
   when: version_output.stdout|match("^5.6.")
 
+- name: Determine if vmdb is configured
+  stat: path=/var/www/miq/vmdb/GUID
+  register: stat_guid
+
+- name: Set fact isdeployed
+  set_fact:
+    isdeployed: "{{stat_guid.stat.exists}}"
+
 # - debug: msg="is54={{is54}},is55={{is55}},is56={{is56}}"
