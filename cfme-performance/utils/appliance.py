@@ -50,6 +50,9 @@ roles56_smartstate = ['automate', 'database_operations', 'ems_inventory', 'ems_o
 roles56_provisioning = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
     'event', 'notifier', 'reporting', 'scheduler', 'user_interface', 'web_services']
 
+roles56_provisioning_cleanup = ['database_operations', 'ems_inventory', 'ems_operations',
+    'event', 'notifier', 'reporting', 'scheduler', 'user_interface', 'web_services']
+
 roles56_workload_all = ['automate', 'database_operations', 'ems_inventory', 'ems_metrics_collector',
     'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations', 'event', 'notifier',
     'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate', 'user_interface',
@@ -175,6 +178,10 @@ def get_server_roles_workload_provisioning(separator=','):
     return separator.join(roles56_provisioning)
 
 
+def get_server_roles_workload_provisioning_cleanup(separator=','):
+    return separator.join(roles56_provisioning_cleanup)
+
+
 def get_server_roles_workload_all(separator=','):
     return separator.join(roles56_workload_all)
 
@@ -225,6 +232,13 @@ def set_server_roles_workload_provisioning(ssh_client):
     """Sets server roles for Provisioning workload."""
     yaml = get_vmdb_yaml_config(ssh_client)
     yaml['server']['role'] = get_server_roles_workload_provisioning()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles_workload_provisioning_cleanup(ssh_client):
+    """Sets server roles for cleaning up the Provisioning workload."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_workload_provisioning_cleanup()
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
