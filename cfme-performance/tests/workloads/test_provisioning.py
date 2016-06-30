@@ -2,6 +2,7 @@
 from utils.appliance import clean_appliance
 from utils.appliance import get_server_roles_workload_provisioning
 from utils.appliance import set_server_roles_workload_provisioning
+from utils.appliance import set_server_roles_workload_provisioning_cleanup
 from utils.appliance import wait_for_miq_server_workers_started
 from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
@@ -11,7 +12,6 @@ from utils.providers import delete_provisioned_vm
 from utils.providers import delete_provisioned_vms
 from utils.providers import provision_vm
 from utils.providers import get_template_guids
-from utils.providers import get_remaining_vms
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_provisioning_scenarios
@@ -47,12 +47,19 @@ def test_provisioning(request, scenario):
         to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
         logger.debug('Started cleaning up monitoring thread.')
+        set_server_roles_workload_provisioning_cleanup(ssh_client)
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
+        final_vm_size = len(vms_to_cleanup)
         delete_provisioned_vms(vms_to_cleanup)
         monitor_thread.join()
         timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
+        logger.info('{} VMs were left over, and {} VMs were deleted in the finalizer.'
+            .format(final_vm_size, final_vm_size - len(vms_to_cleanup)))
+        logger.info('The following VMs were left over after the test: {}'
+            .format(vms_to_cleanup))
+
     request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, provision_order))
 
     monitor_thread.start()
@@ -74,30 +81,40 @@ def test_provisioning(request, scenario):
     starttime = time.time()
 
     while ((time.time() - starttime) < total_time):
-        start_provision_time = time.time()
+        start_iteration_time = time.time()
 
         total_provisioned_vms += 1
         provisioned_vms += 1
         vm_to_provision = '{}-provision-{}'.format(
             time.strftime('%Y%m%d%H%M%S'), str(total_provisioned_vms).zfill(3))
-        guid_to_provision = next(guid_cycle)
-        provision_order.append([vm_to_provision, guid_to_provision[1]])
-        provision_vm(vm_to_provision, guid_to_provision[0], guid_to_provision[1]['vlan_network'])
-        if provisioned_vms > cleanup_size * len(scenario['providers']):
-            initial_size = len(provision_order)
-            delete_provisioned_vm(provision_order)
-            provisioned_vms -= (initial_size - len(provision_order))
-            total_deleted_vms += (initial_size - len(provision_order))
 
-        iteration_time = time.time()
-        provision_time = round(iteration_time - start_provision_time, 2)
-        elapsed_time = iteration_time - starttime
+        guid_to_provision, provider_name = next(guid_cycle)
+        provider_to_provision = cfme_performance['providers'][provider_name]
+        provision_order.append((vm_to_provision, provider_name))
+        provision_vm(vm_to_provision, guid_to_provision, provider_to_provision['vlan_network'])
+        creation_time = time.time()
+        provision_time = round(creation_time - start_iteration_time, 2)
         logger.debug('Time to initiate provisioning: {}'.format(provision_time))
         logger.info('{} VMs provisioned so far'.format(total_provisioned_vms))
+
+        if provisioned_vms > cleanup_size * len(scenario['providers']):
+            start_remove_time = time.time()
+            if delete_provisioned_vm(provision_order[0]):
+                provision_order.pop(0)
+                provisioned_vms -= 1
+                total_deleted_vms += 1
+            deletion_time = round(time.time() - start_remove_time, 2)
+            logger.debug('Time to initate deleting: {}'.format(deletion_time))
+            logger.info('{} VMs deleted so far'.format(total_deleted_vms))
+
+        end_iteration_time = time.time()
+        iteration_time = round(end_iteration_time - start_iteration_time, 2)
+        elapsed_time = end_iteration_time - starttime
+        logger.debug('Time to initiate provisioning and deletion: {}'.format(iteration_time))
         logger.info('Time elapsed: {}/{}'.format(round(elapsed_time, 2), total_time))
 
-        if provision_time < time_between_provision:
-            wait_diff = time_between_provision - provision_time
+        if iteration_time < time_between_provision:
+            wait_diff = time_between_provision - iteration_time
             time_remaining = total_time - elapsed_time
             if (time_remaining > 0 and time_remaining < time_between_provision):
                 time.sleep(time_remaining)
@@ -105,11 +122,8 @@ def test_provisioning(request, scenario):
                 time.sleep(wait_diff)
             else:
                 logger.warn('Time to initiate provisioning ({}) exceeded time between '
-                    '({})'.format(provision_time, time_between_provision))
+                    '({})'.format(iteration_time, time_between_provision))
 
-    logger.info('Provisioned {} VMs and deleted {} VMs during the scenario. \
-        {} VMs were left over, and {} VMs were deleted in the finalizer.'
-        .format(total_provisioned_vms, total_deleted_vms, provisioned_vms, len(provision_order)))
-    logger.info('The following VMs were left over after the test: {}'.format(get_remaining_vms()))
-
+    logger.info('Provisioned {} VMs and deleted {} VMs during the scenario.'
+        .format(total_provisioned_vms, total_deleted_vms))
     logger.info('Test Ending...')

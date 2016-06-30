@@ -203,20 +203,20 @@ def get_vm_ids(vm_names):
 
 
 def get_template_guids(template_dict):
-    """Returns a 2D list. The inner list is formated so that each guid is in index 0, and its
-    provider is in index 1. Expects a dictionary mapping a provider to its templates"""
+    """Returns a list of tuples. The inner tuples are formated so that each guid is in index 0, and its
+    provider's name is in index 1. Expects a dictionary mapping a provider to its templates"""
     result_list = []
     all_template_details = get_all_template_details()
     for provider in template_dict:
+        provider_type = cfme_performance['providers'][provider]['type']
         for template_name in template_dict[provider]:
-            inner_list = []
-            provider_type = cfme_performance['providers'][provider]['type']
+            inner_tuple = ()
             for id in all_template_details:
                 if ((all_template_details[id]['name'] == template_name) and
                         (all_template_details[id]['type'] == provider_type + '::Template')):
-                    inner_list.append(all_template_details[id]['guid'])
-                    inner_list.append(cfme_performance['providers'][provider])
-                    result_list.append(inner_list)
+                    inner_tuple += (all_template_details[id]['guid'],)
+                    inner_tuple += (cfme_performance['providers'][provider]['name'],)
+                    result_list.append(inner_tuple)
     return result_list
 
 
@@ -638,30 +638,35 @@ def get_mgmt_provider_class(provider):
                            provider.credentials.password)
 
 
-def delete_provisioned_vm(provision_order):
-    name_and_provider = provision_order[0]
-    """Deletes the first VM in provision order. Expects a 2D list then where the inner list contains
-    a VM name in index 0, and its provider in index 1"""
-    logger.debug('Cleaning up: {}'.format(name_and_provider[0]))
-    provider_details = (name_and_provider[1])
+def delete_provisioned_vm(vm_tuple):
+    """Deletes the Vm specified in the vm_tuple. Expects a the tuple to contain
+    a VM name in index 0, and its provider in index 1. Returns True if successful"""
+    vm_name, provider_name = vm_tuple
+    logger.debug('Cleaning up: {}'.format(vm_name))
+    provider_details = (cfme_performance['providers'][provider_name])
     provider = get_mgmt_provider_class(provider_details)
     try:
-        provider.delete_vm(name_and_provider[0])
-        provision_order.pop(0)
+        provider.delete_vm(vm_name)
+        return True
     except Exception as e:
         # VM potentially was not yet provisioned
-        logger.error('Could not delete VM: {} Exception: {}'.format(name_and_provider[0], e))
+        logger.error('Could not delete VM: {} Exception: {}'.format(vm_name, e))
+        return False
 
 
 def delete_provisioned_vms(provision_order):
-    """Deletes all VMs in provision_order. Expects a 2D list then where the inner list contains the
-    VM name in index 0, and its provider in index 1"""
-    while len(provision_order) > 0:
-        for vm in provision_order:
-            temp_list = [vm]
-            delete_provisioned_vm(temp_list)
-            if len(temp_list) == 0:
-                provision_order.remove(vm)
+    """Attempts to Deletes all VMs in provision_order. Expects provision order to be a 2D list
+    where the inner list contains the VM name in index 0, and its provider's name in index 1
+    Expects cleanup_size to be an integer"""
+    starttime = time.time()
+    startsize = len(provision_order)
+
+    for vm_tuple in provision_order[:]:
+        if delete_provisioned_vm(vm_tuple):
+            provision_order.remove(vm_tuple)
+
+    logger.debug('Deleted {} VMs in: {}s'.format(startsize - len(provision_order),
+        round(time.time() - starttime, 2)))
 
 
 def shutdown_vm_guest(vm_id):
