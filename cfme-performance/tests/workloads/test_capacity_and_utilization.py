@@ -3,7 +3,7 @@ from utils.appliance import clean_appliance
 from utils.appliance import get_server_roles_workload_cap_and_util
 from utils.appliance import set_cap_and_util_all_via_rails
 from utils.appliance import set_server_roles_workload_cap_and_util
-from utils.appliance import wait_for_miq_server_ready
+from utils.appliance import wait_for_miq_server_workers_started
 from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
@@ -47,7 +47,7 @@ def test_workload_capacity_and_utilization(request, scenario):
 
     monitor_thread.start()
 
-    wait_for_miq_server_ready(poll_interval=2)
+    wait_for_miq_server_workers_started(poll_interval=2)
     set_server_roles_workload_cap_and_util(ssh_client)
     add_providers(scenario['providers'])
     logger.info('Sleeping for Refresh: {}s'.format(scenario['refresh_sleep_time']))

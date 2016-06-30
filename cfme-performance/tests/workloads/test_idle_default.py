@@ -1,7 +1,7 @@
 """Runs Idle Workload by resetting appliance and idling with no providers."""
 from utils.appliance import clean_appliance
 from utils.appliance import get_server_roles_workload_idle_default
-from utils.appliance import wait_for_miq_server_ready
+from utils.appliance import wait_for_miq_server_workers_started
 from utils.conf import cfme_performance
 from utils.grafana import get_default_dashboard_url
 from utils.log import logger
@@ -40,7 +40,7 @@ def test_idle_default(request):
 
     monitor_thread.start()
 
-    wait_for_miq_server_ready(poll_interval=2)
+    wait_for_miq_server_workers_started(poll_interval=2)
     # No need to set server roles as we are using the default set of roles
 
     s_time = cfme_performance['workloads']['test_idle_default']['total_time']

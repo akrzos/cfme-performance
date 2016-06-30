@@ -3,7 +3,7 @@ waiting, then repeating for specified length of time."""
 from utils.appliance import clean_appliance
 from utils.appliance import get_server_roles_workload_refresh_vms
 from utils.appliance import set_server_roles_workload_refresh_vms
-from utils.appliance import wait_for_miq_server_ready
+from utils.appliance import wait_for_miq_server_workers_started
 from utils.appliance import set_full_refresh_threshold
 from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
@@ -53,7 +53,7 @@ def test_refresh_vms(request, scenario):
 
     monitor_thread.start()
 
-    wait_for_miq_server_ready(poll_interval=2)
+    wait_for_miq_server_workers_started(poll_interval=2)
     set_server_roles_workload_refresh_vms(ssh_client)
     add_providers(scenario['providers'])
     logger.info('Sleeping for refresh: {}s'.format(scenario['refresh_sleep_time']))

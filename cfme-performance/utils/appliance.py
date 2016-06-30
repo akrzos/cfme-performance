@@ -270,10 +270,10 @@ def set_rubyrep_replication(ssh_client, host, database='vmdb_production', userna
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
-def wait_for_miq_server_ready(poll_interval=5):
-    """Waits for the CFME to be ready by tailing evm.log for:
-    'INFO -- : MIQ(MiqServer#start) Server starting complete'
-    Verified works with 5.6 appliances.
+def wait_for_miq_server_workers_started(poll_interval=5):
+    """Waits for the CFME's workers to be started by tailing evm.log for:
+    'INFO -- : MIQ(MiqServer#wait_for_started_workers) All workers have been started'
+    Verified works with 5.5 and 5.6 appliances.
     """
     logger.info('Opening /var/www/miq/vmdb/log/evm.log for tail')
     evm_tail = SSHTail('/var/www/miq/vmdb/log/evm.log')
@@ -283,16 +283,16 @@ def wait_for_miq_server_ready(poll_interval=5):
     detected = False
     max_attempts = 60
     while (not detected and attempts < max_attempts):
-        logger.debug('Attempting to detect MIQ Server ready: {}'.format(attempts))
+        logger.debug('Attempting to detect MIQ Server workers started: {}'.format(attempts))
         for line in evm_tail:
-            if 'MiqServer#start' in line:
-                if ('Server starting complete' in line or
-                        'Server starting in Normal mode.' in line):
+            if 'MiqServer#wait_for_started_workers' in line:
+                if ('All workers have been started' in line):
                     logger.info('Detected MIQ Server is ready.')
                     detected = True
                     break
         time.sleep(poll_interval)  # Allow more log lines to accumulate
         attempts += 1
     if not (attempts < max_attempts):
-        logger.error('Could not detect MIQ Server ready in 600s.')
+        logger.error('Could not detect MIQ Server workers started in {}s.'.format(
+            poll_interval * max_attempts))
     evm_tail.close()
