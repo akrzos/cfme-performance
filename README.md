@@ -26,3 +26,16 @@ Browse the Ansible folder for more details on the playbooks which automate stand
 *Note there is several rpms you may have to install depending on what is already installed in your environment.*
 
 When workloads complete, view `cfme-performance/results` directory for workload output and check Grafana for system metrics while workload was run.
+
+## Workloads:
+
+These are the current workloads:
+
+* Idle (default, no websocket/git_owner roles, all roles)
+* Refresh Providers
+* Refresh VMs
+* Capacity and Utilization
+* SmartState Analysis (Scans VMs)
+* Provisioning
+
+Each workload(Except Idle) can take a list of providers and a total_time parameter to adjust how long the appliance is stressed with the workload. Each workload has its only parameters that can adjust the behavior of the workload. (See the default configuration file cfme_performance.yml for example workloads and required parameters for each workload - scenario)  This can lead to many variations of the workloads.
