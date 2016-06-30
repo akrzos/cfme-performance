@@ -1,7 +1,9 @@
 """Monitor Memory on a CFME/Miq appliance and builds report&graphs displaying usage per process."""
+from utils.conf import cfme_performance
 from utils.log import logger
 from utils.path import results_path
-from utils.version import get_current_version
+from utils.version import get_version
+from utils.version import get_current_version_string
 from collections import OrderedDict
 from cycler import cycler
 from datetime import datetime
@@ -345,12 +347,11 @@ class SmemMemoryMonitor(Thread):
 
 def install_smem(ssh_client):
     # smem is included by default in 5.6 appliances
-    # logger.info('Installing smem.')
-    # if version >= EL7
-    #     ssh_client.run_command('rpm -i {}'.format(cfme_performance['tools']['rpms']['epel7_rpm']))
-    # else:
-    #     ssh_client.run_command('rpm -i {}'.format(cfme_performance['tools']['rpms']['epel6_rpm']))
-    # ssh_client.run_command('yum install -y smem')
+    logger.info('Installing smem.')
+    ver = get_version()
+    if ver == '55':
+        ssh_client.run_command('rpm -i {}'.format(cfme_performance['tools']['rpms']['epel7_rpm']))
+        ssh_client.run_command('yum install -y smem')
     # Patch smem to display longer command line names
     logger.info('Patching smem')
     ssh_client.run_command('sed -i s/\.27s/\.200s/g /usr/bin/smem')
@@ -358,7 +359,7 @@ def install_smem(ssh_client):
 
 def create_report(scenario_data, appliance_results, process_results, use_slab, grafana_url):
     logger.info('Creating Memory Monitoring Report.')
-    ver = get_current_version()
+    ver = get_current_version_string()
 
     provider_names = 'No Providers'
     if 'providers' in scenario_data['scenario']:
@@ -394,9 +395,9 @@ def create_report(scenario_data, appliance_results, process_results, use_slab, g
         yaml.dump(dict(scenario_data['scenario']), scenario_file, default_flow_style=False)
 
     generate_summary_csv(scenario_path.join('{}-summary.csv'.format(ver)), appliance_results,
-        process_results, provider_names)
+        process_results, provider_names, ver)
     generate_raw_data_csv(mem_rawdata_path, appliance_results, process_results)
-    generate_summary_html(scenario_path, appliance_results, process_results, scenario_data,
+    generate_summary_html(scenario_path, ver, appliance_results, process_results, scenario_data,
         provider_names, grafana_url)
 
     logger.info('Finished Creating Report')
@@ -453,11 +454,11 @@ def generate_raw_data_csv(directory, appliance_results, process_results):
     logger.info('Generated Raw Data CSVs in: {}'.format(timediff))
 
 
-def generate_summary_csv(file_name, appliance_results, process_results, provider_names):
+def generate_summary_csv(file_name, appliance_results, process_results, provider_names,
+        version_string):
     starttime = time.time()
-    ver = get_current_version()
     with open(str(file_name), 'w') as csv_file:
-        csv_file.write('Version: {}, Provider(s): {}\n'.format(ver, provider_names))
+        csv_file.write('Version: {}, Provider(s): {}\n'.format(version_string, provider_names))
         csv_file.write('Measurement,Start of test,End of test\n')
         start = appliance_results.keys()[0]
         end = appliance_results.keys()[-1]
@@ -493,18 +494,17 @@ def generate_summary_csv(file_name, appliance_results, process_results, provider
     logger.info('Generated Summary CSV in: {}'.format(timediff))
 
 
-def generate_summary_html(directory, appliance_results, process_results, scenario_data,
-        provider_names, grafana_url):
+def generate_summary_html(directory, version_string, appliance_results, process_results,
+        scenario_data, provider_names, grafana_url):
     starttime = time.time()
-    ver = get_current_version()
     file_name = str(directory.join('index.html'))
     with open(file_name, 'w') as html_file:
         html_file.write('<html>\n')
         html_file.write('<head><title>{} - {} Memory Usage Performance</title></head>'.format(
-            ver, provider_names))
+            version_string, provider_names))
 
         html_file.write('<body>\n')
-        html_file.write('<b>CFME {} {} Test Results</b><br>\n'.format(ver,
+        html_file.write('<b>CFME {} {} Test Results</b><br>\n'.format(version_string,
             scenario_data['test_name'].title()))
         html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(
             scenario_data['appliance_roles'].replace(',', ', ')))
@@ -514,7 +514,7 @@ def generate_summary_html(directory, appliance_results, process_results, scenari
         if grafana_url:
             html_file.write(
                 ' : <b><a href=\'{}\' target="_blank">Grafana</a></b><br>\n'.format(grafana_url))
-        html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
+        html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(version_string))
         html_file.write(' : <b><a href=\'scenario.yml\'>Scenario Yaml</a></b>')
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
         html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')
@@ -545,7 +545,8 @@ def generate_summary_html(directory, appliance_results, process_results, scenari
         html_file.write('<td><b>Max Used Memory</b></td>\n')
         html_file.write('<td><b>Total Tracked Processes</b></td>\n')
         html_file.write('</tr>\n')
-        html_file.write('<td><a href=\'rawdata/appliance.csv\'>{}</a></td>\n'.format(ver))
+        html_file.write('<td><a href=\'rawdata/appliance.csv\'>{}</a></td>\n'.format(
+            version_string))
         html_file.write('<td>{}</td>\n'.format(start.replace(microsecond=0)))
         html_file.write('<td>{}</td>\n'.format(end.replace(microsecond=0)))
         html_file.write('<td>{}</td>\n'.format(unicode(timediff).partition('.')[0]))
@@ -723,9 +724,9 @@ def generate_summary_html(directory, appliance_results, process_results, scenari
 
         # Appliance Graph
         html_file.write('</td></tr><tr><td>\n')
-        file_name = '{}-appliance_memory.png'.format(ver)
+        file_name = '{}-appliance_memory.png'.format(version_string)
         html_file.write('<img src=\'graphs/{}\'>\n'.format(file_name))
-        file_name = '{}-appliance_swap.png'.format(ver)
+        file_name = '{}-appliance_swap.png'.format(version_string)
         # Check for swap usage through out time frame:
         max_swap_used = 0
         for ts in appliance_results:

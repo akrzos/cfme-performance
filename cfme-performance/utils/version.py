@@ -1,9 +1,28 @@
 """Functions pertaining to determining version of appliance."""
+from utils.log import logger
 from utils.ssh import SSHClient
+import re
 
 
-# Potentially could use improvement in the future
-def get_current_version():
+def get_current_version_string():
+    """Returns string contents of /var/www/miq/vmdb/VERSION"""
     ssh_client = SSHClient()
     exit_status, current_version = ssh_client.run_command('cat /var/www/miq/vmdb/VERSION')
     return current_version.strip()
+
+
+def get_version():
+    """Returns either: '56', '55', '54', 'master', 'unrecognized', depending upon contents of
+    /var/www/miq/vmdb/VERSION file on appliance."""
+    ver = get_current_version_string()
+    logger.info('ver: {}'.format(ver))
+    if re.search(r'^5\.6', ver):
+        return '56'
+    elif re.search(r'^5\.5', ver):
+        return '55'
+    elif re.search(r'^5\.4', ver):
+        return '54'
+    elif re.search(r'^master', ver):
+        logger.info('master')
+        return 'master'
+    return 'unrecognized'

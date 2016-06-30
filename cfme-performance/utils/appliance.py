@@ -2,11 +2,17 @@
 from utils.conf import cfme_performance
 from utils.log import logger
 from utils.ssh import SSHTail
+from utils.version import get_version
 from textwrap import dedent
 import time
 import yaml
 
-yaml_loader = dedent("""\
+yaml_loader55 = dedent("""\
+new_conf = YAML::load(File.open('/tmp/vmdb.yml'))
+Configuration.create_or_update(MiqServer.my_server, new_conf, 'vmdb')
+""")
+
+yaml_loader56 = dedent("""\
 new_conf = YAML::load(File.open('/tmp/vmdb.yml'))
 new_conf_symbol = new_conf.deep_symbolize_keys.to_yaml
 result = VMDB::Config.save_file(new_conf_symbol)
@@ -70,18 +76,36 @@ def clean_appliance(ssh_client):
 
 
 def get_vmdb_yaml_config(ssh_client):
-    base_data = ssh_client.run_rails_command('puts\(Settings.to_hash.deep_stringify_keys.to_yaml\)')
-    if base_data.rc:
-        logger.error("Config couldn't be found")
-        logger.error(base_data.output)
-        raise Exception('Error obtaining vmdb config')
-    yaml_data = base_data.output[:base_data.output.find('DEPRE')]
+    ver = get_version()
+    if ver == '56':
+        base_data = ssh_client.run_rails_command(
+            'puts\(Settings.to_hash.deep_stringify_keys.to_yaml\)')
+        if base_data.rc:
+            logger.error("Config couldn't be found")
+            logger.error(base_data.output)
+            raise Exception('Error obtaining vmdb config')
+        yaml_data = base_data.output[:base_data.output.find('DEPRE')]
+    elif ver == '55':
+        base_data = ssh_client.run_command('cat "/var/www/miq/vmdb/config/vmdb.yml.db"')
+        if base_data.rc:
+            logger.error("Config couldn't be found")
+            logger.error(base_data.output)
+            raise Exception('Error obtaining vmdb config')
+        yaml_data = base_data.output
     return yaml.load(yaml_data)
 
 
 def set_vmdb_yaml_config(ssh_client, yaml_data):
     logger.info('Uploading VMDB yaml Loader')
-    ssh_client.run_command('echo "{}" > /tmp/yaml_loader.rb'.format(yaml_loader), log_less=True)
+    ver = get_version()
+    if ver == '56':
+        ssh_client.run_command('echo "{}" > /tmp/yaml_loader.rb'.format(yaml_loader56),
+            log_less=True)
+    elif ver == '55':
+        ssh_client.run_command('echo "{}" > /tmp/yaml_loader.rb'.format(yaml_loader55),
+            log_less=True)
+    else:
+        raise Exception('Unable to set config: Unrecognized version of appliance')
     logger.info('Uploading VMDB Config')
     ssh_client.run_command('echo "{}" > /tmp/vmdb.yml'.format(
         yaml.dump(yaml_data, default_flow_style=False)), log_less=True)
@@ -262,7 +286,8 @@ def wait_for_miq_server_ready(poll_interval=5):
         logger.debug('Attempting to detect MIQ Server ready: {}'.format(attempts))
         for line in evm_tail:
             if 'MiqServer#start' in line:
-                if 'Server starting complete' in line:
+                if ('Server starting complete' in line or
+                        'Server starting in Normal mode.' in line):
                     logger.info('Detected MIQ Server is ready.')
                     detected = True
                     break
