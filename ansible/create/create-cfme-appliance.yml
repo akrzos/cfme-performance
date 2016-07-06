@@ -1,0 +1,16 @@
+---
+#
+# Playbook to create appliances used in testing
+#
+
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
+    - ../group_vars/create_appliances.yml
+    - ../group_vars/create_appliances.local.yml
+  roles:
+    - get-certificates
+    - create-cfme-appliance

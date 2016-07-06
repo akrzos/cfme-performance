@@ -2,9 +2,11 @@
 ###############################
 # Upload/Deploy Template
 ###############################
+rhevm_host: performance-testing-domain.com
 rhevm_username: admin@internal
 rhevm_password: smartvm
 export_datastore: export
+
 
 # Template:
 appliance_template: http://manageiq.org/download/manageiq-ovirt-darga-2.ova

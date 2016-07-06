@@ -1,0 +1,15 @@
+---
+#
+# Tasks to create a VM based off of a CFME template
+#
+
+
+- name: cfme-appliance setup
+  shell: ./create/roles/create-cfme-appliance/scripts/create-cfme-appliance.py "{{ item }}" "{{ rhevm_host }}" "{{ rhevm_username }}" "{{ rhevm_password }}"
+  with_items: "{{ cfme_appliances }}"
+
+
+# - name: run configure playbook
+
+
+# - name: add info to google-sheets

@@ -1,0 +1,16 @@
+---
+#
+# Tasks to obtain the ca.crts from the rhevm hosts
+#
+
+
+- name: make /tmp/rhevm_applaince_certs
+  shell: mkdir /tmp/rhevm_appliance_certs
+  args:
+    creates: /tmp/rhevm_appliance_certs/
+
+
+- name: get ca.crt for rhevm host appliance
+  shell: wget "{{ rhevm_host }}"/ca.crt --no-check-certificate; mv ca.crt /tmp/rhevm_appliance_certs/{{ rhevm_host }}
+  args:
+    creates: /tmp/rhevm_appliance_certs/{{ rhevm_host }}
