@@ -2,6 +2,7 @@
 from utils import log
 import collections
 import pytest
+from utils.conf import cfme_performance as perf_data
 
 
 #: A dict of tests, and their state at various test phases
@@ -11,6 +12,18 @@ test_tracking = collections.defaultdict(dict)
 @pytest.fixture(scope='session')
 def logger():
     return log.logger
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup('perf')
+    group.addoption('--appliance', dest='appliance', default=None,
+                    help="Run tests with the appliance ip as command line option.")
+
+
+def pytest_configure(config):
+    if config.option.appliance:
+        perf_data['appliance']['ip_address'] = config.option.appliance
+    logger().info('Appliance IP is {}'.format(perf_data['appliance']['ip_address']))
 
 
 def pytest_collection_modifyitems(session, config, items):
