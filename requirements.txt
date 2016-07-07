@@ -9,3 +9,4 @@ requests==2.10.0
 yaycl==0.2.0
 pycurl==7.43.0
 mgmtsystem==1.2.19
+diaper==1.3
