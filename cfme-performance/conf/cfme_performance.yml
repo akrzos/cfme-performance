@@ -64,6 +64,7 @@ workloads:
     total_time: 3600
   test_idle_all:
     total_time: 3600
+
   test_refresh_providers:
     scenarios:
       - name: 30m-vmware-small
@@ -79,6 +80,7 @@ workloads:
         time_between_refresh: 60
         total_time: 1800
         grafana_dashboard: cfme-vmware-redhat-system-performance
+
   test_refresh_vms:
     scenarios:
       - name: 30m-vmware-small
@@ -100,6 +102,7 @@ workloads:
         time_between_refresh: 10
         total_time: 1800
         grafana_dashboard: cfme-vmware-redhat-system-performance
+
   test_cap_and_util:
     scenarios:
       - name: 30m-vmware-small
@@ -121,6 +124,7 @@ workloads:
         refresh_sleep_time: 600
         total_time: 1800
         grafana_dashboard: cfme-vmware-redhat-system-performance
+
       - name: 4hr-vmware-small
         providers:
           - vmware-small
@@ -140,6 +144,7 @@ workloads:
         refresh_sleep_time: 600
         total_time: 14400
         grafana_dashboard: cfme-vmware-redhat-system-performance
+
   test_smartstate:
     scenarios:
       - name: 30m-vmware-small
@@ -166,7 +171,7 @@ workloads:
         time_between_analyses: 45
         total_time: 1800
         grafana_dashboard: cfme-redhat-system-performance
-      - name: 30m-vmware-rhevm-small
+      - name: 30m-2xsmall-vmware-rhevm
         providers:
           - vmware-small
           - rhevm-small
@@ -183,6 +188,7 @@ workloads:
         time_between_analyses: 45
         total_time: 1800
         grafana_dashboard: cfme-vmware-redhat-system-performance
+
   test_provisioning:
     scenarios:
       - name: 30m-vmware-small
@@ -190,25 +196,34 @@ workloads:
           - vmware-small
         templates:
           vmware-small:
-            - perf-provision-rhel6
             - perf-provision-rhel7
         refresh_sleep_time: 600
         time_between_provision: 60
         cleanup_size: 4
         total_time: 1800
         grafana_dashboard: cfme-vmware-system-performance
-      - name: 4hr-2xsmall-vmware-rhevm
+      - name: 30m-rhevm-small
+        providers:
+          - rhevm-small
+        templates:
+          rhevm-small:
+            - perf-provision-rhel7
+        refresh_sleep_time: 600
+        time_between_provision: 60
+        cleanup_size: 4
+        total_time: 1800
+        grafana_dashboard: cfme-redhat-system-performance
+      - name: 30m-2xsmall-vmware-rhevm
         providers:
           - vmware-small
           - rhevm-small
         templates:
           vmware-small:
-            - perf-provision-rhel6
             - perf-provision-rhel7
           rhevm-small:
             - perf-provision-rhel7
         refresh_sleep_time: 600
         time_between_provision: 90
         cleanup_size: 4
-        total_time: 14400
-        grafana_dashboard: cfme-general-system-performance
+        total_time: 1800
+        grafana_dashboard: cfme-vmware-redhat-system-performance
