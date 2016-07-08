@@ -2,6 +2,7 @@
 from utils import log
 import collections
 import pytest
+from utils import ssh
 from utils.conf import cfme_performance as perf_data
 
 
@@ -83,6 +84,11 @@ def pytest_sessionfinish(session, exitstatus):
     summary = ', '.join(results)
     logger().info(log.format_marker('Finished test run', mark='='))
     logger().info(log.format_marker(str(summary), mark='='))
+    for session in ssh._client_session:
+        try:
+            session.close()
+        except:
+            pass
 
 
 def _test_status(test_name):
