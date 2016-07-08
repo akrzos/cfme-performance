@@ -6,6 +6,7 @@ import warnings
 
 # Additional Verbose Debug level
 VDEBUG_LEVEL = 9
+TRACE_LEVEL = 5
 
 MARKER_LEN = 80
 
@@ -62,12 +63,18 @@ def format_marker(mstring, mark="-"):
         mstring = format_spec.format(mstring)
     return mstring
 
+def trace(self, message, *args, **kws):
+    self._log(TRACE_LEVEL, message, args, **kws)
+
 
 def vdebug(self, message, *args, **kws):
     self._log(VDEBUG_LEVEL, message, args, **kws)
 logging.Logger.vdebug = vdebug
 
 logging.addLevelName(VDEBUG_LEVEL, "VDEBUG")
+
+logging.Logger.trace = trace
+logging.addLevelName(TRACE_LEVEL, "TRACE")
 
 logger = logging.getLogger('cfme-performance')
 logger.setLevel(cfme_performance['logging']['level'])

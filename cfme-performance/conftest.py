@@ -1,9 +1,14 @@
 """pytest plugins"""
+import atexit
 from utils import log
 import collections
+import diaper
 import pytest
+from functools import partial
 from utils import ssh
 from utils.conf import cfme_performance as perf_data
+from utils.sprout import SproutClient
+from wait_for import wait_for as wait_for_mod
 
 
 #: A dict of tests, and their state at various test phases
@@ -15,16 +20,75 @@ def logger():
     return log.logger
 
 
+def at_exit(f, *args, **kwargs):
+    """Diaper-protected atexit handler registering. Same syntax as atexit.register()"""
+    return atexit.register(lambda: diaper(f, *args, **kwargs))
+
+
 def pytest_addoption(parser):
     group = parser.getgroup('perf')
     group.addoption('--appliance', dest='appliance', default=None,
                     help="Run tests with the appliance ip as command line option.")
+    group.addoption('--appliance-name', dest='appliance_name', default=None,
+                    help="Run tests with the appliance ip as command line option.")
+    group._addoption('--use-sprout', dest='use_sprout', action='store_true',
+                     default=False, help="Use Sprout for provisioning appliances.")
+    group._addoption('--sprout-desc', dest='sprout_desc', default='Perf-wrokload-tests',
+                     help="Set description of the pool.")
+    group._addoption('--sprout-appliances', dest='sprout_appliances', type=int,
+                     default=1, help="How many Sprout appliances to use?.")
+    group._addoption('--sprout-group', dest='sprout_group', default='downstream-56z',
+                     help="Which stream to use.")
+    group._addoption('--sprout-timeout', dest='sprout_timeout', type=int,
+                     default=10080, help="How many minutes is the lease timeout.")
 
 
 def pytest_configure(config):
+    if config.option.use_sprout:
+        # Using sprout
+        try:
+            sprout_client = SproutClient.from_config()
+            logger().info(
+                "Requesting {} appliances from Sprout at {}\n".format(
+                    config.option.sprout_appliances, sprout_client.api_entry))
+            pool_id = sprout_client.request_appliances(
+                config.option.sprout_group,
+                count=config.option.sprout_appliances,
+                lease_time=config.option.sprout_timeout
+            )
+            wait_for = partial(wait_for_mod)
+            logger().info("Pool {}. Waiting for fulfillment ...\n".format(pool_id))
+            sprout_pool = pool_id
+            at_exit(sprout_client.destroy_pool, sprout_pool)
+            if config.option.sprout_desc is not None:
+                sprout_client.set_pool_description(
+                    pool_id, str(config.option.sprout_desc))
+            try:
+                result = wait_for(
+                    lambda: sprout_client.request_check(sprout_pool)["fulfilled"],
+                    num_sec=3600,
+                    delay=5,
+                    message="requesting appliances was fulfilled"
+                )
+            except:
+                logger().info("Destroying the pool on error.\n")
+                sprout_client.destroy_pool(pool_id)
+                raise
+            logger().info("Provisioning took {0:.1f} seconds\n".format(result.duration))
+            request = sprout_client.request_check(sprout_pool)
+            # Push an appliance to the stack to have proper reference for test collection
+            perf_data['appliance']['ip_address'] = request["appliances"][0]["ip_address"]
+            perf_data['appliance']['appliance_name'] = 'CFME-R0000-SPROUT-LATEST'
+            logger().info("Sprout Appliances provisioning completed\n")
+        except Exception as e:
+            logger().error(e)
+            logger().error("Exception occured while provisioning from sprout")
     if config.option.appliance:
         perf_data['appliance']['ip_address'] = config.option.appliance
+    if config.option.appliance_name:
+        perf_data['appliance']['appliance_name'] = config.option.appliance_name
     logger().info('Appliance IP is {}'.format(perf_data['appliance']['ip_address']))
+    logger().info('Appliance name is {}'.format(perf_data['appliance']['appliance_name']))
 
 
 def pytest_collection_modifyitems(session, config, items):
