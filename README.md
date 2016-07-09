@@ -35,6 +35,7 @@ These are the current workloads:
 * Refresh Providers
 * Refresh VMs
 * Capacity and Utilization
+* Capacity and Utilization with Replication (pglogical or rubyrep)
 * SmartState Analysis (Scans VMs)
 * Provisioning
 

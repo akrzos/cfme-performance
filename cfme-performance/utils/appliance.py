@@ -59,13 +59,14 @@ roles56_workload_all = ['automate', 'database_operations', 'ems_inventory', 'ems
     'web_services']
 
 
-def clean_appliance(ssh_client):
+def clean_appliance(ssh_client, dbsync_local_uninstall=True):
     starttime = time.time()
     ssh_client.run_command('service evmserverd stop')
     ssh_client.run_command('sync; sync; echo 3 > /proc/sys/vm/drop_caches')
     ssh_client.run_command('service collectd stop')
     ssh_client.run_command('service rh-postgresql94-postgresql restart')
-    ssh_client.run_rake_command('evm:dbsync:local_uninstall')
+    if dbsync_local_uninstall:
+        ssh_client.run_rake_command('evm:dbsync:local_uninstall')
     # 5.6 requires DISABLE_DATABASE_ENVIRONMENT_CHECK=1
     ssh_client.run_command(
         'cd /var/www/miq/vmdb;DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rake evm:db:reset')
@@ -75,7 +76,7 @@ def clean_appliance(ssh_client):
     ssh_client.run_command('service httpd stop')
     ssh_client.run_command('rm -rf /run/httpd/*')
     ssh_client.run_command('service evmserverd start')
-    logger.debug('Cleaned appliance in: {}'.format(time.time() - starttime))
+    logger.debug('Cleaned appliance in: {}'.format(round(time.time() - starttime, 2)))
 
 
 def get_vmdb_yaml_config(ssh_client):
@@ -162,6 +163,12 @@ def get_server_roles_workload_cap_and_util(separator=','):
     return separator.join(roles56_cap_and_util)
 
 
+def get_server_roles_workload_cap_and_util_rep(separator=','):
+    roles = ['database_synchronization']
+    roles.extend(roles56_cap_and_util)
+    return separator.join(sorted(roles))
+
+
 def get_server_roles_workload_refresh_providers(separator=','):
     return separator.join(roles56_refresh_providers)
 
@@ -201,9 +208,16 @@ def set_server_roles_workload_idle_all(ssh_client):
 
 
 def set_server_roles_workload_cap_and_util(ssh_client):
-    """Sets server roles used for all C&U workloads."""
+    """Sets server roles used for C&U workloads."""
     yaml = get_vmdb_yaml_config(ssh_client)
     yaml['server']['role'] = get_server_roles_workload_cap_and_util()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles_workload_cap_and_util_rep(ssh_client):
+    """Sets server roles used for C&U with replication(rubyrep) workloads."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_workload_cap_and_util_rep()
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
@@ -271,6 +285,19 @@ def set_pglogical_replication(ssh_client, replication_type=':none'):
     ssh_client.run_rails_console(command, timeout=None, log_less=False)
 
 
+def add_pglogical_replication_subscription(ssh_client, host, port=5432, dbname='vmdb_production',
+        user='root', password='smartvm'):
+    """Add a pglogical replication subscription without using the Web UI."""
+    command = ('sub = PglogicalSubscription.new;'
+        'sub.dbname = \'{}\';'
+        'sub.host = \'{}\';'
+        'sub.user = \'{}\';'
+        'sub.password = \'{}\';'
+        'sub.port = {};'
+        'sub.save'.format(dbname, host, user, password, port))
+    ssh_client.run_rails_console(command, timeout=None, log_less=True)
+
+
 def set_rubyrep_replication(ssh_client, host, database='vmdb_production', username='root',
         password='v2:{I2SQ5PdmGPwN7t5goRiyaQ==}', port='5432'):
     """Sets up rubyrep replication via advanced configuration settings yaml."""
@@ -284,14 +311,15 @@ def set_rubyrep_replication(ssh_client, host, database='vmdb_production', userna
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
-def wait_for_miq_server_workers_started(poll_interval=5):
+def wait_for_miq_server_workers_started(evm_tail=None, poll_interval=5):
     """Waits for the CFME's workers to be started by tailing evm.log for:
     'INFO -- : MIQ(MiqServer#wait_for_started_workers) All workers have been started'
     Verified works with 5.5 and 5.6 appliances.
     """
-    logger.info('Opening /var/www/miq/vmdb/log/evm.log for tail')
-    evm_tail = SSHTail('/var/www/miq/vmdb/log/evm.log')
-    evm_tail.set_initial_file_end()
+    if evm_tail is None:
+        logger.info('Opening /var/www/miq/vmdb/log/evm.log for tail')
+        evm_tail = SSHTail('/var/www/miq/vmdb/log/evm.log')
+        evm_tail.set_initial_file_end()
 
     attempts = 0
     detected = False
