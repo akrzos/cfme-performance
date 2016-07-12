@@ -105,14 +105,17 @@ def set_vmdb_yaml_config(ssh_client, yaml_data):
     if ver == '56':
         ssh_client.run_command('echo "{}" > /tmp/yaml_loader.rb'.format(yaml_loader56),
             log_less=True)
+        logger.info('Uploading VMDB Config')
+        ssh_client.run_command('echo "{}" > /tmp/vmdb.yml'.format(
+            yaml.dump(yaml_data, default_flow_style=False)), log_less=True)
     elif ver == '55':
         ssh_client.run_command('echo "{}" > /tmp/yaml_loader.rb'.format(yaml_loader55),
             log_less=True)
+        logger.info('Uploading VMDB Config')
+        ssh_client.run_command('echo "{}" | tee /tmp/vmdb.yml /var/www/miq/vmdb/config/vmdb.yml.db'
+            ''.format(yaml.dump(yaml_data, default_flow_style=False)), log_less=True)
     else:
         raise Exception('Unable to set config: Unrecognized version of appliance')
-    logger.info('Uploading VMDB Config')
-    ssh_client.run_command('echo "{}" > /tmp/vmdb.yml'.format(
-        yaml.dump(yaml_data, default_flow_style=False)), log_less=True)
     result = ssh_client.run_rails_command('/tmp/yaml_loader.rb')
     if result.rc:
         raise Exception('Unable to set config')
@@ -298,16 +301,25 @@ def add_pglogical_replication_subscription(ssh_client, host, port=5432, dbname='
     ssh_client.run_rails_console(command, timeout=None, log_less=True)
 
 
-def set_rubyrep_replication(ssh_client, host, database='vmdb_production', username='root',
-        password='v2:{I2SQ5PdmGPwN7t5goRiyaQ==}', port='5432'):
+def set_rubyrep_replication(ssh_client, host, port=5432, database='vmdb_production',
+        username='root', password='v2:{I2SQ5PdmGPwN7t5goRiyaQ==}'):
     """Sets up rubyrep replication via advanced configuration settings yaml."""
     yaml = get_vmdb_yaml_config(ssh_client)
-    dest = yaml['workers']['worker_base']['replication_worker']['replication']['destination']
-    dest['database'] = database
-    dest['username'] = username
-    dest['password'] = password
-    dest['port'] = port
-    dest['host'] = host
+    if 'replication_worker' in yaml['workers']['worker_base']:
+        dest = yaml['workers']['worker_base']['replication_worker']['replication']['destination']
+        dest['database'] = database
+        dest['username'] = username
+        dest['password'] = password
+        dest['port'] = port
+        dest['host'] = host
+    else:  # 5.5 configuration:
+        dest = yaml['workers']['worker_base'][':replication_worker'][':replication'][':destination']
+        dest[':database'] = database
+        dest[':username'] = username
+        dest[':password'] = password
+        dest[':port'] = port
+        dest[':host'] = host
+        logger.debug('Dest: {}'.format(dest))
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
