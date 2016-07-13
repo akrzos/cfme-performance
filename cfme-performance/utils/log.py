@@ -63,6 +63,7 @@ def format_marker(mstring, mark="-"):
         mstring = format_spec.format(mstring)
     return mstring
 
+
 def trace(self, message, *args, **kws):
     self._log(TRACE_LEVEL, message, args, **kws)
 
@@ -88,6 +89,7 @@ filehandler.setLevel(cfme_performance['logging']['level'])
 filehandler.setFormatter(formatter)
 logger.addFilter(_RelpathFilter())
 logger.addHandler(filehandler)
+logger.propagate = False
 
 # Log warnings to cfme-performance logger
 warnings.showwarning = _showwarning
