@@ -23,7 +23,7 @@ Playbooks that configure an appliance for Performance Analysis and Testing. Play
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/all-in-one.yml
 ```
-Runs all of the roles required to create an All-In-One Performance Monitored CFME/Miq appliance.  See this [document](README.allinone.md) for further details.
+Runs all of the roles required to create an All-In-One Performance Monitored CFME/ManageIQ appliance.  See this [document](README.allinone.md) for further details.
 
 ## postdeploy.yml
 ```
@@ -35,7 +35,7 @@ Runs all of the roles from the below playbooks on cfme-vmdb appliances.
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/sshkey.yml
 ```
-Installs the current user's ssh key into the appliances root user's authorized_key file therefore enabling all other playbooks to run.  After running this playbook you can change the default CFME/Miq appliance password to something secure.
+Installs the current user's ssh key into the appliances root user's authorized_key file therefore enabling all other playbooks to run.  After running this playbook you can change the default CFME/ManageIQ appliance password to something secure.
 
 ### hostname.yml
 ```
@@ -59,7 +59,7 @@ Installs and configures chronyd/ntpd service to ensure time is synchronized.
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/config-interface.yml
 ```
-(Optional) Configures static interfaces on CFME/Miq appliances with an address.
+(Optional) Configures static interfaces on CFME/ManageIQ appliances with an address.
 
 ### proctitle-patch.yml
 ```
@@ -77,7 +77,7 @@ Installs and configures chronyd/ntpd service to ensure time is synchronized.
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/collectd.yml
 ```
-Installs and configures collectd on CFME/Miq appliances.
+Installs and configures collectd on CFME/ManageIQ appliances.
 
 ## database-import.yml
 ```

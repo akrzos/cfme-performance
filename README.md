@@ -16,20 +16,21 @@ A repo with the goal to provide end-to-end CFME/ManageIQ performance analysis an
 ## Major Components
 This repo is contains two major components to facilitate its goals:
 * [Ansible](#ansible)
-* [Cfme-performance](#cfme-performance)
+* [cfme-performance](#cfme-performance)
 
 
 ### Ansible
-[Ansible Playbooks](ansible/) <br/>
+[Ansible Playbooks](ansible/)
 Ansible playbooks used for deploying and managing infrastructure used in the testing framework.
 
 
-### Cfme-performance
-[Python Testing Framework](cfme-performance/) <br/>
+### cfme-performance
+[Python Testing Framework](cfme-performance/)
 Testing framework used to run workloads and benchmarks against CFME. The current workloads are:
 * Idle (default, no websocket/git_owner roles, all roles)
 * Refresh Providers
 * Refresh VMs
 * Capacity and Utilization
+* Capacity and Utilization with Replication (pglogical and rubyrep)
 * SmartState Analysis (Scans VMs)
 * Provisioning

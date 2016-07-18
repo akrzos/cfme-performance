@@ -1,6 +1,6 @@
 # cfme-performance - Python Testing Framework
 
-Originally the workloads and benchmarks started as a fork of [RedHatQE/cfme_tests](https://github.com/RedHatQE/cfme_tests) maintained by Alex Krzos however the growing need to have workloads run rapidly, deterministically and easily has come to the need for a separate branch.  The goal of this testing framework is to allow one to quickly measure performance, add providers, run a workload, run a benchmark, and reset their appliance back to a clean state.  The original workloads and benchmarks have a hard requirement of editing multiple yaml files and maintaining an instance of selenium.  The only external requirement for this repo is that of having a provider to test against. (A must have for any testing of ManageIQ and CFME)
+Originally the workloads and benchmarks started as a fork of [RedHatQE/cfme_tests](https://github.com/RedHatQE/cfme_tests) maintained by Alex Krzos however the growing need to have workloads run rapidly, deterministically and easily has come to the need for a separate repository.  The goal of this testing framework is to quickly measure performance, add providers, run a workload, and reset appliances back to a clean state.  The original workloads and benchmarks have a hard requirement of editing multiple yaml files and maintaining an instance of selenium.  The only external requirement for this repo is that of having a provider to test against. (A must have for any testing of ManageIQ and CFME)
 
 For more in-depth analysis you need a "MonitorHost" or a all-in-one Performance Monitored appliance.  Implementing either of those two options gives you a many more measurements and graphs through Grafana of the system performance and potentially application performance metrics (via statsd) of a CFME or ManageIQ appliance.
 
@@ -41,6 +41,7 @@ These are the current workloads:
 * Refresh Providers
 * Refresh VMs
 * Capacity and Utilization
+* Capacity and Utilization with Replication (pglogical and rubyrep)
 * SmartState Analysis (Scans VMs)
 * Provisioning
 
@@ -52,9 +53,9 @@ Each workload(Except Idle) can take a list of providers and a total_time paramet
 # py.test --verbose tests/workloads/
 ```
 
-### Running Specific workloads
+### Running Specific Workloads
 ```shell
-# py.test --verbose tests/workloads/<worklad_to_run>
+# py.test --verbose tests/workloads/<workload_to_run>
 ```
 
 ## Analysis
