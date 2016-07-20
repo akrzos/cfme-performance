@@ -3,6 +3,7 @@ from mgmtsystem.virtualcenter import VMWareSystem
 from mgmtsystem.rhevm import RHEVMSystem
 from utils.conf import cfme_performance
 from utils.log import logger
+from utils.ssh import SSHClient
 import copy
 import json
 import requests
@@ -285,6 +286,21 @@ def add_provider(provider):
                              allow_redirects=False)
 
     logger.debug('Added Provider: {}, Response: {}'.format(provider['name'], response))
+
+    # Workaround for Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1351253
+    if provider['type'] == "ManageIQ::Providers::Microsoft::InfraManager":
+        logger.debug('Running rails command for Microsoft InfraManager Workaround')
+        ssh_client = SSHClient()
+        command = (
+            'm = ExtManagementSystem.find_by_name \'{}\';'
+            'attributes = {{:security_protocol => \'{}\'}};'
+            'm.update_authentication(:default => {{:userid => \'{}\', :password => \'{}\'}});'
+            'm.update_attributes(attributes);'
+            'm.save;'
+            'm.authentication_check;'.format(provider['name'], provider['security_protocol'],
+                provider['credentials']['username'].replace('\\', '\\\\'),
+                provider['credentials']['password']))
+        ssh_client.run_rails_console(command, timeout=None, log_less=True)
 
 
 def add_providers(providers):
