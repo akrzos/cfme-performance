@@ -302,6 +302,58 @@ def add_provider(provider):
                 provider['credentials']['password']))
         ssh_client.run_rails_console(command, timeout=None, log_less=True)
 
+    # Workaround for Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1351253
+    if provider['type'] == 'ManageIQ::Providers::Openstack::CloudManager':
+        logger.debug('Running rails command for Openstack CloudManager Workaround')
+        ssh_client = SSHClient()
+        command = (
+            'e = ExtManagementSystem.find_by_name \'{}\'; '
+            'attributes = {{:security_protocol => \'{}\', :port => \'{}\'}}; '
+            'e.update_authentication(:default => {{:userid => \'{}\', :password => \'{}\'}}); '
+            'e.update_attributes(attributes); '
+            'e.save; '
+            'e.authentication_check;'.format(
+                provider['name'], provider['credentials']['security_protocol'],
+                provider['credentials']['port'], provider['credentials']['username'],
+                provider['credentials']['password']))
+        if 'amqp_credentials' in provider:
+            default_ip = provider['ip_address']
+            default_port = provider['credentials']['port']
+            default_user = provider['credentials']['username']
+            default_pass = provider['credentials']['password']
+            default_protocol = provider['credentials']['security_protocol']
+            amqp_ip = provider['amqp_credentials']['ip_address']
+            amqp_port = provider['amqp_credentials']['port']
+            amqp_user = provider['amqp_credentials']['username']
+            amqp_pass = provider['amqp_credentials']['password']
+            amqp_protocol = provider['amqp_credentials']['security_protocol']
+            command = (
+                'e = ExtManagementSystem.find_by_name \'{0}\'; '
+                'attributes = {{:security_protocol => \'{5}\', :port => {2}}}; '
+                'e.update_authentication(:default => {{:userid => \'{3}\', :password => \'{4}\'}});'
+                'e.update_attributes(attributes); '
+                'configurations = [{{:endpoint => {{:role => :default, :hostname => \'{1}\', '
+                ':port => {2}, :security_protocol => \'{5}\'}}, '
+                ':authentication => {{:role => :default, :userid => \'{3}\', '
+                ':password => \'{4}\', :save => true }}}}, '
+                '{{:endpoint => {{:role => :amqp, :hostname => \'{6}\', :port => {7}, '
+                ':security_protocol => \'{10}\'}}, :authentication => {{:role => :amqp, '
+                ':userid => \'FOOBAR\', :password => \'{9}\', :save => true}}}}]; '
+                'e.connection_configurations = configurations; '
+                'configurations = [{{:endpoint => {{:role => :default, :hostname => \'{1}\', '
+                ':port => {2}, :security_protocol => \'{5}\'}}, '
+                ':authentication => {{:role => :default, :userid => \'{3}\', '
+                ':password => \'{4}\', :save => true }}}}, '
+                '{{:endpoint => {{:role => :amqp, :hostname => \'{6}\', :port => {7}, '
+                ':security_protocol => \'{10}\'}}, :authentication => {{:role => :amqp, '
+                ':userid => \'{8}\', :password => \'{9}\', :save => true}}}}]; '
+                'e.connection_configurations = configurations; '
+                'e.save; '
+                'e.authentication_check;'.format(
+                    provider['name'], default_ip, default_port, default_user, default_pass,
+                    default_protocol, amqp_ip, amqp_port, amqp_user, amqp_pass, amqp_protocol))
+        ssh_client.run_rails_console(command, timeout=None, log_less=True)
+
 
 def add_providers(providers):
     """Adds a provider with one request per provider via the REST API."""
