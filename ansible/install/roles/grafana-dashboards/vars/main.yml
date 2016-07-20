@@ -191,6 +191,9 @@ per_process_panels:
     - name: "Azure::NetworkManager::RefreshWorker"
       processes:
         - "Azure::NetworkManager::RefreshWorker"
+    - name: "Google::NetworkManager::RefreshWorker"
+      processes:
+        - "Google::NetworkManager::RefreshWorker"
     - name: "Openstack::NetworkManager::RefreshWorker"
       processes:
         - "Openstack::NetworkManager::RefreshWorker"
@@ -436,6 +439,9 @@ per_process_panels:
     - name: "Azure::NetworkManager::RefreshWorker"
       processes:
         - "Azure::NetworkManager::RefreshWorker"
+    - name: "Google::NetworkManager::RefreshWorker"
+      processes:
+        - "Google::NetworkManager::RefreshWorker"
     - name: "Openstack::NetworkManager::RefreshWorker"
       processes:
         - "Openstack::NetworkManager::RefreshWorker"

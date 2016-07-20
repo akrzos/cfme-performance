@@ -36,22 +36,22 @@ miq_workers = [
     'ManageIQ::Providers::Openstack::InfraManager::RefreshWorker',
     'ManageIQ::Providers::Redhat::InfraManager::RefreshWorker',
     'ManageIQ::Providers::Vmware::InfraManager::RefreshWorker',
-    'MiqEmsRefreshWorkerMicrosoft',
-    'MiqEmsRefreshWorkerRedhat',
-    'MiqEmsRefreshWorkerVmware',
+    'MiqEmsRefreshWorkerMicrosoft',                                               # 5.4
+    'MiqEmsRefreshWorkerRedhat',                                                  # 5.4
+    'MiqEmsRefreshWorkerVmware',                                                  # 5.4
 
     'ManageIQ::Providers::Amazon::CloudManager::RefreshWorker',
     'ManageIQ::Providers::Azure::CloudManager::RefreshWorker',
     'ManageIQ::Providers::Google::CloudManager::RefreshWorker',
     'ManageIQ::Providers::Openstack::CloudManager::RefreshWorker',
-    'MiqEmsRefreshWorkerAmazon',
-    'MiqEmsRefreshWorkerOpenstack',
+    'MiqEmsRefreshWorkerAmazon',                                                  # 5.4
+    'MiqEmsRefreshWorkerOpenstack',                                               # 5.4
 
     'ManageIQ::Providers::AnsibleTower::ConfigurationManager::RefreshWorker',
     'ManageIQ::Providers::Foreman::ConfigurationManager::RefreshWorker',
     'ManageIQ::Providers::Foreman::ProvisioningManager::RefreshWorker',
-    'MiqEmsRefreshWorkerForemanConfiguration',
-    'MiqEmsRefreshWorkerForemanProvisioning',
+    'MiqEmsRefreshWorkerForemanConfiguration',                                    # 5.4
+    'MiqEmsRefreshWorkerForemanProvisioning',                                     # 5.4
 
     'ManageIQ::Providers::Atomic::ContainerManager::RefreshWorker',
     'ManageIQ::Providers::AtomicEnterprise::ContainerManager::RefreshWorker',
@@ -63,6 +63,7 @@ miq_workers = [
 
     'ManageIQ::Providers::Amazon::NetworkManager::RefreshWorker',
     'ManageIQ::Providers::Azure::NetworkManager::RefreshWorker',
+    'ManageIQ::Providers::Google::NetworkManager::RefreshWorker',
     'ManageIQ::Providers::Openstack::NetworkManager::RefreshWorker',
 
     'MiqNetappRefreshWorker',
@@ -74,15 +75,15 @@ miq_workers = [
     'ManageIQ::Providers::Openstack::InfraManager::EventCatcher',
     'ManageIQ::Providers::Redhat::InfraManager::EventCatcher',
     'ManageIQ::Providers::Vmware::InfraManager::EventCatcher',
-    'MiqEventCatcherRedhat',
-    'MiqEventCatcherVmware',
+    'MiqEventCatcherRedhat',                                                      # 5.4
+    'MiqEventCatcherVmware',                                                      # 5.4
 
     'ManageIQ::Providers::Amazon::CloudManager::EventCatcher',
     'ManageIQ::Providers::Azure::CloudManager::EventCatcher',
     'ManageIQ::Providers::Google::CloudManager::EventCatcher',
     'ManageIQ::Providers::Openstack::CloudManager::EventCatcher',
-    'MiqEventCatcherAmazon',
-    'MiqEventCatcherOpenstack',
+    'MiqEventCatcherAmazon',                                                      # 5.4
+    'MiqEventCatcherOpenstack',                                                   # 5.4
 
     'ManageIQ::Providers::Atomic::ContainerManager::EventCatcher',
     'ManageIQ::Providers::AtomicEnterprise::ContainerManager::EventCatcher',
@@ -100,14 +101,14 @@ miq_workers = [
     'ManageIQ::Providers::Openstack::InfraManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Redhat::InfraManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Vmware::InfraManager::MetricsCollectorWorker',
-    'MiqEmsMetricsCollectorWorkerRedhat',
-    'MiqEmsMetricsCollectorWorkerVmware',
+    'MiqEmsMetricsCollectorWorkerRedhat',                                         # 5.4
+    'MiqEmsMetricsCollectorWorkerVmware',                                         # 5.4
 
     'ManageIQ::Providers::Amazon::CloudManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Azure::CloudManager::MetricsCollectorWorker',
     'ManageIQ::Providers::Openstack::CloudManager::MetricsCollectorWorker',
-    'MiqEmsMetricsCollectorWorkerAmazon',
-    'MiqEmsMetricsCollectorWorkerOpenstack',
+    'MiqEmsMetricsCollectorWorkerAmazon',                                         # 5.4
+    'MiqEmsMetricsCollectorWorkerOpenstack',                                      # 5.4
 
     'ManageIQ::Providers::Atomic::ContainerManager::MetricsCollectorWorker',
     'ManageIQ::Providers::AtomicEnterprise::ContainerManager::MetricsCollectorWorker',
