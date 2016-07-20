@@ -60,13 +60,16 @@ providers:
     name: openstack-cloud
     type: ManageIQ::Providers::Openstack::CloudManager
     ip_address: 10.20.30.40
-    security_protocol: no-ssl
     credentials:
       username: admin
       password: password
+      security_protocol: no_ssl
+      port: 5000
     amqp_credentials:
       username: administrator
       password: password
+      security_protocol: ssl
+      port: 5672
   scvmm:
     name: scvmm-infrastructure
     type: ManageIQ::Providers::Microsoft::InfraManager
@@ -78,6 +81,7 @@ providers:
     host_credentials:
       username: administrator
       password: password
+
 # Tests Configuration
 workloads:
   test_idle_default:
