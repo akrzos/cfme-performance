@@ -322,7 +322,11 @@ def add_provider(provider):
             default_user = provider['credentials']['username']
             default_pass = provider['credentials']['password']
             default_protocol = provider['credentials']['security_protocol']
-            amqp_ip = provider['amqp_credentials']['ip_address']
+            # Optionalize amqp endpoint as separate endpoint if specified in provider definition
+            if 'ip_address' in provider['amqp_credentials']:
+                amqp_ip = provider['amqp_credentials']['ip_address']
+            else:
+                amqp_ip = provider['ip_address']
             amqp_port = provider['amqp_credentials']['port']
             amqp_user = provider['amqp_credentials']['username']
             amqp_pass = provider['amqp_credentials']['password']
