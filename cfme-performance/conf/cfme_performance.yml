@@ -292,6 +292,7 @@ workloads:
         templates:
           vmware-infrastructure:
             - perf-provision-rhel7
+        number_of_vms: 1
         refresh_sleep_time: 600
         time_between_provision: 60
         cleanup_size: 4
@@ -303,6 +304,7 @@ workloads:
         templates:
           rhevm-infrastructure:
             - perf-provision-rhel7
+        number_of_vms: 50
         refresh_sleep_time: 600
         time_between_provision: 60
         cleanup_size: 4
@@ -317,6 +319,7 @@ workloads:
             - perf-provision-rhel7
           rhevm-infrastructure:
             - perf-provision-rhel7
+        number_of_vms: 5
         refresh_sleep_time: 600
         time_between_provision: 90
         cleanup_size: 4

@@ -13,6 +13,7 @@ from utils.providers import delete_provisioned_vms
 from utils.providers import provision_vm
 from utils.providers import get_template_guids
 from utils.smem_memory_monitor import SmemMemoryMonitor
+from utils.smem_memory_monitor import test_ts
 from utils.ssh import SSHClient
 from utils.workloads import get_provisioning_scenarios
 from itertools import cycle
@@ -74,6 +75,7 @@ def test_provisioning(request, scenario):
     guid_list = get_template_guids(scenario['templates'])
     guid_cycle = cycle(guid_list)
     cleanup_size = scenario['cleanup_size']
+    number_of_vms = scenario['number_of_vms']
     total_time = scenario['total_time']
     time_between_provision = scenario['time_between_provision']
     total_provisioned_vms = 0
@@ -83,16 +85,19 @@ def test_provisioning(request, scenario):
 
     while ((time.time() - starttime) < total_time):
         start_iteration_time = time.time()
+        provision_list = []
+        for i in range(number_of_vms):
+            total_provisioned_vms += 1
+            provisioned_vms += 1
+            vm_to_provision = '{}-provision-{}'.format(
+                test_ts, str(total_provisioned_vms).zfill(4))
+            guid_to_provision, provider_name = next(guid_cycle)
+            provider_to_provision = cfme_performance['providers'][provider_name]
+            provision_order.append((vm_to_provision, provider_name))
+            provision_list.append((vm_to_provision, guid_to_provision,
+                provider_to_provision['vlan_network']))
 
-        total_provisioned_vms += 1
-        provisioned_vms += 1
-        vm_to_provision = '{}-provision-{}'.format(
-            time.strftime('%Y%m%d%H%M%S'), str(total_provisioned_vms).zfill(3))
-
-        guid_to_provision, provider_name = next(guid_cycle)
-        provider_to_provision = cfme_performance['providers'][provider_name]
-        provision_order.append((vm_to_provision, provider_name))
-        provision_vm(vm_to_provision, guid_to_provision, provider_to_provision['vlan_network'])
+        provision_vm(provision_list)
         creation_time = time.time()
         provision_time = round(creation_time - start_iteration_time, 2)
         logger.debug('Time to initiate provisioning: {}'.format(provision_time))
