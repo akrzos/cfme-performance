@@ -331,6 +331,8 @@ def add_provider(provider):
             amqp_user = provider['amqp_credentials']['username']
             amqp_pass = provider['amqp_credentials']['password']
             amqp_protocol = provider['amqp_credentials']['security_protocol']
+            # In order to properly set the connection_configurations, it must first change twice
+            # To do so, we set the userid to FOOBAR, then set it to the correct userid
             command = (
                 'e = ExtManagementSystem.find_by_name \'{0}\'; '
                 'attributes = {{:security_protocol => \'{5}\', :port => {2}}}; '
