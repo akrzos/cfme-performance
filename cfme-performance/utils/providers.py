@@ -371,31 +371,20 @@ def add_providers(providers):
 
 def add_host_credentials(provider):
     """"Adds host credentials to a provider via the REST API"""
-    data_dict = {
-        "action": "edit",
-        "resource": {
-            "credentials": {
-                "userid": provider['host_credentials']['username'],
-                "password": provider['host_credentials']['password']
-            }
-        }
-    }
+    starttime = time.time()
+    ssh_client = SSHClient()
 
-    json_data = json.dumps(data_dict)
-    appliance = cfme_performance['appliance']['ip_address']
-    for host in get_all_host_ids():
-        response = requests.post("https://" + appliance + "/api/hosts/" + str(host),
-                                 data=json_data,
-                                 auth=(cfme_performance['appliance']['rest_api']['username'],
-                                       cfme_performance['appliance']['rest_api']['password']),
-                                 verify=False,
-                                 headers={"content-type": "application/json"},
-                                 allow_redirects=False)
+    command = ('p = ExtManagementSystem.find_by_name(\'{}\'); '
+        'for host in p.hosts do; '
+            'host.update_authentication(:default => {{:userid => \'{}\', :password => \'{}\'}});'
+            'host.save; '
+            'end'.format(provider['name'], provider['host_credentials']['username'],
+            provider['host_credentials']['password']))
 
-        if response.status_code != 200:
-            logger.debug(response.text)
+    ssh_client.run_rails_console(command, timeout=None, log_less=True)
 
-    logger.debug('Added host credentials, Response: {}'.format(response))
+    elapsed_time = time.time() - starttime
+    logger.debug('Added host credentials in {}s'.format(elapsed_time))
 
 
 def scan_provider_vm(vm_id):
