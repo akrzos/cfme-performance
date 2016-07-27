@@ -10,6 +10,7 @@ from utils.log import logger
 from utils.providers import add_providers
 from utils.providers import get_all_provider_ids
 from utils.providers import refresh_providers_bulk
+from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_refresh_providers_scenarios
@@ -28,6 +29,7 @@ def test_refresh_providers(request, scenario):
 
     clean_appliance(ssh_client)
 
+    quantifiers = {}
     scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
         'appliance_name': cfme_performance['appliance']['appliance_name'],
         'test_dir': 'workload-refresh-providers',
@@ -36,7 +38,7 @@ def test_refresh_providers(request, scenario):
         'scenario': scenario}
     monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
-    def cleanup_workload(scenario, from_ts):
+    def cleanup_workload(scenario, from_ts, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
@@ -44,9 +46,10 @@ def test_refresh_providers(request, scenario):
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
+        add_workload_quantifiers(quantifiers, scenario_data)
         timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
-    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts))
+    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, quantifiers, scenario_data))
 
     monitor_thread.start()
 
@@ -59,10 +62,12 @@ def test_refresh_providers(request, scenario):
     total_time = scenario['total_time']
     starttime = time.time()
     time_between_refresh = scenario['time_between_refresh']
+    total_refreshed_providers = 0
 
     while ((time.time() - starttime) < total_time):
         start_refresh_time = time.time()
         refresh_providers_bulk(id_list)
+        total_refreshed_providers += len(id_list)
         iteration_time = time.time()
 
         refresh_time = round(iteration_time - start_refresh_time, 2)
@@ -81,4 +86,6 @@ def test_refresh_providers(request, scenario):
             logger.warn('Time to Queue Refreshes ({}) exceeded time between '
                 '({})'.format(refresh_time, time_between_refresh))
 
+    quantifiers['Elapsed_Time'] = round(time.time() - starttime, 2)
+    quantifiers['Queued_Provider_Refreshes'] = total_refreshed_providers
     logger.info('Test Ending...')

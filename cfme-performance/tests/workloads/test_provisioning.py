@@ -12,6 +12,7 @@ from utils.providers import delete_provisioned_vm
 from utils.providers import delete_provisioned_vms
 from utils.providers import provision_vm
 from utils.providers import get_template_guids
+from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_provisioning_scenarios
@@ -33,6 +34,7 @@ def test_provisioning(request, scenario):
 
     clean_appliance(ssh_client)
 
+    quantifiers = {}
     scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
         'appliance_name': cfme_performance['appliance']['appliance_name'],
         'test_dir': 'workload-provisioning',
@@ -43,7 +45,7 @@ def test_provisioning(request, scenario):
 
     provision_order = []
 
-    def cleanup_workload(scenario, from_ts, vms_to_cleanup):
+    def cleanup_workload(scenario, from_ts, vms_to_cleanup, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
@@ -54,14 +56,19 @@ def test_provisioning(request, scenario):
         final_vm_size = len(vms_to_cleanup)
         delete_provisioned_vms(vms_to_cleanup)
         monitor_thread.join()
-        timediff = time.time() - starttime
-        logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
         logger.info('{} VMs were left over, and {} VMs were deleted in the finalizer.'
             .format(final_vm_size, final_vm_size - len(vms_to_cleanup)))
         logger.info('The following VMs were left over after the test: {}'
             .format(vms_to_cleanup))
+        quantifiers['VMs_To_Delete_In_Finalizer'] = final_vm_size
+        quantifiers['VMs_Deleted_In_Finalizer'] = final_vm_size - len(vms_to_cleanup)
+        quantifiers['Leftover_VMs'] = vms_to_cleanup
+        add_workload_quantifiers(quantifiers, scenario_data)
+        timediff = time.time() - starttime
+        logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
 
-    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, provision_order))
+    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, provision_order, quantifiers,
+            scenario_data))
 
     monitor_thread.start()
 
@@ -125,6 +132,9 @@ def test_provisioning(request, scenario):
                 logger.warn('Time to initiate provisioning ({}) exceeded time between '
                     '({})'.format(iteration_time, time_between_provision))
 
+    quantifiers['Elapsed_Time'] = round(time.time() - starttime, 2)
+    quantifiers['Queued_VM_Provisionings'] = total_provisioned_vms
+    quantifiers['Deleted_VMs'] = total_deleted_vms
     logger.info('Provisioned {} VMs and deleted {} VMs during the scenario.'
         .format(total_provisioned_vms, total_deleted_vms))
     logger.info('Test Ending...')

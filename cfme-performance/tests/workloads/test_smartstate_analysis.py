@@ -12,6 +12,7 @@ from utils.providers import add_host_credentials
 from utils.providers import add_providers
 from utils.providers import map_vms_to_ids
 from utils.providers import scan_provider_vms_bulk
+from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_smartstate_analysis_scenarios
@@ -31,6 +32,7 @@ def test_workload_smartstate_analysis(request, scenario):
 
     clean_appliance(ssh_client)
 
+    quantifiers = {}
     scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
         'appliance_name': cfme_performance['appliance']['appliance_name'],
         'test_dir': 'workload-ssa',
@@ -39,7 +41,7 @@ def test_workload_smartstate_analysis(request, scenario):
         'scenario': scenario}
     monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
-    def cleanup_workload(scenario, from_ts):
+    def cleanup_workload(scenario, from_ts, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
@@ -47,9 +49,10 @@ def test_workload_smartstate_analysis(request, scenario):
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
+        add_workload_quantifiers(quantifiers, scenario_data)
         timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
-    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts))
+    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, quantifiers, scenario_data))
 
     monitor_thread.start()
 
@@ -74,10 +77,12 @@ def test_workload_smartstate_analysis(request, scenario):
     total_time = scenario['total_time']
     starttime = time.time()
     time_between_analyses = scenario['time_between_analyses']
+    total_scanned_VMs = 0
 
     while ((time.time() - starttime) < total_time):
         start_ssa_time = time.time()
         scan_provider_vms_bulk(vm_ids_to_scan)
+        total_scanned_VMs += len(vm_ids_to_scan)
         iteration_time = time.time()
 
         ssa_time = round(iteration_time - start_ssa_time, 2)
@@ -96,4 +101,6 @@ def test_workload_smartstate_analysis(request, scenario):
             logger.warn('Time to Queue SmartState Analyses ({}) exceeded time between '
                 '({})'.format(ssa_time, time_between_analyses))
 
+    quantifiers['Elapsed_Time'] = round(time.time() - starttime, 2)
+    quantifiers['Queued_VM_Scans'] = total_scanned_VMs
     logger.info('Test Ending...')

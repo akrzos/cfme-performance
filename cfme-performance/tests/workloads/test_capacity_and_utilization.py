@@ -8,6 +8,7 @@ from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
+from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_capacity_and_utilization_scenarios
@@ -26,6 +27,7 @@ def test_workload_capacity_and_utilization(request, scenario):
 
     clean_appliance(ssh_client)
 
+    quantifiers = {}
     scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
         'appliance_name': cfme_performance['appliance']['appliance_name'],
         'test_dir': 'workload-cap-and-util',
@@ -34,7 +36,7 @@ def test_workload_capacity_and_utilization(request, scenario):
         'scenario': scenario}
     monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
-    def cleanup_workload(scenario, from_ts):
+    def cleanup_workload(scenario, from_ts, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
@@ -42,9 +44,10 @@ def test_workload_capacity_and_utilization(request, scenario):
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
+        add_workload_quantifiers(quantifiers, scenario_data)
         timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
-    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts))
+    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, quantifiers, scenario_data))
 
     monitor_thread.start()
 
@@ -68,4 +71,5 @@ def test_workload_capacity_and_utilization(request, scenario):
         elif time_left > 0:
             time.sleep(300)
 
+    quantifiers['Elapsed_Time'] = round(elapsed_time, 2)
     logger.info('Test Ending...')
