@@ -8,7 +8,14 @@ from functools import partial
 from utils import ssh
 from utils.conf import cfme_performance as perf_data
 from utils.sprout import SproutClient
+from utils import version_info
 from wait_for import wait_for as wait_for_mod
+from utils.path import results_path
+from utils.ssh import SSHClient
+from utils.smem_memory_monitor import test_ts
+import glob
+import os
+import time
 
 
 #: A dict of tests, and their state at various test phases
@@ -182,3 +189,28 @@ def _format_nodeid(nodeid, strip_filename=True):
             return nodeid
     else:
         return nodeid
+
+
+@pytest.yield_fixture(scope='session')
+def generate_version_files():
+    yield
+    starttime = time.time()
+    ssh_client = SSHClient()
+    relative_path = os.path.relpath(str(results_path), str(os.getcwd()))
+    relative_string = relative_path + '/{}*'.format(test_ts)
+    directory_list = glob.glob(relative_string)
+
+    for directory in directory_list:
+        module_path = os.path.join(directory, 'version_info')
+        if os.path.exists(str(module_path)):
+            return
+        else:
+            os.mkdir(str(module_path))
+        version_info.generate_system_file(ssh_client, module_path)
+        version_info.generate_processes_file(ssh_client, module_path)
+        version_info.generate_gems_file(ssh_client, module_path)
+        version_info.generate_rpms_file(ssh_client, module_path)
+
+    timediff = time.time() - starttime
+    logger().info('Generated all version files in {}'.format(timediff))
+    ssh_client.close()
