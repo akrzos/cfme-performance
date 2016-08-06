@@ -21,6 +21,10 @@ cfme-performance/conf/*.local.yml
 # Log Files
 cfme-performance/log/*.log
 
+# Virtual Environment
+.cfme_performance
+.cfme-performance
+
 # Python files
 *.py[cod]
 

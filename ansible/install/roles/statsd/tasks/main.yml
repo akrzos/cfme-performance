@@ -35,6 +35,9 @@
   when: ansible_os_family == "RedHat" and ansible_distribution_version|int == 7
   ignore_errors: true
 
+- name: Set /etc/ld.so.conf.d/statsd.conf
+  shell: 'echo "/opt/rh/nodejs010/root/usr/lib64" > /etc/ld.so.conf.d/statsd.conf; ldconfig'
+
 - name: Start statsd
   service: name=statsd state=started enabled=true
 

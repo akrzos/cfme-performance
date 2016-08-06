@@ -3,6 +3,15 @@
 # Setup cfme/miq repos
 #
 
+# Disable subscription-manager yum plugin as it can cause issues with installing repo files
+# Keeping this incase it causes issues
+# - name: Disable subscription-manager plugin
+#   ini_file:
+#     dest=/etc/yum/pluginconf.d/subscription-manager.conf
+#     section=main
+#     option=enabled
+#     value=0
+
 - name: Install Repo File
   template:
     src=cfme-performance.repo.j2
