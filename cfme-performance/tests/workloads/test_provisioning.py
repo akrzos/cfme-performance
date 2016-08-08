@@ -20,6 +20,7 @@ import time
 import pytest
 
 
+@pytest.mark.usefixtures('generate_version_files')
 @pytest.mark.parametrize('scenario', get_provisioning_scenarios())
 def test_provisioning(request, scenario):
     """Runs through provisioning scenarios using the REST API to

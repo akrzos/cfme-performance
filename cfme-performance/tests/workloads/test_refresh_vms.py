@@ -21,6 +21,7 @@ import pytest
 FULL_REFRESH_THRESHOLD_DEFAULT = 100
 
 
+@pytest.mark.usefixtures('generate_version_files')
 @pytest.mark.parametrize('scenario', get_refresh_vms_scenarios())
 def test_refresh_vms(request, scenario):
     """Refreshes all vm's then waits for a specific amount of time. Memory Monitor creates
