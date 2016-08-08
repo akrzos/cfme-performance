@@ -1,6 +1,0 @@
----
-#
-# Playbook to setup cfme appliance as a worker appliance connected to another vmdb appliance
-#
-
-# TODO: write this playbook

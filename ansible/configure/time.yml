@@ -1,9 +1,9 @@
 ---
 #
-# Playbook to setup chronyd/ntpd for CFME/Miq appliances
+# Playbook to setup chronyd/ntpd for CFME/ManageIQ appliances
 #
 
-- hosts: cfme-vmdb,cfme,cfme-all-in-one
+- hosts: cfme-vmdb, cfme-worker, cfme-all-in-one
   gather_facts: false
   remote_user: root
   vars_files:

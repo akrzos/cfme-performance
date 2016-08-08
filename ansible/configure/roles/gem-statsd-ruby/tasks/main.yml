@@ -1,0 +1,13 @@
+---
+#
+# This role installs statsd-ruby gem on an appliance
+#
+
+- name: Install statsd-ruby gem
+  shell: "cd /var/wwww/miq/vmdb/; gem install statsd-ruby"
+
+- name: Add statsd-ruby to /var/www/miq/vmdb/Gemfile
+  lineinfile:
+    dest: /var/www/miq/vmdb/Gemfile
+    line: 'gem "statsd-ruby"'
+    insertbefore: 'gem "rails",'

@@ -29,7 +29,7 @@ Runs all of the roles required to create an All-In-One Performance Monitored CFM
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/postdeploy.yml
 ```
-Runs all of the roles from the below playbooks on cfme-vmdb appliances.
+Runs all of the roles from the below playbooks on cfme-vmdb and cfme-worker appliances.
 
 ### sshkey.yml
 ```
@@ -71,7 +71,7 @@ Installs and configures chronyd/ntpd service to ensure time is synchronized.
 ```
 [root@perf ansible]# ansible-playbook -i hosts.local configure/init-vmdb.yml
 ```
-(CFME VMDB appliances only) Installs the dev v2_key and initializes the Postgres database for the region configured in ../group_vars/all.yml (or overriden by all.local.yml) on cfme-vmdb appliances.
+Installs the dev v2_key and initializes the Postgres database for the region configured in ../group_vars/all.yml (or overriden by all.local.yml) on cfme-vmdb appliances.  On cfme-worker appliances is initializes the worker appliance to the specified database appliance configured in your ../group_vars/all.local.yml.
 
 ### collectd.yml
 ```

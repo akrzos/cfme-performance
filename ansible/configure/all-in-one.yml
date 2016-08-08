@@ -37,7 +37,8 @@
     - grafana
     - { role: collectd, when: "{{appliances[inventory_hostname].run_collectd}} == true"}
     - { role: cfme-statsd, when: "{{appliances[inventory_hostname].run_statsd}} == true"}
-    - { role: statsd-patch, when: "{{appliances[inventory_hostname].run_statsd}} == true"}
+    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: statsd-miqqueue-patch, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
 
 - hosts: cfme-all-in-one
   gather_facts: false

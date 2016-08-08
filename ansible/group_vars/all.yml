@@ -7,8 +7,8 @@ rhevm_password: smartvm
 export_datastore: export
 
 # Template:
-appliance_template: http://manageiq.org/download/manageiq-ovirt-capablanca-2.ova
-template_name: manageiq-ovirt-capablanca-2.ova
+appliance_template: http://manageiq.org/download/manageiq-ovirt-darga-2.ova
+template_name: manageiq-ovirt-darga-2.ova
 template_dest: /root/{{template_name}}
 
 
@@ -36,7 +36,7 @@ firewall_zone: public
 # Collectd:
 carbon_host_prefix: carbon
 
-# Collectd applies to all Hosts (MonitorHost/CFME/Miq)
+# Collectd applies to all Hosts (MonitorHost/CFME/ManageIQ)
 collectd_interval: 10
 
 
@@ -58,16 +58,16 @@ cfme_carbon_prefix: manageiq
 # Per appliance settings:
 appliances:
   # Examples corresponding to examples in ssh-config.local.template and hosts.local.template
-  CF-R0000-DB-Workload-5542:
+  CF-R0000-DB-Workload-5554-1:
     interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
     run_collectd: true
-    run_statsd: false
+    statsd_miqqueue_patch: false
   # Example appliance with database dump
-  CF-R0000-DB-Workload-5542-Patched:
+  CF-R0000-DB-Workload-5554-2:
     dbdump: dump1
     interfaces: []
     use_separate_vmdb_disk: true
@@ -75,33 +75,33 @@ appliances:
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
     run_collectd: true
-    run_statsd: false
-  CF-R0000-DB-Workload-56012:
+    statsd_miqqueue_patch: false
+  CF-R0000-DB-Workload-5610:
     interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 0
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
     run_collectd: true
-    run_statsd: false
+    statsd_miqqueue_patch: false
   # Example Worker appliance for "CF-R0000-DB-Workload-56012"
-  CF-R0000-Wkr1-Workload-56012:
+  CF-R0000-Wkr1-Workload-5610:
     interfaces: []
     external_vmdb_ip_address: 33.22.33.44
     external_vmdb_name: vmdb_production
     external_vmdb_username: root
     external_vmdb_password: smartvm
     run_collectd: true
-    run_statsd: true
+    statsd_miqqueue_patch: true
   # Example Replication Master appliance
-  CF-R0099-DB-Workload-ReplicationMaster-56012:
+  CF-R0099-DB-Workload-ReplicationMaster-5610:
     interfaces: []
     use_separate_vmdb_disk: true
     vmdb_region: 99
     vmdb_disk: /dev/vdb
     vmdb_password: smartvm
     run_collectd: true
-    run_statsd: false
+    statsd_miqqueue_patch: false
 
 
 ###############################

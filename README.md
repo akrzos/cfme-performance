@@ -26,7 +26,9 @@ Ansible playbooks used for deploying and managing infrastructure used in the tes
 
 ### cfme-performance
 [Python Testing Framework](cfme-performance/)
-Testing framework used to run workloads and benchmarks against CFME. The current workloads are:
+Testing framework used to run workloads against CFME.
+
+The current workloads are:
 * Idle (default, no websocket/git_owner roles, all roles)
 * Refresh Providers
 * Refresh VMs

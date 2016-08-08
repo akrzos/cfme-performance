@@ -1,13 +1,14 @@
 ---
 #
-# Playbook to setup database on vmdb appliances
+# Playbook to setup database on appliances (Handles vmdb and worker appliances)
 #
 
-- hosts: cfme-vmdb
+- hosts: cfme-vmdb, cfme-worker
   gather_facts: false
   remote_user: root
   vars_files:
     - ../group_vars/all.yml
     - ../group_vars/all.local.yml
   roles:
-    - init-vmdb
+    - version
+    - { role: init-vmdb, when: not isdeployed }

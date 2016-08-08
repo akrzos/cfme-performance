@@ -1,6 +1,6 @@
 ---
 #
-# Handler for statsd-patch
+# Handler for statsd-miqqueue-patch
 #
 
 - name: restart evmserverd for statsd

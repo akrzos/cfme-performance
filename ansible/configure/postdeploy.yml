@@ -33,7 +33,8 @@
     - { role: proctitle-patch, when: is55}
     - { role: init-vmdb, when: not isdeployed }
     - { role: collectd, when: "{{appliances[inventory_hostname].run_collectd}} == true"}
-    - { role: statsd-patch, when: "{{appliances[inventory_hostname].run_statsd}} == true"}
+    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: statsd-miqqueue-patch, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
 
 - hosts: cfme-worker
   gather_facts: true
@@ -50,7 +51,8 @@
     - { role: ntpd, when: (is54)}
     - { role: chronyd, when: (is55 or is56)}
     - { role: config-interface, when: "{{appliances[inventory_hostname].interfaces|length}} > 0" }
-    - proctitle-patch
-    - external-vmdb
-    - collectd
-    - { role: statsd-patch, when: "{{appliances[inventory_hostname].run_statsd}} == true"}
+    - { role: proctitle-patch, when: is55}
+    - { role: external-vmdb, when: not isdeployed }
+    - { role: collectd, when: "{{appliances[inventory_hostname].run_collectd}} == true"}
+    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: statsd-miqqueue-patch, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}

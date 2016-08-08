@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to reset cfme appliance database, Clean logs, and restart CFME/Miq Services
+# Playbook to reset cfme appliance database, Clean logs, and restart CFME/ManageIQ Services
 #
 
 - hosts: cfme-vmdb,cfme-all-in-one

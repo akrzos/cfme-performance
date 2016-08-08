@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to add current user's ssh key to all inventory hosts
+# Playbook to add current user's ssh key to all inventory hosts if they match the parameters in vars
 #
 
 - hosts: all
