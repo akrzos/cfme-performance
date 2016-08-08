@@ -4,6 +4,7 @@ from mgmtsystem.rhevm import RHEVMSystem
 from utils.conf import cfme_performance
 from utils.log import logger
 from utils.ssh import SSHClient
+from utils.version import get_version
 import copy
 import json
 import requests
@@ -369,19 +370,58 @@ def add_providers(providers):
     logger.info('Added Providers in: {}s'.format(round(time.time() - starttime, 2)))
 
 
-def add_host_credentials(provider):
+def add_host_credentials(provider, ssh_client):
     """"Adds host credentials to a provider via the REST API"""
     starttime = time.time()
-    ssh_client = SSHClient()
-
-    command = ('p = ExtManagementSystem.find_by_name(\'{}\'); '
-        'for host in p.hosts do; '
+    appliance = cfme_performance['appliance']['ip_address']
+    p_id = get_provider_id(provider['name'])
+    version = get_version()
+    if int(version) < 56:
+        command = ('p = ExtManagementSystem.find_by_name(\'{}\'); '
+            'for host in p.hosts do; '
             'host.update_authentication(:default => {{:userid => \'{}\', :password => \'{}\'}});'
             'host.save; '
             'end'.format(provider['name'], provider['host_credentials']['username'],
-            provider['host_credentials']['password']))
+                provider['host_credentials']['password']))
+        ssh_client.run_rails_console(command, timeout=None, log_less=True)
+    else:
+        response = requests.get(
+            url="https://{}/api/providers/{}?attributes=hosts".format(appliance, p_id),
+            auth=(cfme_performance['appliance']['rest_api']['username'],
+                  cfme_performance['appliance']['rest_api']['password']),
+            verify=False
+        )
 
-    ssh_client.run_rails_console(command, timeout=None, log_less=True)
+        if response.status_code != 200:
+            logger.warning('Could not get host list, error: {}'.format(response.content))
+
+        host_list = response.json()['hosts']
+        id_list = []
+        for host in host_list:
+            id_list.append(host['id'])
+
+        data_dict = {
+            "action": "edit",
+            "resource": {
+                "credentials": {
+                    "userid": provider['host_credentials']['username'],
+                    "password": provider['host_credentials']['password']
+                }
+            }
+        }
+
+        json_data = json.dumps(data_dict)
+        for host in id_list:
+            response = requests.post("https://" + appliance + "/api/hosts/" + str(host),
+                                     data=json_data,
+                                     auth=(cfme_performance['appliance']['rest_api']['username'],
+                                           cfme_performance['appliance']['rest_api']['password']),
+                                     verify=False,
+                                     headers={"content-type": "application/json"},
+                                     allow_redirects=False)
+
+            if response.status_code != 200:
+                logger.debug(response.text)
 
     elapsed_time = time.time() - starttime
     logger.debug('Added host credentials in {}s'.format(elapsed_time))

@@ -61,7 +61,7 @@ def test_workload_smartstate_analysis(request, scenario):
 
     # Add host credentials and set CFME relationship for RHEVM SSA
     for provider in scenario['providers']:
-        add_host_credentials(cfme_performance['providers'][provider])
+        add_host_credentials(cfme_performance['providers'][provider], ssh_client)
         if (cfme_performance['providers'][provider]['type'] ==
                 "ManageIQ::Providers::Redhat::InfraManager"):
             set_cfme_server_relationship(ssh_client,
