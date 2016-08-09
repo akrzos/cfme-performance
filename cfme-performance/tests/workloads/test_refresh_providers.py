@@ -17,6 +17,7 @@ import time
 import pytest
 
 
+@pytest.mark.usefixtures('generate_version_files')
 @pytest.mark.parametrize('scenario', get_refresh_providers_scenarios())
 def test_refresh_providers(request, scenario):
     """Refreshes providers then waits for a specific amount of time. Memory Monitor creates graphs

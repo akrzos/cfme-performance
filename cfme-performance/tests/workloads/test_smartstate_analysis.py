@@ -19,6 +19,7 @@ import time
 import pytest
 
 
+@pytest.mark.usefixtures('generate_version_files')
 @pytest.mark.parametrize('scenario', get_smartstate_analysis_scenarios())
 def test_workload_smartstate_analysis(request, scenario):
     """Runs through provider based scenarios initiating smart state analysis against VMs, Hosts,

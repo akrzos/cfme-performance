@@ -21,6 +21,7 @@ import time
 import pytest
 
 
+@pytest.mark.usefixtures('generate_version_files')
 @pytest.mark.parametrize('scenario', get_capacity_and_utilization_replication_scenarios())
 def test_workload_capacity_and_utilization_rep(request, scenario):
     """Runs through provider based scenarios enabling C&U and replication, run for a set period of

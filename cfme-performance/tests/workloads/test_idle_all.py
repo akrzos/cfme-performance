@@ -9,8 +9,10 @@ from utils.log import logger
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 import time
+import pytest
 
 
+@pytest.mark.usefixtures('generate_version_files')
 def test_idle_all(request):
     """Runs an appliance at idle with specific roles turned on for specific amount of time. Memory
     Monitor creates graphs and summary at the end of the scenario."""
