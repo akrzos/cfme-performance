@@ -8,6 +8,8 @@ from collections import OrderedDict
 from cycler import cycler
 from datetime import datetime
 from threading import Thread
+from yaycl import AttrDict
+import json
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.dates as mdates
@@ -400,6 +402,7 @@ def create_report(scenario_data, appliance_results, process_results, use_slab, g
     generate_raw_data_csv(mem_rawdata_path, appliance_results, process_results)
     generate_summary_html(scenario_path, ver, appliance_results, process_results, scenario_data,
         provider_names, grafana_url)
+    generate_workload_html(scenario_path, ver, scenario_data, provider_names, grafana_url)
 
     logger.info('Finished Creating Report')
 
@@ -516,7 +519,7 @@ def generate_summary_html(directory, version_string, appliance_results, process_
             html_file.write(
                 ' : <b><a href=\'{}\' target="_blank">Grafana</a></b><br>\n'.format(grafana_url))
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(version_string))
-        html_file.write(' : <b><a href=\'scenario.yml\'>Scenario Yaml</a></b>')
+        html_file.write(' : <b><a href=\'workload.html\'>Workload Info</a></b>')
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
         html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')
         start = appliance_results.keys()[0]
@@ -819,6 +822,161 @@ def generate_summary_html(directory, version_string, appliance_results, process_
         html_file.write('</html>\n')
     timediff = time.time() - starttime
     logger.info('Generated Summary html in: {}'.format(timediff))
+
+
+def generate_workload_html(directory, ver, scenario_data, provider_names, grafana_url):
+    starttime = time.time()
+    file_name = str(directory.join('workload.html'))
+    with open(file_name, 'w') as html_file:
+        html_file.write('<html>\n')
+        html_file.write('<head><title>{} - {}</title></head>'.format(
+            scenario_data['test_name'], provider_names))
+
+        html_file.write('<body>\n')
+        html_file.write('<b>CFME {} {} Test Results</b><br>\n'.format(ver,
+            scenario_data['test_name'].title()))
+        html_file.write('<b>Appliance Roles:</b> {}<br>\n'.format(
+            scenario_data['appliance_roles'].replace(',', ', ')))
+        html_file.write('<b>Provider(s):</b> {}<br>\n'.format(provider_names))
+        html_file.write('<b><a href=\'https://{}/\' target="_blank">{}</a></b>\n'.format(
+            scenario_data['appliance_ip'], scenario_data['appliance_name']))
+        if grafana_url:
+            html_file.write(
+                ' : <b><a href=\'{}\' target="_blank">Grafana</a></b><br>\n'.format(grafana_url))
+        html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
+        html_file.write(' : <b><a href=\'index.html\'>Memory Info</a></b>')
+        html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
+        html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')
+
+        if is_local_invalid():
+            html_file.write('<br>\n<br>\n<br>\n<hr>\n<br>\n <center>\n')
+            html_file.write('<b><font color="red" size="6"> THE DEFAULT YAML CONFIGURATION WAS USED! </font> </b>\n')
+            html_file.write('</center>\n<br>\n<hr>\n<br>\n')
+
+        html_file.write('<br><b>Scenario Data: </b><br>\n')
+        yaml_html = get_scenario_html(scenario_data['scenario'])
+        html_file.write(yaml_html + '\n')
+
+        html_file.write('<br>\n<br>\n<br>\n<b>Quantifier Data: </b>\n<br>\n<br>\n<br>\n<br>\n')
+
+        html_file.write('<table border="1">\n')
+
+        html_file.write('<tr>\n')
+        html_file.write('<td><b><font size="4"> System Information</font></b></td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>\n')
+        system_path = ('../version_info/system.csv')
+        html_file.write('<a href="{}" download="System_Versions-{}-{}"> System Versions</a>'
+            .format(system_path, test_ts, scenario_data['scenario']['name']))
+        html_file.write('</td>\n')
+        html_file.write('</tr>\n')
+
+        html_file.write('<tr>\n')
+        html_file.write('<td>&nbsp</td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>&nbsp</td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td><b><font size="4"> Process Information</font></b></td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>\n')
+        process_path = ('../version_info/processes.csv')
+        html_file.write('<a href="{}" download="Process_Versions-{}-{}"> Process Versions</a>'
+            .format(process_path, test_ts, scenario_data['scenario']['name']))
+        html_file.write('</td>\n')
+        html_file.write('</tr>\n')
+
+        html_file.write('<tr>\n')
+        html_file.write('<td>&nbsp</td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>&nbsp</td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td><b><font size="4"> Ruby Gem Information</font></b></td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>\n')
+        gems_path = ('../version_info/gems.csv')
+        html_file.write('<a href="{}" download="Gem_Versions-{}-{}"> Ruby Gem Versions</a>'
+            .format(gems_path, test_ts, scenario_data['scenario']['name']))
+        html_file.write('</td>\n')
+        html_file.write('</tr>\n')
+
+        html_file.write('<tr>\n')
+        html_file.write('<td>&nbsp</td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>&nbsp</td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td><b><font size="4"> RPM Information</font></b></td>\n')
+        html_file.write('</tr>\n')
+        html_file.write('<tr>\n')
+        html_file.write('<td>\n')
+        rpms_path = ('../version_info/rpms.csv')
+        html_file.write('<a href="{}" download="RPM_Versions-{}-{}"> RPM Versions</a>'
+            .format(rpms_path, test_ts, scenario_data['scenario']['name']))
+        html_file.write('</td>\n')
+        html_file.write('</tr>\n')
+
+        html_file.write('</table>\n')
+        html_file.write('</body>\n')
+        html_file.write('</html>\n')
+    timediff = time.time() - starttime
+    logger.info('Generated Workload html in: {}'.format(timediff))
+
+
+def add_workload_quantifiers(quantifiers, scenario_data):
+    starttime = time.time()
+    ver = get_current_version_string()
+    workload_path = results_path.join('{}-{}-{}'.format(test_ts, scenario_data['test_dir'], ver))
+    directory = workload_path.join(scenario_data['scenario']['name'])
+    file_name = str(directory.join('workload.html'))
+    marker = '<b>Quantifier Data: </b>'
+    yaml_dict = quantifiers
+    yaml_string = str(json.dumps(yaml_dict, indent=4))
+    yaml_html = yaml_string.replace('\n', '<br>\n')
+
+    with open(file_name, 'r+') as html_file:
+        line = ''
+        while marker not in line:
+            line = html_file.readline()
+        marker_pos = html_file.tell()
+        remainder = html_file.read()
+        html_file.seek(marker_pos)
+        html_file.write('{} \n'.format(yaml_html))
+        html_file.write(remainder)
+
+    timediff = time.time() - starttime
+    logger.info('Added quantifiers in: {}'.format(timediff))
+
+
+def is_local_invalid():
+    # TODO: Implement Me!
+    return False
+
+
+def get_scenario_html(scenario_data):
+    scenario_dict = create_dict(scenario_data)
+    scenario_yaml = yaml.dump(scenario_dict)
+    scenario_html = scenario_yaml.replace('\n', '<br>\n')
+    scenario_html = scenario_html.replace(', ', '<br>\n &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;')
+    scenario_html = scenario_html.replace(' ', '&nbsp;')
+    scenario_html = scenario_html.replace('[', '<br>\n &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;')
+    scenario_html = scenario_html.replace(']', '\n')
+    return scenario_html
+
+
+def create_dict(attr_dict):
+    main_dict = dict(attr_dict)
+    for key, value in main_dict.iteritems():
+        if type(value) == AttrDict:
+            main_dict[key] = create_dict(value)
+    return main_dict
 
 
 def graph_appliance_measurements(graphs_path, ver, appliance_results, use_slab, provider_names):
