@@ -2719,6 +2719,495 @@
             "datasource": null,
             "editable": true,
             "error": false,
+            "fill": 1,
+            "grid": {
+              "threshold1": null,
+              "threshold1Color": "rgba(216, 200, 27, 0.27)",
+              "threshold2": null,
+              "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            },
+        {% if vars.update({'panel_idx': (vars.panel_idx + 1)}) %} {% endif %}
+            "id": {{vars.panel_idx}},
+            "isNew": true,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": false,
+              "hideEmpty": false,
+              "hideZero": false,
+              "max": true,
+              "min": false,
+              "rightSide": true,
+              "show": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "span": 12,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "refId": "A",
+                "target": "aliasByNode(stats.timers.$Cloud.$Node.ui_stat.*.*.total_duration.upper, 5, 6)",
+                "textEditor": false
+              }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "UI Total Duration Upper(Max)",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "show": true
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ]
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "datasource": null,
+            "editable": true,
+            "error": false,
+            "fill": 1,
+            "grid": {
+              "threshold1": null,
+              "threshold1Color": "rgba(216, 200, 27, 0.27)",
+              "threshold2": null,
+              "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            },
+        {% if vars.update({'panel_idx': (vars.panel_idx + 1)}) %} {% endif %}
+            "id": {{vars.panel_idx}},
+            "isNew": true,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": false,
+              "hideEmpty": false,
+              "hideZero": false,
+              "max": true,
+              "min": false,
+              "rightSide": true,
+              "show": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "span": 12,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "refId": "A",
+                "target": "aliasByNode(stats.timers.$Cloud.$Node.ui_stat.*.*.total_duration.mean, 5, 6)",
+                "textEditor": false
+              }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "UI Total Duration Mean",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "show": true
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": 0,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ]
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "datasource": null,
+            "editable": true,
+            "error": false,
+            "fill": 1,
+            "grid": {
+              "threshold1": null,
+              "threshold1Color": "rgba(216, 200, 27, 0.27)",
+              "threshold2": null,
+              "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            },
+        {% if vars.update({'panel_idx': (vars.panel_idx + 1)}) %} {% endif %}
+            "id": {{vars.panel_idx}},
+            "isNew": true,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": false,
+              "hideEmpty": false,
+              "hideZero": false,
+              "max": true,
+              "min": false,
+              "rightSide": true,
+              "show": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "span": 12,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "refId": "A",
+                "target": "aliasByNode(stats.timers.$Cloud.$Node.ui_stat.*.*.db_time.upper, 5, 6)",
+                "textEditor": false
+              }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "UI DB Duration Upper(Max)",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "show": true
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ]
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "datasource": null,
+            "editable": true,
+            "error": false,
+            "fill": 1,
+            "grid": {
+              "threshold1": null,
+              "threshold1Color": "rgba(216, 200, 27, 0.27)",
+              "threshold2": null,
+              "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            },
+        {% if vars.update({'panel_idx': (vars.panel_idx + 1)}) %} {% endif %}
+            "id": {{vars.panel_idx}},
+            "isNew": true,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": false,
+              "hideEmpty": false,
+              "hideZero": false,
+              "max": true,
+              "min": false,
+              "rightSide": true,
+              "show": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "span": 12,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "refId": "A",
+                "target": "aliasByNode(stats.timers.$Cloud.$Node.ui_stat.*.*.db_time.mean, 5, 6)",
+                "textEditor": false
+              }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "UI DB Duration Mean",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "show": true
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ]
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "datasource": null,
+            "editable": true,
+            "error": false,
+            "fill": 1,
+            "grid": {
+              "threshold1": null,
+              "threshold1Color": "rgba(216, 200, 27, 0.27)",
+              "threshold2": null,
+              "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            },
+        {% if vars.update({'panel_idx': (vars.panel_idx + 1)}) %} {% endif %}
+            "id": {{vars.panel_idx}},
+            "isNew": true,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": false,
+              "hideEmpty": false,
+              "hideZero": false,
+              "max": true,
+              "min": false,
+              "rightSide": true,
+              "show": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "span": 12,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "refId": "A",
+                "target": "aliasByNode(stats.timers.$Cloud.$Node.ui_stat.*.*.view_time.upper, 5, 6)",
+                "textEditor": false
+              }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "UI View Time Upper(Max)",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "show": true
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ]
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "datasource": null,
+            "editable": true,
+            "error": false,
+            "fill": 1,
+            "grid": {
+              "threshold1": null,
+              "threshold1Color": "rgba(216, 200, 27, 0.27)",
+              "threshold2": null,
+              "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            },
+        {% if vars.update({'panel_idx': (vars.panel_idx + 1)}) %} {% endif %}
+            "id": {{vars.panel_idx}},
+            "isNew": true,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": false,
+              "hideEmpty": false,
+              "hideZero": false,
+              "max": true,
+              "min": false,
+              "rightSide": true,
+              "show": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 2,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "span": 12,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "refId": "A",
+                "target": "aliasByNode(stats.timers.$Cloud.$Node.ui_stat.*.*.view_time.mean, 5, 6)",
+                "textEditor": false
+              }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "UI View Time Mean",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 0,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "show": true
+            },
+            "yaxes": [
+              {
+                "format": "ms",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ]
+          }
+        ],
+        "showTitle": true,
+        "title": "statsd UI Performance"
+      },
+      {
+        "collapse": true,
+        "editable": true,
+        "height": "250px",
+        "panels": [
+          {
+            "aliasColors": {},
+            "bars": false,
+            "datasource": null,
+            "editable": true,
+            "error": false,
             "fill": 0,
             "grid": {
               "leftLogBase": 1,
