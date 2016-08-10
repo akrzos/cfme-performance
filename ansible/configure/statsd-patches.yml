@@ -1,0 +1,16 @@
+---
+#
+# Playbook to apply all statsd patches on CFME appliances
+#
+
+- hosts: cfme-vmdb, cfme-worker, cfme-all-in-one
+  gather_facts: false
+  remote_user: root
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/all.local.yml
+  roles:
+    - version
+    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} or {{appliances[inventory_hostname].statsd_uiworker_patch}}"}
+    - { role: statsd-miqqueue-patch, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: statsd-uiworker-patch, when: "{{appliances[inventory_hostname].statsd_uiworker_patch}} == true"}
