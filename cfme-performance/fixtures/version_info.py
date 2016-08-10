@@ -1,6 +1,11 @@
 from utils.log import logger
 import os
 import time
+from utils.path import results_path
+from utils.ssh import SSHClient
+from utils.smem_memory_monitor import test_ts
+import glob
+import pytest
 
 
 def find_nth_pos(string, substring, n):
@@ -137,3 +142,28 @@ def generate_rpms_file(ssh_client, directory):
 
     timediff = time.time() - starttime
     logger.info('Generated rpms file in: {}'.format(timediff))
+
+
+@pytest.yield_fixture(scope='session')
+def generate_version_files():
+    yield
+    starttime = time.time()
+    ssh_client = SSHClient()
+    relative_path = os.path.relpath(str(results_path), str(os.getcwd()))
+    relative_string = relative_path + '/{}*'.format(test_ts)
+    directory_list = glob.glob(relative_string)
+
+    for directory in directory_list:
+        module_path = os.path.join(directory, 'version_info')
+        if os.path.exists(str(module_path)):
+            return
+        else:
+            os.mkdir(str(module_path))
+        generate_system_file(ssh_client, module_path)
+        generate_processes_file(ssh_client, module_path)
+        generate_gems_file(ssh_client, module_path)
+        generate_rpms_file(ssh_client, module_path)
+
+    timediff = time.time() - starttime
+    logger.info('Generated all version files in {}'.format(timediff))
+    ssh_client.close()
