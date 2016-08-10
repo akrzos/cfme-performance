@@ -848,11 +848,6 @@ def generate_workload_html(directory, ver, scenario_data, provider_names, grafan
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
         html_file.write(' : <b><a href=\'rawdata/\'>CSVs directory</a></b><br>\n')
 
-        if is_local_invalid():
-            html_file.write('<br>\n<br>\n<br>\n<hr>\n<br>\n <center>\n')
-            html_file.write('<b><font color="red" size="6"> THE DEFAULT YAML CONFIGURATION WAS USED! </font> </b>\n')
-            html_file.write('</center>\n<br>\n<hr>\n<br>\n')
-
         html_file.write('<br><b>Scenario Data: </b><br>\n')
         yaml_html = get_scenario_html(scenario_data['scenario'])
         html_file.write(yaml_html + '\n')
@@ -953,11 +948,6 @@ def add_workload_quantifiers(quantifiers, scenario_data):
 
     timediff = time.time() - starttime
     logger.info('Added quantifiers in: {}'.format(timediff))
-
-
-def is_local_invalid():
-    # TODO: Implement Me!
-    return False
 
 
 def get_scenario_html(scenario_data):
