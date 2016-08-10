@@ -601,39 +601,45 @@ def refresh_provider_vms_bulk(vm_ids):
         round(time.time() - starttime, 2)))
 
 
-def provision_vm(vm_name, template_guid, vlan):
-    """Create a provision request for a VM"""
+def provision_vm(tuple_list):
+    """Create a provision request for a VM
+        This method expects a list of tuples, each of which have the format:
+        (vm_name, template_guid, vlan)"""
     starttime = time.time()
     data_dict = {
         'action': 'create',
-        'resources': [{
-            'template_fields': {
-                'guid': template_guid
-            },
-            'vm_fields': {
-                'number_of_sockets': 1,
-                'cores_per_socket': 1,
-                'vm_name': vm_name,
-                'vm_memory': '1024',
-                'vlan': vlan,
-                'vm_auto_start': True,
-                'provision_type': 'native_clone'
-            },
-            'requester': {
-                'user_name': 'admin',
-                'owner_first_name': 'FirstName',
-                'owner_last_name': 'LastName',
-                'owner_email': 'alex@perf.com',
-                'auto_approve': True
-            },
-            'additional_values': {
-                'request_id': '1001'
-            },
-
-            'ems_custom_attributes': {},
-            'miq_custom_attributes': {}
-        }]
+        'resources': []
     }
+
+    for vm_name, template_guid, vlan in tuple_list:
+        data_dict['resources'].append(
+            {
+                'template_fields': {
+                    'guid': template_guid
+                },
+                'vm_fields': {
+                    'number_of_sockets': 1,
+                    'cores_per_socket': 1,
+                    'vm_name': vm_name,
+                    'vm_memory': '1024',
+                    'vlan': vlan,
+                    'vm_auto_start': True,
+                    'provision_type': 'native_clone'
+                },
+                'requester': {
+                    'user_name': 'admin',
+                    'owner_first_name': 'FirstName',
+                    'owner_last_name': 'LastName',
+                    'owner_email': 'alex@perf.com',
+                    'auto_approve': True
+                },
+                'additional_values': {
+                    'request_id': '1001'
+                },
+
+                'ems_custom_attributes': {},
+                'miq_custom_attributes': {}
+            })
 
     data_json = json.dumps(data_dict)
     appliance = cfme_performance['appliance']['ip_address']
