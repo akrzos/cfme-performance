@@ -1,0 +1,9 @@
+---
+#
+# Handler for statsd-uiworker-patch
+#
+
+- name: restart evmserverd for statsd-uiworker-patch
+  service:
+    name: evmserverd
+    state: restarted

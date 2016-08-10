@@ -66,6 +66,7 @@ appliances:
     vmdb_password: smartvm
     run_collectd: true
     statsd_miqqueue_patch: false
+    statsd_uiworker_patch: false
   # Example appliance with database dump
   CF-R0000-DB-Workload-5554-2:
     dbdump: dump1
@@ -76,6 +77,7 @@ appliances:
     vmdb_password: smartvm
     run_collectd: true
     statsd_miqqueue_patch: false
+    statsd_uiworker_patch: false
   CF-R0000-DB-Workload-5610:
     interfaces: []
     use_separate_vmdb_disk: true
@@ -84,6 +86,7 @@ appliances:
     vmdb_password: smartvm
     run_collectd: true
     statsd_miqqueue_patch: false
+    statsd_uiworker_patch: false
   # Example Worker appliance for "CF-R0000-DB-Workload-56012"
   CF-R0000-Wkr1-Workload-5610:
     interfaces: []
@@ -93,6 +96,7 @@ appliances:
     external_vmdb_password: smartvm
     run_collectd: true
     statsd_miqqueue_patch: true
+    statsd_uiworker_patch: false
   # Example Replication Master appliance
   CF-R0099-DB-Workload-ReplicationMaster-5610:
     interfaces: []
@@ -102,6 +106,7 @@ appliances:
     vmdb_password: smartvm
     run_collectd: true
     statsd_miqqueue_patch: false
+    statsd_uiworker_patch: false
 
 
 ###############################

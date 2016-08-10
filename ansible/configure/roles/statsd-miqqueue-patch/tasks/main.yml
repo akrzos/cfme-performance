@@ -3,7 +3,7 @@
 # Patches files for statsd miqqueue publishing timing values
 #
 
-- name: Create patched files for statsd
+- name: Create patched files for statsd-miqqueue-patch
   template:
     src: "{{item.src}}"
     dest: "{{item.dest}}"
@@ -13,7 +13,7 @@
     - src: runner.rb.patch.j2
       dest: /root/runner.rb.patch
 
-- name: Deploy patched files for statsd
+- name: Deploy patched files for statsd-miqqueue-patch
   patch:
     src: "{{item.src}}"
     dest: "{{item.dest}}"
@@ -26,4 +26,4 @@
     - src: /root/runner.rb.patch
       dest: /var/www/miq/vmdb/app/models/miq_queue_worker_base/runner.rb
   notify:
-    - restart evmserverd for statsd
+    - restart evmserverd for statsd-miqqueue-patch

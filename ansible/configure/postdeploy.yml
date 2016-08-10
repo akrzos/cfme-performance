@@ -33,8 +33,9 @@
     - { role: proctitle-patch, when: is55}
     - { role: init-vmdb, when: not isdeployed }
     - { role: collectd, when: "{{appliances[inventory_hostname].run_collectd}} == true"}
-    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} or {{appliances[inventory_hostname].statsd_uiworker_patch}}"}
     - { role: statsd-miqqueue-patch, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: statsd-uiworker-patch, when: "{{appliances[inventory_hostname].statsd_uiworker_patch}} == true"}
 
 - hosts: cfme-worker
   gather_facts: true
@@ -54,5 +55,6 @@
     - { role: proctitle-patch, when: is55}
     - { role: external-vmdb, when: not isdeployed }
     - { role: collectd, when: "{{appliances[inventory_hostname].run_collectd}} == true"}
-    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: gem-statsd-ruby, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} or {{appliances[inventory_hostname].statsd_uiworker_patch}}"}
     - { role: statsd-miqqueue-patch, when: "{{appliances[inventory_hostname].statsd_miqqueue_patch}} == true"}
+    - { role: statsd-uiworker-patch, when: "{{appliances[inventory_hostname].statsd_uiworker_patch}} == true"}

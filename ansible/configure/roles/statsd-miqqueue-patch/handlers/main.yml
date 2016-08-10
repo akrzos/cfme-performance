@@ -3,7 +3,7 @@
 # Handler for statsd-miqqueue-patch
 #
 
-- name: restart evmserverd for statsd
+- name: restart evmserverd for statsd-miqqueue-patch
   service:
     name: evmserverd
     state: restarted

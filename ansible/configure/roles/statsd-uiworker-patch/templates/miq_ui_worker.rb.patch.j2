@@ -1,0 +1,32 @@
+--- miq_ui_worker.rb.orig	2016-08-09 20:04:21.035391472 -0400
++++ miq_ui_worker.rb	2016-08-09 20:39:19.642759651 -0400
+@@ -25,5 +25,29 @@
+     @friendly_name ||= "User Interface Worker"
+   end
+
++  # cfme-performance UI Performance Listen and Publish UI Timings
++  ActiveSupport::Notifications.subscribe /process_action.action_controller/ do |*args|
++    event = ActiveSupport::Notifications::Event.new(*args)
++    controller = event.payload[:controller]
++    action = event.payload[:action]
++    format = event.payload[:format] || "all"
++    format = "all" if format == "*/*"
++    #status = event.payload[:status]
++    key = "#{controller}.#{action}_#{format}"
++    ActiveSupport::Notifications.instrument :performance, :action => :timing, :measurement => "#{key}.total_duration", :value => event.duration
++    ActiveSupport::Notifications.instrument :performance, :action => :timing, :measurement => "#{key}.db_time", :value => event.payload[:db_runtime]
++    ActiveSupport::Notifications.instrument :performance, :action => :timing, :measurement => "#{key}.view_time", :value => event.payload[:view_runtime]
++    #ActiveSupport::Notifications.instrument :performance, :measurement => "#{key}.status.#{status}"
++  end
++
++  ActiveSupport::Notifications.subscribe /performance/ do |name, start, finish, id, payload|
++    if payload[:value]
++      $hostname = Socket.gethostname
++      $statsd = Statsd.new '{{statsd_host}}', 8125
++      $statsd.timing "manageiq.#{$hostname}.ui_stat.#{payload[:measurement]}", payload[:value]
++    end
++  end
++  # End cfme-performance UI Performance Listen and Publish UI Timings
++
+   include MiqWebServerWorkerMixin
+ end

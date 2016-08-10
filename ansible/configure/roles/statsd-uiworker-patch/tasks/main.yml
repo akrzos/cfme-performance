@@ -1,0 +1,19 @@
+---
+#
+# Patches files for statsd uiworker publishing timing values
+#
+
+- name: Create patched files for statsd-uiworker-patch
+  template:
+    src: "miq_ui_worker.rb.patch.j2"
+    dest: "/root/miq_ui_worker.rb.patch"
+
+- name: Deploy patched files for statsd-uiworker-patch
+  patch:
+    src: "/root/miq_ui_worker.rb.patch"
+    dest: "/var/www/miq/vmdb/app/models/miq_ui_worker.rb"
+    remote_src: true
+    backup: true
+  when: is56
+  notify:
+    - restart evmserverd for statsd-uiworker-patch
