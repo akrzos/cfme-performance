@@ -13,6 +13,7 @@ from utils.conf import cfme_performance
 from utils.grafana import get_scenario_dashboard_url
 from utils.log import logger
 from utils.providers import add_providers
+from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.ssh import SSHTail
@@ -58,9 +59,10 @@ def test_workload_capacity_and_utilization_rep(request, scenario):
             'test_name': 'Capacity and Utilization Replication (RubyRep)',
             'appliance_roles': get_server_roles_workload_cap_and_util_rep(separator=', '),
             'scenario': scenario}
+    quantifiers = {}
     monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
-    def cleanup_workload(scenario, from_ts):
+    def cleanup_workload(scenario, from_ts, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
         g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
@@ -68,9 +70,10 @@ def test_workload_capacity_and_utilization_rep(request, scenario):
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
+        add_workload_quantifiers(quantifiers, scenario_data)
         timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
-    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts))
+    request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, quantifiers, scenario_data))
 
     monitor_thread.start()
 
@@ -117,4 +120,6 @@ def test_workload_capacity_and_utilization_rep(request, scenario):
         set_pglogical_replication(ssh_client_master, replication_type=':none')
     else:
         set_server_roles_workload_cap_and_util(ssh_client)
+
+    quantifiers['Elapsed_Time'] = round(elapsed_time, 2)
     logger.info('Test Ending...')

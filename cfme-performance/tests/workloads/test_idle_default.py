@@ -6,6 +6,7 @@ from utils.conf import cfme_performance
 from utils.grafana import get_default_dashboard_url
 from utils.log import logger
 from utils.smem_memory_monitor import SmemMemoryMonitor
+from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.ssh import SSHClient
 import time
 import pytest
@@ -20,6 +21,7 @@ def test_idle_default(request):
 
     clean_appliance(ssh_client)
 
+    quantifiers = {}
     scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
         'appliance_name': cfme_performance['appliance']['appliance_name'],
         'test_dir': 'workload-idle',
@@ -28,7 +30,7 @@ def test_idle_default(request):
         'scenario': {'name': 'default'}}
     monitor_thread = SmemMemoryMonitor(SSHClient(), scenario_data)
 
-    def cleanup_workload(from_ts):
+    def cleanup_workload(from_ts, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
         g_url = get_default_dashboard_url(from_ts, to_ts)
@@ -36,9 +38,10 @@ def test_idle_default(request):
         monitor_thread.grafana_url = g_url
         monitor_thread.signal = False
         monitor_thread.join()
+        add_workload_quantifiers(quantifiers, scenario_data)
         timediff = time.time() - starttime
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
-    request.addfinalizer(lambda: cleanup_workload(from_ts))
+    request.addfinalizer(lambda: cleanup_workload(from_ts, quantifiers, scenario_data))
 
     monitor_thread.start()
 
@@ -49,4 +52,5 @@ def test_idle_default(request):
     logger.info('Idling appliance for {}s'.format(s_time))
     time.sleep(s_time)
 
+    quantifiers['Elapsed_Time'] = s_time
     logger.info('Test Ending...')
