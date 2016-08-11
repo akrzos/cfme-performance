@@ -3,6 +3,9 @@
 appliance:
   appliance_name: CF-R0000-DB-Workload-56013
   ip_address: 10.20.30.40
+  web_ui:
+    username: admin
+    password: smartvm
   rest_api:
     username: admin
     password: smartvm
