@@ -48,3 +48,11 @@ def get_smartstate_analysis_scenarios():
                 len(cfme_performance['workloads']['test_smartstate']['scenarios']) > 0):
             return cfme_performance['workloads']['test_smartstate']['scenarios']
     return []
+
+
+def get_ui_single_page_scenarios():
+    if 'test_ui_single_page' in cfme_performance.tests.ui_workloads:
+        if(cfme_performance['tests']['ui_workloads']['test_ui_single_page']['scenarios'] and
+                len(cfme_performance['tests']['ui_workloads']['test_ui_single_page']['scenarios']) > 0):
+            return cfme_performance['tests']['ui_workloads']['test_ui_single_page']['scenarios']
+    return []

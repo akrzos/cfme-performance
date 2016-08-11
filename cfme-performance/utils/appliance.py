@@ -58,6 +58,9 @@ roles56_workload_all = ['automate', 'database_operations', 'ems_inventory', 'ems
     'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate', 'user_interface',
     'web_services']
 
+roles56_ui_workload_single_page = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
+    'event', 'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
+
 
 def clean_appliance(ssh_client, dbsync_local_uninstall=True):
     starttime = time.time()
@@ -196,6 +199,10 @@ def get_server_roles_workload_all(separator=','):
     return separator.join(roles56_workload_all)
 
 
+def get_server_roles_ui_workload_single_page(separator=','):
+    return separator.join(roles56_ui_workload_single_page)
+
+
 def set_server_roles_workload_idle(ssh_client):
     """Turns on all server roles except for git owner and websocket used for idle workload."""
     yaml = get_vmdb_yaml_config(ssh_client)
@@ -264,6 +271,13 @@ def set_server_roles_workload_all(ssh_client):
     on datbase_synchronization role."""
     yaml = get_vmdb_yaml_config(ssh_client)
     yaml['server']['role'] = get_server_roles_workload_all()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles_ui_workload_single_page(ssh_client):
+    """Sets server roles for single_page UI workload."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = get_server_roles_ui_workload_single_page()
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
