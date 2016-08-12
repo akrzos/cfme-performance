@@ -328,3 +328,20 @@ workloads:
         cleanup_size: 4
         total_time: 1800
         grafana_dashboard: cfme-vmware-redhat-system-performance
+tests:
+  ui_workloads:
+    test_ui_single_page:
+      scenarios:
+        - name: UI-vmware-all-vms-10x
+          providers:
+            - vmware-infrastructure
+          clean_appliance: true
+          requests: 10
+          request_page: vm_infra/explorer
+          grafana_dashboard: cfme-ui-system-performance
+        - name: UI-empty-all-reports-10x
+          providers: []
+          clean_appliance: false
+          requests: 10
+          request_page: report/explorer
+          grafana_dashboard: cfme-ui-system-performance
