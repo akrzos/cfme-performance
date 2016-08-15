@@ -40,9 +40,8 @@ roles56_provisioning = ['automate', 'database_operations', 'ems_inventory', 'ems
 roles56_provisioning_cleanup = ['database_operations', 'ems_inventory', 'ems_operations',
     'event', 'notifier', 'reporting', 'scheduler', 'user_interface', 'web_services']
 
-roles56_ui_workload_single_page = ['automate', 'database_operations', 'ems_inventory',
-    'ems_operations', 'event', 'reporting', 'scheduler', 'smartstate', 'user_interface',
-    'web_services', 'websocket']
+roles56_ui_workload = ['automate', 'reporting', 'scheduler', 'user_interface', 'web_services',
+    'websocket']
 
 
 def clean_appliance(ssh_client, dbsync_local_uninstall=True):
@@ -136,8 +135,8 @@ def install_vddk(ssh_client, vddk_version='vddk6_0'):
     logger.debug('VDDK Install finished')
 
 
-def get_server_roles_ui_workload_single_page(separator=','):
-    return separator.join(roles56_ui_workload_single_page)
+def get_server_roles_ui_workload(separator=','):
+    return separator.join(roles56_ui_workload)
 
 
 def get_server_roles_workload_cap_and_util_rep(separator=','):
@@ -177,9 +176,9 @@ def set_server_roles(ssh_client, roles):
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
-def set_server_roles_ui_workload_single_page(ssh_client):
+def set_server_roles_ui_workload(ssh_client):
     """Sets server roles for single_page UI workload."""
-    set_server_roles(ssh_client, roles56_ui_workload_single_page)
+    set_server_roles(ssh_client, roles56_ui_workload)
 
 
 def set_server_roles_workload_cap_and_util_rep(ssh_client):

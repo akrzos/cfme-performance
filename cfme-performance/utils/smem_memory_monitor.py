@@ -143,6 +143,7 @@ class SmemMemoryMonitor(Thread):
         self.ssh_client = ssh_client
         self.scenario_data = scenario_data
         self.grafana_url = ''
+        self.miq_server_id = ''
         self.use_slab = False
         self.signal = True
 
@@ -204,7 +205,9 @@ class SmemMemoryMonitor(Thread):
 
     def get_evm_workers(self):
         exit_status, worker_types = self.ssh_client.run_command(
-            'psql -t -q -d vmdb_production -c \'select pid,type from miq_workers\'')
+            'psql -t -q -d vmdb_production -c '
+            '\"select pid,type from miq_workers where miq_server_id = \'{}\'\"'.format(
+            self.miq_server_id))
         if worker_types.strip():
             workers = {}
             for worker in worker_types.strip().split('\n'):
@@ -232,6 +235,17 @@ class SmemMemoryMonitor(Thread):
     #         memory_by_pid[pid]['name'] = values[3]
     #         memory_by_pid[pid]['cmd'] = ' '.join(values[4:])
     #     return memory_by_pid
+
+    def get_miq_server_id(self):
+        # Obtain the Miq Server GUID:
+        exit_status, miq_server_guid = self.ssh_client.run_command('cat /var/www/miq/vmdb/GUID')
+        logger.info('Obtained appliance GUID: {}'.format(miq_server_guid.strip()))
+        # Get server id:
+        exit_status, miq_server_id = self.ssh_client.run_command(
+            'psql -t -q -d vmdb_production -c "select id from miq_servers where guid = \'{}\'"'
+            ''.format(miq_server_guid.strip()))
+        logger.info('Obtained miq_server_id: {}'.format(miq_server_id.strip()))
+        self.miq_server_id = miq_server_id.strip()
 
     def get_pids_memory(self):
         exit_status, smem_out = self.ssh_client.run_command(
@@ -280,6 +294,7 @@ class SmemMemoryMonitor(Thread):
         appliance_results = OrderedDict()
         process_results = OrderedDict()
         install_smem(self.ssh_client)
+        self.get_miq_server_id()
         logger.info('Starting Monitoring Thread.')
         while self.signal:
             starttime = time.time()

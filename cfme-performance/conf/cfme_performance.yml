@@ -93,24 +93,12 @@ tests:
   ui_workloads:
     test_ui_single_page:
       scenarios:
-        - name: ui-vmware-infrastructure-vm-explorer
-          providers:
-            - vmware-infrastructure
-          clean_appliance: true
-          requests: 10
-          request_page: vm_infra/explorer
-          grafana_dashboard: cfme-ui-system-performance
-
         # Typically tested with appliance already loaded with a database:
         - name: ui-vm-explorer
-          providers: []
-          clean_appliance: false
           requests: 10
           request_page: vm_infra/explorer
           grafana_dashboard: cfme-ui-system-performance
         - name: ui-reports-explorer
-          providers: []
-          clean_appliance: false
           requests: 10
           request_page: report/explorer
           grafana_dashboard: cfme-ui-system-performance
