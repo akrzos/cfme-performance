@@ -36,3 +36,8 @@ The current workloads are:
 * Capacity and Utilization with Replication (pglogical and rubyrep)
 * SmartState Analysis (Scans VMs)
 * Provisioning
+
+In addition to the above workloads, UI Workloads are being built and added as well.  Currently we have one experimental UI Performance workload.
+* test_ui_single_page - Produces navigations to the dashboard and back to a single page.
+
+In order to analyze UI performance you must be using Grafana and a patched appliance that has the `statsd_uiworker_patch` applied.  This can be applied via the provided Ansible playbooks.  This will allow you to view page render timings graphed over time in Grafana.
