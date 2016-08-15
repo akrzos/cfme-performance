@@ -40,11 +40,6 @@ roles56_provisioning = ['automate', 'database_operations', 'ems_inventory', 'ems
 roles56_provisioning_cleanup = ['database_operations', 'ems_inventory', 'ems_operations',
     'event', 'notifier', 'reporting', 'scheduler', 'user_interface', 'web_services']
 
-roles56_workload_all = ['automate', 'database_operations', 'ems_inventory', 'ems_metrics_collector',
-    'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations', 'event', 'notifier',
-    'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate', 'user_interface',
-    'web_services']
-
 roles56_ui_workload_single_page = ['automate', 'database_operations', 'ems_inventory',
     'ems_operations', 'event', 'reporting', 'scheduler', 'smartstate', 'user_interface',
     'web_services', 'websocket']
@@ -141,14 +136,26 @@ def install_vddk(ssh_client, vddk_version='vddk6_0'):
     logger.debug('VDDK Install finished')
 
 
-def get_server_roles_workload_cap_and_util(separator=','):
-    return separator.join(roles56_cap_and_util)
+def get_server_roles_ui_workload_single_page(separator=','):
+    return separator.join(roles56_ui_workload_single_page)
 
 
 def get_server_roles_workload_cap_and_util_rep(separator=','):
     roles = ['database_synchronization']
     roles.extend(roles56_cap_and_util)
     return separator.join(sorted(roles))
+
+
+def get_server_roles_workload_cap_and_util(separator=','):
+    return separator.join(roles56_cap_and_util)
+
+
+def get_server_roles_workload_provisioning(separator=','):
+    return separator.join(roles56_provisioning)
+
+
+def get_server_roles_workload_provisioning_cleanup(separator=','):
+    return separator.join(roles56_provisioning_cleanup)
 
 
 def get_server_roles_workload_refresh_providers(separator=','):
@@ -163,71 +170,6 @@ def get_server_roles_workload_smartstate(separator=','):
     return separator.join(roles56_smartstate)
 
 
-def get_server_roles_workload_provisioning(separator=','):
-    return separator.join(roles56_provisioning)
-
-
-def get_server_roles_workload_provisioning_cleanup(separator=','):
-    return separator.join(roles56_provisioning_cleanup)
-
-
-def get_server_roles_workload_all(separator=','):
-    return separator.join(roles56_workload_all)
-
-
-def get_server_roles_ui_workload_single_page(separator=','):
-    return separator.join(roles56_ui_workload_single_page)
-
-
-def set_server_roles_workload_cap_and_util(ssh_client):
-    """Sets server roles used for C&U workloads."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_cap_and_util()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_cap_and_util_rep(ssh_client):
-    """Sets server roles used for C&U with replication(rubyrep) workloads."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_cap_and_util_rep()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_refresh_providers(ssh_client):
-    """Sets server roles used for all refresh_providers workloads."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_refresh_providers()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_refresh_vms(ssh_client):
-    """Sets server roles used for all refresh_vms workloads"""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_refresh_vms()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_smartstate(ssh_client):
-    """Sets server roles for Smartstate workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_smartstate()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_provisioning(ssh_client):
-    """Sets server roles for Provisioning workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_provisioning()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_provisioning_cleanup(ssh_client):
-    """Sets server roles for cleaning up the Provisioning workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_provisioning_cleanup()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
 def set_server_roles(ssh_client, roles):
     """Sets server roles to roles specified in roles list."""
     yaml = get_vmdb_yaml_config(ssh_client)
@@ -235,19 +177,46 @@ def set_server_roles(ssh_client, roles):
     set_vmdb_yaml_config(ssh_client, yaml)
 
 
-def set_server_roles_workload_all(ssh_client):
-    """Turns on all server roles used for all workload memory measurement benchmark. Does not turn
-    on datbase_synchronization role."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_all()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
 def set_server_roles_ui_workload_single_page(ssh_client):
     """Sets server roles for single_page UI workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_ui_workload_single_page()
-    set_vmdb_yaml_config(ssh_client, yaml)
+    set_server_roles(ssh_client, roles56_ui_workload_single_page)
+
+
+def set_server_roles_workload_cap_and_util_rep(ssh_client):
+    """Sets server roles used for C&U with replication(rubyrep) workloads."""
+    roles = ['database_synchronization']
+    roles.extend(roles56_cap_and_util)
+    set_server_roles(ssh_client, roles)
+
+
+def set_server_roles_workload_cap_and_util(ssh_client):
+    """Sets server roles used for C&U workloads."""
+    set_server_roles(ssh_client, roles56_cap_and_util)
+
+
+def set_server_roles_workload_provisioning(ssh_client):
+    """Sets server roles for Provisioning workload."""
+    set_server_roles(ssh_client, roles56_provisioning)
+
+
+def set_server_roles_workload_provisioning_cleanup(ssh_client):
+    """Sets server roles for cleaning up the Provisioning workload."""
+    set_server_roles(ssh_client, roles56_provisioning_cleanup)
+
+
+def set_server_roles_workload_refresh_providers(ssh_client):
+    """Sets server roles used for all refresh_providers workloads."""
+    set_server_roles(ssh_client, roles56_refresh_providers)
+
+
+def set_server_roles_workload_refresh_vms(ssh_client):
+    """Sets server roles used for all refresh_vms workloads"""
+    set_server_roles(ssh_client, roles56_refresh_vms)
+
+
+def set_server_roles_workload_smartstate(ssh_client):
+    """Sets server roles for Smartstate workload."""
+    set_server_roles(ssh_client, roles56_smartstate)
 
 
 def set_cap_and_util_all_via_rails(ssh_client):
