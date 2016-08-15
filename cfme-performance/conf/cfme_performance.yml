@@ -117,12 +117,28 @@ tests:
 
   # Backend focused workloads:
   workloads:
-    test_idle_default:
-      total_time: 3600
     test_idle:
-      total_time: 3600
-    test_idle_all:
-      total_time: 3600
+      scenarios:
+        - name: default
+          total_time: 3600
+          roles: ['automate', 'database_operations', 'ems_inventory', 'ems_operations', 'event',
+              'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
+          grafana_dashboard: cfme-general-system-performance
+        - name: all-no-websocketworker
+          total_time: 3600
+          roles: ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
+              'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor',
+              'ems_operations', 'event', 'notifier', 'reporting', 'rhn_mirror', 'scheduler',
+              'smartproxy', 'smartstate', 'user_interface', 'web_services']
+          grafana_dashboard: cfme-general-system-performance
+        - name: all
+          total_time: 3600
+          roles: ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
+              'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor',
+              'ems_operations', 'event', 'git_owner', 'notifier', 'reporting', 'rhn_mirror',
+              'scheduler', 'smartproxy', 'smartstate', 'user_interface', 'web_services',
+              'websocket']
+          grafana_dashboard: cfme-general-system-performance
 
     test_refresh_providers:
       scenarios:

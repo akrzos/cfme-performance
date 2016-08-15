@@ -9,11 +9,20 @@ def get_capacity_and_utilization_replication_scenarios():
             return cfme_performance['tests']['workloads']['test_cap_and_util_rep']['scenarios']
     return []
 
+
 def get_capacity_and_utilization_scenarios():
     if 'test_cap_and_util' in cfme_performance.tests.workloads:
         if (cfme_performance['tests']['workloads']['test_cap_and_util']['scenarios'] and
                 len(cfme_performance['tests']['workloads']['test_cap_and_util']['scenarios']) > 0):
             return cfme_performance['tests']['workloads']['test_cap_and_util']['scenarios']
+    return []
+
+
+def get_idle_scenarios():
+    if 'test_idle' in cfme_performance.tests.workloads:
+        if(cfme_performance['tests']['workloads']['test_idle']['scenarios'] and
+                len(cfme_performance['tests']['workloads']['test_idle']['scenarios']) > 0):
+            return cfme_performance['tests']['workloads']['test_idle']['scenarios']
     return []
 
 

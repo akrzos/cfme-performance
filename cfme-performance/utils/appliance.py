@@ -20,19 +20,6 @@ if result != true
   exit 255
 end""")
 
-roles56_default = ['automate', 'database_operations', 'ems_inventory', 'ems_operations', 'event',
-    'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
-
-roles56_idle = ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
-    'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations',
-    'event', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate',
-    'user_interface', 'web_services']
-
-roles56_all = ['automate', 'database_operations', 'database_synchronization', 'ems_inventory',
-    'ems_metrics_collector', 'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations',
-    'event', 'git_owner', 'notifier', 'reporting', 'rhn_mirror', 'scheduler', 'smartproxy',
-    'smartstate', 'user_interface', 'web_services', 'websocket']
-
 roles56_cap_and_util = ['automate', 'database_operations', 'ems_inventory', 'ems_metrics_collector',
     'ems_metrics_coordinator', 'ems_metrics_processor', 'ems_operations', 'event', 'notifier',
     'reporting', 'scheduler', 'user_interface', 'web_services']
@@ -58,8 +45,9 @@ roles56_workload_all = ['automate', 'database_operations', 'ems_inventory', 'ems
     'reporting', 'rhn_mirror', 'scheduler', 'smartproxy', 'smartstate', 'user_interface',
     'web_services']
 
-roles56_ui_workload_single_page = ['automate', 'database_operations', 'ems_inventory', 'ems_operations',
-    'event', 'reporting', 'scheduler', 'smartstate', 'user_interface', 'web_services', 'websocket']
+roles56_ui_workload_single_page = ['automate', 'database_operations', 'ems_inventory',
+    'ems_operations', 'event', 'reporting', 'scheduler', 'smartstate', 'user_interface',
+    'web_services', 'websocket']
 
 
 def clean_appliance(ssh_client, dbsync_local_uninstall=True):
@@ -153,18 +141,6 @@ def install_vddk(ssh_client, vddk_version='vddk6_0'):
     logger.debug('VDDK Install finished')
 
 
-def get_server_roles_workload_idle_default(separator=','):
-    return separator.join(roles56_default)
-
-
-def get_server_roles_workload_idle(separator=','):
-    return separator.join(roles56_idle)
-
-
-def get_server_roles_workload_idle_all(separator=','):
-    return separator.join(roles56_all)
-
-
 def get_server_roles_workload_cap_and_util(separator=','):
     return separator.join(roles56_cap_and_util)
 
@@ -201,20 +177,6 @@ def get_server_roles_workload_all(separator=','):
 
 def get_server_roles_ui_workload_single_page(separator=','):
     return separator.join(roles56_ui_workload_single_page)
-
-
-def set_server_roles_workload_idle(ssh_client):
-    """Turns on all server roles except for git owner and websocket used for idle workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_idle()
-    set_vmdb_yaml_config(ssh_client, yaml)
-
-
-def set_server_roles_workload_idle_all(ssh_client):
-    """Turns on all server roles used for idle all workload."""
-    yaml = get_vmdb_yaml_config(ssh_client)
-    yaml['server']['role'] = get_server_roles_workload_idle_all()
-    set_vmdb_yaml_config(ssh_client, yaml)
 
 
 def set_server_roles_workload_cap_and_util(ssh_client):
@@ -263,6 +225,13 @@ def set_server_roles_workload_provisioning_cleanup(ssh_client):
     """Sets server roles for cleaning up the Provisioning workload."""
     yaml = get_vmdb_yaml_config(ssh_client)
     yaml['server']['role'] = get_server_roles_workload_provisioning_cleanup()
+    set_vmdb_yaml_config(ssh_client, yaml)
+
+
+def set_server_roles(ssh_client, roles):
+    """Sets server roles to roles specified in roles list."""
+    yaml = get_vmdb_yaml_config(ssh_client)
+    yaml['server']['role'] = ','.join(roles)
     set_vmdb_yaml_config(ssh_client, yaml)
 
 

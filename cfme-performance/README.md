@@ -35,9 +35,13 @@ In order to run tests properly against CFME/ManageIQ, you will need to create an
 
 ## Workloads:
 
-These are the current workloads:
+There are two main types of workloads:
+* UI Workloads
+* Backend Workloads (Known just as workloads)
 
-* Idle (default, no websocket/git_owner roles, all roles)
+These are the current (backend) workloads:
+
+* Idle
 * Refresh Providers
 * Refresh VMs
 * Capacity and Utilization
@@ -45,18 +49,29 @@ These are the current workloads:
 * SmartState Analysis (Scans VMs)
 * Provisioning
 
-Each workload(Except Idle) can take a list of providers and a total_time parameter to adjust how long the appliance is stressed with the workload. Each workload has its only parameters that can adjust the behavior of the workload. (See the default configuration file cfme_performance.yml for example workloads and required parameters for each workload - scenario)  This can lead to many variations of the workloads.
+Each workload can take a list of providers(Except Idle) and a total_time parameter to adjust how long the appliance is stressed with the workload. Each workload has parameters that can adjust the behavior of the workload. (See the default/example configuration file cfme_performance.yml for example workloads and required parameters for each workload - scenario)  This can lead to many variations of the workloads through the use of scenarios.
 
 ## Running Workloads
-### Running All Workloads
+### Running All Workloads/Tests
+```shell
+# py.test --verbose tests/
+```
+
+### Running All UI Workloads
+```shell
+# py.test --verbose tests/ui_workloads/
+```
+
+### Running All Backend Workloads
 ```shell
 # py.test --verbose tests/workloads/
 ```
 
-### Running Specific Workloads
+### Running Specific Workload(s)
 ```shell
-# py.test --verbose tests/workloads/<workload_to_run>
+# py.test --verbose tests/(ui_workloads/workloads)/(workload_to_run).py
 ```
+*Specify the exact path to the workload to be run*
 
 ## Analysis
 When workloads complete, view the `results/` directory for workload output and check Grafana for system metrics while workload was run.
