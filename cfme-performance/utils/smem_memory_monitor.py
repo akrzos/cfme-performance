@@ -142,7 +142,7 @@ class SmemMemoryMonitor(Thread):
         super(SmemMemoryMonitor, self).__init__()
         self.ssh_client = ssh_client
         self.scenario_data = scenario_data
-        self.grafana_url = ''
+        self.grafana_urls = {}
         self.miq_server_id = ''
         self.use_slab = False
         self.signal = True
@@ -353,7 +353,7 @@ class SmemMemoryMonitor(Thread):
         logger.info('Monitoring CFME Memory Terminating')
 
         create_report(self.scenario_data, appliance_results, process_results, self.use_slab,
-            self.grafana_url)
+            self.grafana_urls)
 
     def run(self):
         try:
@@ -375,7 +375,7 @@ def install_smem(ssh_client):
     ssh_client.run_command('sed -i s/\.27s/\.200s/g /usr/bin/smem')
 
 
-def create_report(scenario_data, appliance_results, process_results, use_slab, grafana_url):
+def create_report(scenario_data, appliance_results, process_results, use_slab, grafana_urls):
     logger.info('Creating Memory Monitoring Report.')
     ver = get_current_version_string()
 
@@ -416,8 +416,8 @@ def create_report(scenario_data, appliance_results, process_results, use_slab, g
         process_results, provider_names, ver)
     generate_raw_data_csv(mem_rawdata_path, appliance_results, process_results)
     generate_summary_html(scenario_path, ver, appliance_results, process_results, scenario_data,
-        provider_names, grafana_url)
-    generate_workload_html(scenario_path, ver, scenario_data, provider_names, grafana_url)
+        provider_names, grafana_urls)
+    generate_workload_html(scenario_path, ver, scenario_data, provider_names, grafana_urls)
 
     logger.info('Finished Creating Report')
 
@@ -514,7 +514,7 @@ def generate_summary_csv(file_name, appliance_results, process_results, provider
 
 
 def generate_summary_html(directory, version_string, appliance_results, process_results,
-        scenario_data, provider_names, grafana_url):
+        scenario_data, provider_names, grafana_urls):
     starttime = time.time()
     file_name = str(directory.join('index.html'))
     with open(file_name, 'w') as html_file:
@@ -530,9 +530,12 @@ def generate_summary_html(directory, version_string, appliance_results, process_
         html_file.write('<b>Provider(s):</b> {}<br>\n'.format(provider_names))
         html_file.write('<b><a href=\'https://{}/\' target="_blank">{}</a></b>\n'.format(
             scenario_data['appliance_ip'], scenario_data['appliance_name']))
-        if grafana_url:
-            html_file.write(
-                ' : <b><a href=\'{}\' target="_blank">Grafana</a></b><br>\n'.format(grafana_url))
+        if grafana_urls:
+            for g_name in sorted(grafana_urls.keys()):
+                html_file.write(
+                    ' : <b><a href=\'{}\' target="_blank">{}</a></b>'.format(grafana_urls[g_name],
+                    g_name))
+        html_file.write('<br>\n')
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(version_string))
         html_file.write(' : <b><a href=\'workload.html\'>Workload Info</a></b>')
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')
@@ -839,7 +842,7 @@ def generate_summary_html(directory, version_string, appliance_results, process_
     logger.info('Generated Summary html in: {}'.format(timediff))
 
 
-def generate_workload_html(directory, ver, scenario_data, provider_names, grafana_url):
+def generate_workload_html(directory, ver, scenario_data, provider_names, grafana_urls):
     starttime = time.time()
     file_name = str(directory.join('workload.html'))
     with open(file_name, 'w') as html_file:
@@ -855,9 +858,12 @@ def generate_workload_html(directory, ver, scenario_data, provider_names, grafan
         html_file.write('<b>Provider(s):</b> {}<br>\n'.format(provider_names))
         html_file.write('<b><a href=\'https://{}/\' target="_blank">{}</a></b>\n'.format(
             scenario_data['appliance_ip'], scenario_data['appliance_name']))
-        if grafana_url:
-            html_file.write(
-                ' : <b><a href=\'{}\' target="_blank">Grafana</a></b><br>\n'.format(grafana_url))
+        if grafana_urls:
+            for g_name in sorted(grafana_urls.keys()):
+                html_file.write(
+                    ' : <b><a href=\'{}\' target="_blank">{}</a></b>'.format(grafana_urls[g_name],
+                    g_name))
+        html_file.write('<br>\n')
         html_file.write('<b><a href=\'{}-summary.csv\'>Summary CSV</a></b>'.format(ver))
         html_file.write(' : <b><a href=\'index.html\'>Memory Info</a></b>')
         html_file.write(' : <b><a href=\'graphs/\'>Graphs directory</a></b>\n')

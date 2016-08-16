@@ -6,6 +6,9 @@ def get_capacity_and_utilization_replication_scenarios():
     if 'test_cap_and_util_rep' in cfme_performance.tests.workloads:
         if (cfme_performance['tests']['workloads']['test_cap_and_util_rep']['scenarios'] and
                 len(cfme_performance['tests']['workloads']['test_cap_and_util_rep']['scenarios']) > 0):
+            # Add Replication Master into Scenario(s):
+            for scn in cfme_performance['tests']['workloads']['test_cap_and_util_rep']['scenarios']:
+                scn['replication_master'] = cfme_performance['replication_master']
             return cfme_performance['tests']['workloads']['test_cap_and_util_rep']['scenarios']
     return []
 

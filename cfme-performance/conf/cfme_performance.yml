@@ -1,7 +1,7 @@
 # Template File (Examples), copy and edit to your own specification
 # Appliance Under Test
 appliance:
-  appliance_name: CF-R0000-DB-Workload-56013
+  appliance_name: CF-R0000-DB-Workload-5612
   ip_address: 10.20.30.40
   web_ui:
     username: admin
@@ -9,6 +9,13 @@ appliance:
   rest_api:
     username: admin
     password: smartvm
+  ssh:
+    username: root
+    password: smartvm
+# Appliance to replicate to for replication workloads (C&U w/ Rep)
+replication_master:
+  appliance_name: CF-R0099-DB-Workload-ReplicationMaster-5612
+  ip_address: 10.20.30.41
   ssh:
     username: root
     password: smartvm

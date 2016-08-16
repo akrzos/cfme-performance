@@ -32,7 +32,11 @@ def pytest_addoption(parser):
     group.addoption('--appliance', dest='appliance', default=None,
                     help="Run tests with the appliance ip as command line option.")
     group.addoption('--appliance-name', dest='appliance_name', default=None,
-                    help="Run tests with the appliance ip as command line option.")
+                    help="Run tests with the appliance name as command line option.")
+    group.addoption('--replication-master-ip', dest='replication_master_ip', default=None,
+                    help="Run tests with the replication master ip as command line option.")
+    group.addoption('--replication-master-name', dest='replication_master_name', default=None,
+                    help="Run tests with the replication master name as command line option.")
     group._addoption('--use-sprout', dest='use_sprout', action='store_true',
                      default=False, help="Use Sprout for provisioning appliances.")
     group._addoption('--sprout-desc', dest='sprout_desc', default='Perf-wrokload-tests',
@@ -91,6 +95,14 @@ def pytest_configure(config):
         perf_data['appliance']['appliance_name'] = config.option.appliance_name
     logger().info('Appliance IP is {}'.format(perf_data['appliance']['ip_address']))
     logger().info('Appliance name is {}'.format(perf_data['appliance']['appliance_name']))
+    if config.option.replication_master_ip:
+        perf_data['replication_master']['ip_address'] = config.option.replication_master_ip
+        logger().info('Replication Master IP is {}'.format(
+            perf_data['replication_master']['ip_address']))
+    if config.option.replication_master_name:
+        perf_data['replication_master']['appliance_name'] = config.option.replication_master_name
+        logger().info('Replication Master appliance name is {}'.format(
+            perf_data['replication_master']['appliance_name']))
 
 
 def pytest_collection_modifyitems(session, config, items):

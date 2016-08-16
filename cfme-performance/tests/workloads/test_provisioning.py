@@ -5,7 +5,7 @@ from utils.appliance import set_server_roles_workload_provisioning
 from utils.appliance import set_server_roles_workload_provisioning_cleanup
 from utils.appliance import wait_for_miq_server_workers_started
 from utils.conf import cfme_performance
-from utils.grafana import get_scenario_dashboard_url
+from utils.grafana import get_scenario_dashboard_urls
 from utils.log import logger
 from utils.providers import add_providers
 from utils.providers import delete_provisioned_vm
@@ -49,10 +49,10 @@ def test_provisioning(request, scenario):
     def cleanup_workload(scenario, from_ts, vms_to_cleanup, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
-        g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
+        g_urls = get_scenario_dashboard_urls(scenario, from_ts, to_ts)
         logger.debug('Started cleaning up monitoring thread.')
         set_server_roles_workload_provisioning_cleanup(ssh_client)
-        monitor_thread.grafana_url = g_url
+        monitor_thread.grafana_urls = g_urls
         monitor_thread.signal = False
         final_vm_size = len(vms_to_cleanup)
         delete_provisioned_vms(vms_to_cleanup)

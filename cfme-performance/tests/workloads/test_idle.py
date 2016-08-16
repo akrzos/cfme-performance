@@ -3,7 +3,7 @@ from utils.appliance import clean_appliance
 from utils.appliance import set_server_roles
 from utils.appliance import wait_for_miq_server_workers_started
 from utils.conf import cfme_performance
-from utils.grafana import get_scenario_dashboard_url
+from utils.grafana import get_scenario_dashboard_urls
 from utils.log import logger
 from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
@@ -36,9 +36,9 @@ def test_idle(request, scenario):
     def cleanup_workload(from_ts, quantifiers, scenario_data):
         starttime = time.time()
         to_ts = int(starttime * 1000)
-        g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
+        g_urls = get_scenario_dashboard_urls(scenario, from_ts, to_ts)
         logger.debug('Started cleaning up monitoring thread.')
-        monitor_thread.grafana_url = g_url
+        monitor_thread.grafana_urls = g_urls
         monitor_thread.signal = False
         monitor_thread.join()
         add_workload_quantifiers(quantifiers, scenario_data)

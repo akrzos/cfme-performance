@@ -1,7 +1,7 @@
 """Workload to stress WebUI with python requests."""
 from utils.appliance import get_server_roles_ui_workload
 from utils.conf import cfme_performance
-from utils.grafana import get_scenario_dashboard_url
+from utils.grafana import get_scenario_dashboard_urls
 from utils.log import logger
 from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
@@ -32,9 +32,9 @@ def test_ui_single_page(request, scenario):
     def cleanup_workload(scenario, from_ts, quantifiers):
         starttime = time.time()
         to_ts = int(starttime * 1000)
-        g_url = get_scenario_dashboard_url(scenario, from_ts, to_ts)
+        g_urls = get_scenario_dashboard_urls(scenario, from_ts, to_ts)
         logger.debug('Started cleaning up monitoring thread.')
-        monitor_thread.grafana_url = g_url
+        monitor_thread.grafana_urls = g_urls
         monitor_thread.signal = False
         monitor_thread.join()
         add_workload_quantifiers(quantifiers, scenario_data)
