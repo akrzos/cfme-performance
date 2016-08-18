@@ -13,8 +13,13 @@ import time
 import pytest
 
 
+def pytest_generate_tests(metafunc):
+    argvalues = [[scenario] for scenario in get_idle_scenarios()]
+    idlist = [scenario['name'] for scenario in get_idle_scenarios()]
+    metafunc.parametrize(['scenario'], argvalues, ids=idlist)
+
+
 @pytest.mark.usefixtures('generate_version_files')
-@pytest.mark.parametrize('scenario', get_idle_scenarios())
 def test_idle(request, scenario):
     """Runs an appliance at idle with specific roles turned on for specific amount of time. Memory
     Monitor creates graphs and summary at the end of the scenario."""
