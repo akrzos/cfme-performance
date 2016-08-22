@@ -7,7 +7,8 @@ else
   YUM=yum
 fi
 
-sudo $YUM install -y python-virtualenv \
+sudo $YUM install -y numpy \
+                     python-virtualenv \
                      gcc \
                      postgresql-devel \
                      libxml2-devel \
