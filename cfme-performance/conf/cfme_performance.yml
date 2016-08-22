@@ -98,16 +98,77 @@ providers:
 tests:
   # Frontend (UI) focused workloads:
   ui_workloads:
+    # Typically these tests are run against an appliance with a populated database
     test_ui_single_page:
       scenarios:
-        # Typically tested with appliance already loaded with a database:
-        - name: ui-vm-explorer
+        - name: explorer
           requests: 10
-          request_page: vm_infra/explorer
+          pages:
+            - catalog/explorer
+            - chargeback/explorer
+            - container/explorer
+            - miq_ae_class/explorer
+            - miq_ae_customization/explorer
+            - miq_policy/explorer
+            - ops/explorer
+            - provider_foreman/explorer
+            - pxe/explorer
+            - report/explorer
+            - service/explorer
+            - storage/explorer
+            - vm_cloud/explorer
+            - vm_infra/explorer
+            - vm_or_template/explorer
           grafana_dashboard: cfme-ui-system-performance
-        - name: ui-reports-explorer
+        - name: show_list
           requests: 10
-          request_page: report/explorer
+          pages:
+            - alert/show_list
+            - auth_key_pair_cloud/show_list
+            - availability_zone/show_list
+            - configuration_job/show_list
+            - cloud_object_store_container/show_list
+            - cloud_tenant/show_list
+            - cloud_object_store_object/show_list
+            - cloud_volume/show_list
+            - cloud_volume_snapshot/show_list
+            - container/show_list
+            - container_group/show_list
+            - container_node/show_list
+            - container_replicator/show_list
+            - container_image/show_list
+            - container_image_registry/show_list
+            - container_service/show_list
+            - container_project/show_list
+            - container_route/show_list
+            - persistent_volume/show_list
+            - container_build/show_list
+            - ems_cloud/show_list
+            - ems_cluster/show_list
+            - ems_infra/show_list
+            - ems_container/show_list
+            - ems_middleware/show_list
+            - middleware_server/show_list
+            - middleware_deployment/show_list
+            - ems_network/show_list
+            - security_group/show_list
+            - floating_ip/show_list
+            - cloud_subnet/show_list
+            - cloud_network/show_list
+            - network_port/show_list
+            - network_router/show_list
+            - flavor/show_list
+            - host/show_list
+            - miq_request/show_list
+            - ontap_file_share/show_list
+            - ontap_logical_disk/show_list
+            - ontap_storage_system/show_list
+            - orchestration_stack/show_list
+            - provider_foreman/show_list
+            - resource_pool/show_list
+            - storage/show_list
+            - storage_manager/show_list
+            - vm/show_list
           grafana_dashboard: cfme-ui-system-performance
 
   # Backend focused workloads:

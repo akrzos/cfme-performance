@@ -7,6 +7,7 @@ from utils.smem_memory_monitor import add_workload_quantifiers
 from utils.smem_memory_monitor import SmemMemoryMonitor
 from utils.ssh import SSHClient
 from utils.workloads import get_ui_single_page_scenarios
+from collections import OrderedDict
 import pytest
 import re
 import requests
@@ -23,7 +24,7 @@ def test_ui_single_page(request, scenario):
     scenario_data = {'appliance_ip': cfme_performance['appliance']['ip_address'],
         'appliance_name': cfme_performance['appliance']['appliance_name'],
         'test_dir': 'ui-workload-single-page',
-        'test_name': 'UI-single-page'.format(),
+        'test_name': 'UI Workload {}'.format(scenario['name']),
         'appliance_roles': get_server_roles_ui_workload(),
         'scenario': scenario}
     quantifiers = {}
@@ -38,7 +39,7 @@ def test_ui_single_page(request, scenario):
         monitor_thread.signal = False
         monitor_thread.join()
         add_workload_quantifiers(quantifiers, scenario_data)
-        timediff = time.time() - starttime
+        timediff = round(time.time() - starttime, 2)
         logger.info('Finished cleaning up monitoring thread in {}'.format(timediff))
     request.addfinalizer(lambda: cleanup_workload(scenario, from_ts, quantifiers))
 
@@ -49,7 +50,7 @@ def test_ui_single_page(request, scenario):
     ui_password = cfme_performance['appliance']['web_ui']['password']
     request_number = scenario['requests']
     quantifiers['number of requests'] = request_number
-    request_page = scenario['request_page']
+    quantifiers['pages'] = OrderedDict()
 
     url = 'https://{}/'.format(cfme_ip)
     credentials = {'user_name': ui_user, 'user_password': ui_password}
@@ -70,12 +71,37 @@ def test_ui_single_page(request, scenario):
             verify=False, allow_redirects=False, headers=headers)
 
         # Get a protected page now:
-        requests_start = time.time()
-        for i in range(request_number):
-            response = session.get('{}{}'.format(url, 'dashboard/show'), verify=False,
-                headers=headers)
-            response = session.get('{}{}'.format(url, request_page), verify=False, headers=headers)
+        for page in scenario['pages']:
+            logger.info('Producing Navigations to: {}'.format(page))
+            requests_start = time.time()
+            for i in range(request_number):
+                navigation_start = time.time()
+                response = session.get('{}{}'.format(url, page), verify=False, headers=headers)
+                navigation_time = round(time.time() - navigation_start, 2)
 
-        requests_time = time.time() - requests_start
-    logger.info('created {} Requests in {}s'.format(request_number, round(requests_time, 2)))
+                if page not in quantifiers['pages']:
+                    quantifiers['pages'][page] = OrderedDict()
+                    quantifiers['pages'][page]['navigations'] = 1
+                    quantifiers['pages'][page][response.status_code] = 1
+                    quantifiers['pages'][page]['timings'] = []
+                    quantifiers['pages'][page]['timings'].append(
+                        {response.status_code: navigation_time})
+                else:
+                    quantifiers['pages'][page]['navigations'] += 1
+                    quantifiers['pages'][page]['timings'].append(
+                        {response.status_code: navigation_time})
+                    if response.status_code not in quantifiers['pages'][page]:
+                        quantifiers['pages'][page][response.status_code] = 1
+                    else:
+                        quantifiers['pages'][page][response.status_code] += 1
+
+                if response.status_code == 503:
+                    # TODO: Better handling of this, typically 503 means the UIWorker has restarted
+                    logger.error('Status code 503 received, waiting 5s before next request')
+                    time.sleep(5)
+                elif response.status_code != 200:
+                    logger.error('Non-200 HTTP status code: {} on {}'.format(response.status_code, page))
+            requests_time = round(time.time() - requests_start, 2)
+            logger.info('Created {} Requests in {}s'.format(request_number, requests_time))
+
     logger.info('Test Ending...')
