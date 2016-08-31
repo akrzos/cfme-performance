@@ -3,7 +3,7 @@
 # Playbook to create appliances used in testing
 #
 
-- hosts: 127.0.0.1
+- hosts: localhost
   connection: local
   gather_facts: false
   vars_files:
