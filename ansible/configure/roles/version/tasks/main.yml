@@ -13,6 +13,7 @@
     is54: true
     is55: false
     is56: false
+    isMaster: false
   when: version_output.stdout|match("^5.4.")
 
 - name: Set fact for CFME version 5.5.x
@@ -20,6 +21,7 @@
     is54: false
     is55: true
     is56: false
+    isMaster: false
   when: version_output.stdout|match("^5.5.")
 
 - name: Set fact for CFME version 5.6.x
@@ -27,7 +29,16 @@
     is54: false
     is55: false
     is56: true
+    isMaster: false
   when: version_output.stdout|match("^5.6.")
+
+- name: Set fact for Upstream ManageIQ Master
+  set_fact:
+    is54: false
+    is55: false
+    is56: false
+    isMaster: true
+  when: version_output.stdout|match("^master")
 
 - name: Determine if vmdb is configured
   stat: path=/var/www/miq/vmdb/GUID
