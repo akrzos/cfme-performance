@@ -12,10 +12,12 @@ def get_current_version_string():
 
 
 def get_version():
-    """Returns either: '56', '55', '54', 'master', 'unrecognized', depending upon contents of
+    """Returns either: '57', '56', '55', '54', 'master', 'unrecognized', depending upon contents of
     /var/www/miq/vmdb/VERSION file on appliance."""
     ver = get_current_version_string()
-    if re.search(r'^5\.6', ver):
+    if re.search(r'^5\.7', ver):
+        return '57'
+    elif re.search(r'^5\.6', ver):
         return '56'
     elif re.search(r'^5\.5', ver):
         return '55'
