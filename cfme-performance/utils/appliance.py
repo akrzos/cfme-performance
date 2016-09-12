@@ -66,7 +66,7 @@ def clean_appliance(ssh_client, dbsync_local_uninstall=True):
 
 def get_vmdb_yaml_config(ssh_client):
     ver = get_version()
-    if ver == '56':
+    if ver == '56' or ver == '57':
         base_data = ssh_client.run_rails_command(
             'puts\(Settings.to_hash.deep_stringify_keys.to_yaml\)')
         if base_data.rc:
@@ -87,7 +87,7 @@ def get_vmdb_yaml_config(ssh_client):
 def set_vmdb_yaml_config(ssh_client, yaml_data):
     logger.info('Uploading VMDB yaml Loader')
     ver = get_version()
-    if ver == '56':
+    if ver == '56' or ver == '57':
         ssh_client.run_command('echo "{}" > /tmp/yaml_loader.rb'.format(yaml_loader56),
             log_less=True)
         logger.info('Uploading VMDB Config')
