@@ -14,6 +14,6 @@
     dest: "/var/www/miq/vmdb/app/models/miq_ui_worker.rb"
     remote_src: true
     backup: true
-  when: is56
+  when: is56 or isMaster
   notify:
     - restart evmserverd for statsd-uiworker-patch
