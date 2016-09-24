@@ -13,7 +13,20 @@
   shell: sync; sync; echo 3 > /proc/sys/vm/drop_caches
 
 - name: Restart Postgres
+  service: name=rh-postgresql92-postgresql state=restarted
+  when: is54
+
+- name: Restart Postgres
   service: name=rh-postgresql94-postgresql state=restarted
+  when: is55
+
+- name: Restart Postgres
+  service: name=rh-postgresql94-postgresql state=restarted
+  when: is56
+
+- name: Restart Postgres
+  service: name=rh-postgresql95-postgresql state=restarted
+  when: is57
 
 - name: Remove replication
   shell: "cd /var/www/miq/vmdb; bin/rake evm:dbsync:local_uninstall"
