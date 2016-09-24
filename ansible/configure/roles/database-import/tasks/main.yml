@@ -45,13 +45,9 @@
   command: "pg_restore --dbname=vmdb_production /opt/rh/postgresql92/root/var/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
   when: is54
 
-- name: Import database (5.5.x appliances)
+- name: Import database (5.5.x and 5.6.x appliances)
   command: "pg_restore --dbname=vmdb_production /var/opt/rh/rh-postgresql94/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
-  when: is55
-
-- name: Import database (5.6.x appliances)
-  command: "pg_restore --dbname=vmdb_production /var/opt/rh/rh-postgresql94/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
-  when: is56
+  when: is55 or is56
 
 - name: Import database (5.7.x appliances)
   command: "pg_restore --dbname=vmdb_production /var/opt/rh/rh-postgresql95/lib/pgsql/data/{{appliances[inventory_hostname].dbdump}}"
