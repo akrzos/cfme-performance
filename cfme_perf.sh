@@ -7,10 +7,25 @@ else
   YUM=yum
 fi
 
-sudo $YUM install -y python-virtualenv gcc postgresql-devel libxml2-devel libxslt-devel zeromq3-devel libcurl-devel redhat-rpm-config  gcc-c++ freetype-devel libffi-devel libcurl-devel
+sudo $YUM install -y numpy \
+                     python-virtualenv \
+                     gcc \
+                     postgresql-devel \
+		     zeromq3-devel \
+                     libxml2-devel \
+                     libxslt-devel \
+                     libcurl-devel \
+                     redhat-rpm-config \
+                     gcc-c++ \
+                     python-virtualenv \
+                     libffi-devel \
+                     libpng \
+                     libpng-devel \
+                     freetype-devel \
+                     openssl-devel
 
 if [[ ! -d .cfme_perf ]]; then
-    virtualenv .cfme_perf
+    virtualenv -p python2 .cfme_perf
 fi
 
 echo "export PYTHONPATH='`pwd`'" | tee -a ./.cfme_perf/bin/activate
